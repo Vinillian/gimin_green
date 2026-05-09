@@ -1,4 +1,4 @@
-/* style.css - финальная версия с новым расположением лога и панели выбора */
+/* style.css - полная версия со всеми стилями */
 
 * {
     margin: 0;
@@ -25,7 +25,7 @@ body {
     height: 99vh;
 }
 
-/* Правая панель с кнопками и логом */
+/* Правая панель */
 .sidebar-right {
     flex: 0 0 320px;
     background: rgba(20, 40, 25, 0.95);
@@ -54,7 +54,7 @@ body {
     border-radius: 10px;
 }
 
-/* Лог внутри правой панели */
+/* Лог в правой панели */
 .log-panel {
     background: #1b3d23;
     border-radius: 12px;
@@ -79,6 +79,7 @@ body {
     overflow: hidden;
 }
 
+/* Верхняя панель */
 .top-bar {
     background: rgba(20, 40, 25, 0.9);
     border-radius: 20px;
@@ -143,6 +144,7 @@ body {
 .top-btn.achievements-btn { background: #8a4f9c; }
 .top-btn.pause-btn { background: #4caf50; }
 
+/* Рабочая область */
 .workspace {
     display: flex;
     gap: 8px;
@@ -152,17 +154,17 @@ body {
     padding-bottom: 2px;
 }
 
+/* Колонки */
 .column {
     display: flex;
     flex-direction: column;
-    height: 100%;
-    overflow-y: auto;
     background: rgba(20, 40, 25, 0.8);
     border-radius: 15px;
     padding: 8px;
     border: 2px solid #e4c87b;
     box-shadow: 0 5px 0 #6d8f4a;
-    max-height: calc(100vh - 140px); /* подстроено под новую нижнюю панель */
+    max-height: calc(100vh - 160px); /* подобрано под новую нижнюю панель */
+    overflow-y: auto;
 }
 
 .pallets-column { flex: 0 0 450px; }
@@ -170,6 +172,7 @@ body {
 .sowing-column { flex: 0 0 280px; }
 .buckets-column { flex: 0 0 300px; }
 
+/* Заголовки зон */
 .zone-header {
     color: #ffdb8e;
     font-weight: bold;
@@ -209,7 +212,9 @@ body {
 }
 .zone-btn:active { transform: translateY(2px); box-shadow: none; }
 .zone-btn.light-btn { background: #f2b84b; color: #1e3a1e; box-shadow: 0 2px 0 #b87e2e; }
+.zone-btn.press-btn { background: #b68b40; }
 
+/* Счётчик семян в вёдрах */
 .bucket-count-indicator {
     font-size: 0.7rem;
     background: #1f4727;
@@ -218,19 +223,19 @@ body {
     border: 1px solid #e4c87b;
 }
 
-/* Панель действий над светом */
-.light-actions {
-    display: flex;
+/* Сетка кнопок над светом 2x2 */
+.light-actions-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
     gap: 4px;
-    margin-bottom: 6px;
-    flex-wrap: wrap;
+    margin-bottom: 8px;
 }
+
 .action-btn {
-    flex: 1;
     background: #4f7a4f;
     border: 2px solid #dbb158;
     border-radius: 15px;
-    padding: 4px 0;
+    padding: 6px 0;
     font-size: 0.7rem;
     font-weight: bold;
     color: white;
@@ -244,6 +249,7 @@ body {
 .action-btn.spray-btn { background: #00acc1; }
 .action-btn.water-btn { background: #2f77b3; }
 
+/* Поддоны */
 .pallet-wrapper {
     flex: 1;
     display: flex;
@@ -288,6 +294,7 @@ body {
     height: 100%;
 }
 
+/* Прижим */
 .press-vertical {
     display: flex;
     flex-direction: column;
@@ -328,6 +335,7 @@ body {
     overflow-y: auto;
 }
 
+/* Стол посева */
 .table-container {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
@@ -340,6 +348,7 @@ body {
     overflow-y: auto;
 }
 
+/* Вёдра */
 .buckets-grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
@@ -389,6 +398,7 @@ body {
 .buckets-grid .bucket-count { font-size: 13px; font-weight: bold; color: #ffeb99; }
 .buckets-grid .bucket-status { font-size: 11px; margin-top: 2px; }
 
+/* Панель управления вёдрами */
 .buckets-control-vertical {
     display: flex;
     flex-direction: column;
@@ -490,6 +500,7 @@ body {
     box-shadow: none;
 }
 
+/* Карточки контейнеров */
 .container-card {
     background: #4f7a4f;
     border: 2px solid #dbb158;
@@ -606,6 +617,7 @@ body {
     color: #9ccc7c;
 }
 
+/* Пустые ячейки */
 .table-cell.empty, .shelf-cell.empty, .pallet .container-card.empty {
     background: #2d5a2d;
     border: 2px dashed #dbb158;
@@ -624,7 +636,7 @@ body {
     box-shadow: none;
 }
 
-/* Новая нижняя панель для информации о выбранных контейнерах */
+/* Нижняя панель с выбранными контейнерами */
 .selected-bottom-panel {
     background: #1b3d23;
     border-radius: 12px;
@@ -641,21 +653,66 @@ body {
     width: 100%;
 }
 
-/* Кнопки в правой панели */
+/* Стили для кнопок правой панели */
 .sidebar-right .btn {
-    margin-bottom: 8px;
-}
-.sidebar-right .action-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
+    border: none;
+    border-radius: 35px;
+    padding: 10px 12px;
+    font-size: 1rem;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     gap: 8px;
+    cursor: pointer;
+    transition: all 0.1s ease;
+    color: white;
     margin-bottom: 8px;
+    box-shadow: 0 4px 0 rgba(0, 0, 0, 0.3);
+    width: 100%;
 }
-.sidebar-right .action-grid .btn {
-    margin-bottom: 0;
+.sidebar-right .btn:active {
+    transform: translateY(3px);
+    box-shadow: 0 1px 0 rgba(0, 0, 0, 0.3);
+}
+.sidebar-right .btn-stage.reset { background: #a55e5e; }
+.sidebar-right .btn-danger { background: #b34f4f; }
+
+.sidebar-right .btn-small {
+    border: none;
+    border-radius: 25px;
+    padding: 6px 10px;
+    font-size: 0.85rem;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    cursor: pointer;
+    transition: all 0.1s ease;
+    color: white;
+    box-shadow: 0 3px 0 rgba(0, 0, 0, 0.3);
+    width: 100%;
+    margin-bottom: 4px;
+}
+.sidebar-right .btn-small:active {
+    transform: translateY(2px);
+    box-shadow: 0 1px 0 rgba(0, 0, 0, 0.3);
+}
+.sidebar-right .btn-small.btn-info { background: #00acc1; }
+.sidebar-right .btn-small.btn-warning { background: #ff9800; }
+
+.sidebar-right .section-title {
+    color: #ffdb8e;
+    font-size: 1rem;
+    font-weight: bold;
+    margin: 10px 0 8px;
+    text-align: center;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
 }
 
-/* Анимации и прочее */
+/* Анимации */
 @keyframes blink {
     0%, 100% { opacity: 1; }
     50% { opacity: 0.5; }

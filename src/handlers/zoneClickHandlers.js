@@ -3,11 +3,20 @@ import { store } from '../store/index.js';
 export function initZoneClickHandlers() {
     console.log('🖱️ Initializing zone click handlers');
 
+    // Кнопка "ВСЕ" над светом – выбирает все контейнеры вообще
+    const selectAllBtn = document.getElementById('selectAllBtn');
+    if (selectAllBtn) {
+        selectAllBtn.addEventListener('click', () => {
+            const ids = store.containers.map(c => c.id);
+            store.selectContainers(ids);
+            store.addLog(`🔲 Выбраны все контейнеры (${ids.length})`);
+        });
+    }
+
     // Стол посева (по id)
     const tableZone = document.getElementById('tableZoneHeader');
     if (tableZone) {
         tableZone.addEventListener('click', (e) => {
-            // Чтобы клик по кнопке внутри не срабатывал на заголовок
             if (e.target.tagName === 'BUTTON') return;
             const ids = store.containers.filter(c => c.location === 'table').map(c => c.id);
             store.selectContainers(ids);
@@ -15,7 +24,7 @@ export function initZoneClickHandlers() {
         });
     }
 
-    // Полки (уже есть, но оставим для надёжности)
+    // Полки (по заголовкам)
     document.querySelectorAll('.shelf-header').forEach((header, index) => {
         header.addEventListener('click', (e) => {
             e.stopPropagation();
@@ -27,7 +36,7 @@ export function initZoneClickHandlers() {
         });
     });
 
-    // Поддоны (уже есть)
+    // Поддоны (по заголовкам)
     document.querySelectorAll('.pallet-header').forEach((header, index) => {
         header.addEventListener('click', (e) => {
             e.stopPropagation();

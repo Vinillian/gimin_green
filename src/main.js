@@ -68,15 +68,6 @@ document.getElementById('resetGameBtn')?.addEventListener('click', () => {
     }
 });
 
-// Новая кнопка "ВСЕ" на свету
-document.getElementById('selectAllLightBtn')?.addEventListener('click', () => {
-    const lightIds = store.containers
-        .filter(c => c.location === 'light')
-        .map(c => c.id);
-    store.selectContainers(lightIds);
-    store.addLog(`🔲 Выбраны все контейнеры на свету (${lightIds.length})`);
-});
-
 // Для отладки
 window.store = store;
 window.debug = {

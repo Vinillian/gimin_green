@@ -8,9 +8,9 @@
 </head>
 <body>
 <div class="container">
-    <!-- Левая основная область (рабочие колонки + нижняя панель выбранного) -->
+    <!-- Левая основная область -->
     <div class="main-content">
-        <!-- Верхняя панель с ресурсами и кнопками -->
+        <!-- Верхняя панель с ресурсами -->
         <div class="top-bar">
             <div class="resources-group">
                 <div class="resource-card">
@@ -47,11 +47,12 @@
 
         <!-- Рабочая область (четыре колонки) -->
         <div class="workspace">
-            <!-- Колонка 1: Поддоны (свет) с панелью кнопок -->
+            <!-- Колонка 1: Поддоны (свет) -->
             <div class="column pallets-column">
                 <div class="zone-header" id="lightZoneHeader" style="cursor: pointer;">💡 СВЕТ</div>
-                <div class="light-actions">
-                    <button class="action-btn" id="selectAllLightBtn">🔲 ВСЕ НА СВЕТУ</button>
+                <!-- Кнопки в сетке 2x2 -->
+                <div class="light-actions-grid">
+                    <button class="action-btn" id="selectAllBtn">🔲 ВСЕ</button>
                     <button class="action-btn harvest-btn" id="harvestSelectedBtn">✂️ СОБРАТЬ</button>
                     <button class="action-btn spray-btn" id="spraySelectedBtn">💦 ОПРЫСКАТЬ</button>
                     <button class="action-btn water-btn" id="waterSelectedBtn">🚰 ПОЛИТЬ</button>
@@ -76,7 +77,7 @@
                 </div>
             </div>
 
-            <!-- Колонка 2: Стеллаж для прижима (с кнопкой на свет) -->
+            <!-- Колонка 2: Стеллаж для прижима -->
             <div class="column press-column">
                 <div class="zone-header with-button" id="pressZoneHeader" style="cursor: pointer;">
                     <span>📦 ПРИЖИМ</span>
@@ -98,7 +99,7 @@
                 </div>
             </div>
 
-            <!-- Колонка 3: Стол посева (с кнопкой прижим) -->
+            <!-- Колонка 3: Стол посева -->
             <div class="column sowing-column">
                 <div class="zone-header with-button" id="tableZoneHeader" style="cursor: pointer;">
                     <span>🌱 СТОЛ ПОСЕВА</span>
@@ -107,17 +108,13 @@
                 <div class="table-container" id="tableContainer"></div>
             </div>
 
-            <!-- Колонка 4: Вёдра + управление -->
+            <!-- Колонка 4: Вёдра -->
             <div class="column buckets-column">
                 <div class="zone-header" id="bucketsZoneHeader" style="cursor: pointer;">
                     <span>💧 ВЁДРА</span>
                     <span class="bucket-count-indicator"><span id="totalSeedsInBuckets">0</span>/16 🌱</span>
                 </div>
-                
-                <!-- Сетка вёдер 2x2 -->
                 <div class="buckets-grid" id="bucketsCompactContainer"></div>
-                
-                <!-- Панель управления вёдрами -->
                 <div class="buckets-control-vertical">
                     <div class="control-row">
                         <button class="btn-bucket-add" id="compactAdd1Btn">➕1 СЕМЯ</button>
@@ -138,7 +135,7 @@
             </div>
         </div>
 
-        <!-- Новая нижняя панель для информации о выбранных контейнерах (на всю ширину) -->
+        <!-- Нижняя панель с информацией о выбранных контейнерах -->
         <div class="selected-bottom-panel" id="selectedInfoBottom">
             👆 Нажми на контейнер или ведро (Ctrl+клик для нескольких)
         </div>
@@ -146,7 +143,6 @@
 
     <!-- Правая панель с кнопками и логом -->
     <div class="sidebar-right">
-        <!-- Кнопки добавления ресурсов -->
         <div class="resources-buttons">
             <button class="resource-add-btn water" id="addWaterBtn">🚰 +5 ВОДЫ</button>
             <button class="resource-add-btn solution" id="addSolutionBtn">🧪 +4 РАСТВОРА</button>
@@ -158,21 +154,14 @@
             <span>🔄</span> СБРОС ВЫБОРА
         </button>
 
-        <div class="section-title">ВЫДЕЛЕНИЕ</div>
-        <div class="action-grid">
-            <button class="btn btn-blue" id="selectAllBtn">🔲 ВСЕ КОНТЕЙНЕРЫ</button>
-            <button class="btn btn-purple" id="clearSelectionBtn">❌ СНЯТЬ ВЫДЕЛЕНИЕ</button>
-        </div>
-
         <div class="section-title">УМНОЕ ПЕРЕМЕЩЕНИЕ</div>
         <button class="btn-small btn-info" id="smartPressBtn">
             <span>📦➡️</span> УМНЫЙ ПРИЖИМ
         </button>
-        <button class="btn-small btn-warning" id="smartLightBtn" style="margin-top: 4px;">
+        <button class="btn-small btn-warning" id="smartLightBtn">
             <span>💡➡️</span> УМНЫЙ СВЕТ
         </button>
 
-        <!-- Блок лога -->
         <div class="section-title" style="margin-top: 15px;">📋 ЛОГ СОБЫТИЙ</div>
         <div class="log-panel" id="logPanel">
             📋 Добро пожаловать в ферму!
