@@ -364,3 +364,61 @@ body {
 .container-card {
     min-height: 110px !important;
 }
+
+/* Прогресс-бар */
+.progress-container {
+    width: 90%;
+    height: 8px;
+    background-color: #1f4727;
+    border-radius: 10px;
+    margin: 8px 0 4px;
+    overflow: hidden;
+    border: 1px solid #b8a45a;
+}
+
+.progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #4caf50, #8bc34a);
+    border-radius: 10px;
+    transition: width 0.3s ease;
+    box-shadow: 0 0 5px #8bc34a;
+}
+
+/* Для разных стадий можно сделать разные цвета заполнения */
+.container-card.soak .progress-fill {
+    background: linear-gradient(90deg, #4a6fa5, #6d8fd1);
+}
+
+.container-card.air .progress-fill {
+    background: linear-gradient(90deg, #7b6c5c, #a5927a);
+}
+
+.container-card.sow .progress-fill {
+    background: linear-gradient(90deg, #4caf50, #8bc34a);
+}
+
+.container-card.press .progress-fill {
+    background: linear-gradient(90deg, #b68b40, #e6b450);
+}
+
+.container-card.light .progress-fill {
+    background: linear-gradient(90deg, #f2b84b, #ffd966);
+}
+
+/* Номер дня на контейнере */
+.container-day {
+    font-size: 0.7rem;
+    color: #9ccc7c;
+    margin-top: 4px;
+    font-weight: bold;
+}
+
+/* Увеличиваем высоту карточки для нового контента */
+.container-card {
+    min-height: 120px !important;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 5px;
+}

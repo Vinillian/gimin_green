@@ -96,15 +96,19 @@ function renderContainer(container, grid) {
         
         // Какой день идёт (1, 2, 3...)
         const currentDay = Math.min(Math.floor(daysPassed) + 1, totalDays);
-        currentDayText = `День ${currentDay}`;
+        currentDayText = `День ${currentDay} из ${totalDays}`;
     } else {
         // Для мгновенных стадий (посев)
         progressPercent = 100;
         currentDayText = 'Готово';
     }
     
-    // Создаём прогресс-бар
-    const progressBar = createProgressBar(progressPercent);
+    // Создаём CSS-прогресс бар
+    const progressBar = `
+        <div class="progress-container">
+            <div class="progress-fill" style="width: ${progressPercent}%;"></div>
+        </div>
+    `;
     
     card.innerHTML = `
         <div class="container-number">#${container.number}</div>
@@ -133,25 +137,6 @@ function renderContainer(container, grid) {
     grid.appendChild(card);
 }
 
-function createProgressBar(percent) {
-    // Округляем до целого для отображения
-    const roundedPercent = Math.round(percent);
-    
-    // Создаём псевдо-прогресс бар из символов
-    const barLength = 10;
-    const filledLength = Math.round((percent / 100) * barLength);
-    const emptyLength = barLength - filledLength;
-    
-    const filledBar = '='.repeat(filledLength);
-    const emptyBar = ' '.repeat(emptyLength);
-    
-    return `
-        <div class="progress-bar-container">
-            <div class="progress-bar-text">[${filledBar}${emptyBar}] ${roundedPercent}%</div>
-        </div>
-    `;
-}
-
 function renderEmptyCell(grid, number) {
     const emptyCard = document.createElement('div');
     emptyCard.className = 'container-card';
@@ -162,7 +147,7 @@ function renderEmptyCell(grid, number) {
     emptyCard.style.display = 'flex';
     emptyCard.style.alignItems = 'center';
     emptyCard.style.justifyContent = 'center';
-    emptyCard.style.minHeight = '85px';
+    emptyCard.style.minHeight = '110px';
     emptyCard.innerHTML = `<div class="container-number">#${number}</div>`;
     
     grid.appendChild(emptyCard);
