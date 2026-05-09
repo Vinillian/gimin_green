@@ -1,0 +1,45 @@
+import { store } from '../store/index.js';
+
+export function initZoneClickHandlers() {
+    console.log('🖱️ Initializing zone click handlers');
+    
+    // Стол посева
+    const tableHeader = document.getElementById('tableHeader');
+    if (tableHeader) {
+        tableHeader.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const ids = store.containers.filter(c => c.location === 'table').map(c => c.id);
+            store.selectContainers(ids);
+            store.addLog(`🔲 Выбраны все контейнеры на столе (${ids.length})`);
+        });
+    }
+
+    // Полки
+    document.querySelectorAll('.shelf-header').forEach((header, index) => {
+        header.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const shelf = store.shelves[index];
+            if (shelf) {
+                store.selectContainers(shelf.containers);
+                store.addLog(`🔲 Выбраны все контейнеры на полке ${index + 1} (${shelf.containers.length})`);
+            }
+        });
+    });
+
+    // Поддоны
+    document.querySelectorAll('.pallet-header').forEach((header, index) => {
+        header.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const palletNumber = index + 1;
+            const start = (palletNumber - 1) * 8 + 1;
+            const end = palletNumber * 8;
+            const ids = store.containers
+                .filter(c => c.location === 'light' && c.number >= start && c.number <= end)
+                .map(c => c.id);
+            store.selectContainers(ids);
+            store.addLog(`🔲 Выбраны все контейнеры на поддоне ${palletNumber} (${ids.length})`);
+        });
+    });
+    
+    console.log('✅ Zone click handlers initialized');
+}

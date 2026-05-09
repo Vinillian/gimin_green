@@ -41,7 +41,7 @@
             </div>
             <div class="top-buttons-group">
                 <button class="top-btn achievements-btn" id="achievementsBtn">🏆 ДОСТИЖЕНИЯ</button>
-                <button class="top-btn pause-btn" id="pauseBtn" onclick="toggleGamePause()">⏸️ ПАУЗА</button>
+                <button class="top-btn pause-btn" id="pauseBtn">⏸️ ПАУЗА</button>
             </div>
         </div>
 
@@ -198,17 +198,16 @@
                 <span>🗑️</span> УДАЛИТЬ
             </button>
         </div>
+
+        <!-- Кнопка сброса игры -->
         <div class="section-title" style="margin-top: 15px;">СИСТЕМА</div>
-            <button class="btn btn-danger" id="resetGameBtn" onclick="resetGame()">
-                <span>🔄</span> СБРОСИТЬ ИГРУ
-            </button>
-        </div>
+        <button class="btn btn-danger" id="resetGameBtn">
+            <span>🔄</span> СБРОСИТЬ ИГРУ
+        </button>
+    </div>
 </div>
 
-<script src="constants.js"></script>
-<script src="state.js"></script>
-<script src="containerManager.js"></script>
-<script src="ui.js"></script>
-<script src="main.js"></script>
+<!-- Подключаем основной модуль -->
+<script type="module" src="src/main.js"></script>
 </body>
 </html>

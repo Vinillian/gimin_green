@@ -1,0 +1,34 @@
+src/
+  models/
+    Bucket.js
+    Container.js
+    Shelf.js
+    Pallet.js
+    ResourceStock.js
+  store/
+    index.js          # создание store, подписки
+  services/
+    achievementService.js
+    timeService.js
+    persistenceService.js
+    eventBus.js
+  controllers/
+    bucketController.js
+    containerController.js
+    harvestController.js
+    careController.js
+  views/
+    renderBuckets.js
+    renderTable.js
+    renderShelves.js
+    renderPallets.js
+    renderResources.js
+    renderLog.js
+    renderSelectedInfo.js
+  handlers/
+    buttonHandlers.js
+    keyboardHandlers.js
+    zoneClickHandlers.js
+  constants.js
+  main.js             # инициализация всех модулей
+  utils.js

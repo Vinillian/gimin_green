@@ -1,13 +1,13 @@
-// constants.js
+// constants.js - теперь это модуль с экспортами
 
 // Максимальное количество контейнеров
-const MAX_CONTAINERS = 20;
+export const MAX_CONTAINERS = 20;
 
 // Стадии роста
-const STAGES = ['soak', 'air', 'sow', 'press', 'light'];
+export const STAGES = ['soak', 'air', 'sow', 'press', 'light'];
 
 // Названия стадий для отображения
-const STAGE_NAMES = {
+export const STAGE_NAMES = {
     'soak': '💧 Замачивание',
     'air': '🌬 Проветривание',
     'sow': '🌱 Посев',
@@ -16,7 +16,7 @@ const STAGE_NAMES = {
 };
 
 // Иконки стадий
-const STAGE_ICONS = {
+export const STAGE_ICONS = {
     'soak': '💧',
     'air': '🌬',
     'sow': '🌱',
@@ -25,7 +25,7 @@ const STAGE_ICONS = {
 };
 
 // Длительность стадий в днях
-const STAGE_DURATION = {
+export const STAGE_DURATION = {
     'soak': 1,
     'air': 1,
     'sow': 0,
@@ -34,20 +34,20 @@ const STAGE_DURATION = {
 };
 
 // Расход ресурсов
-const RESOURCE_COSTS = {
+export const RESOURCE_COSTS = {
     soak: {
-        water: 0.2,  // на один контейнер в ведре
-        seeds: 0.08   // на один контейнер в ведре
+        water: 0.2,
+        seeds: 0.08
     },
     sow: {
-        solution: 0.2 // на один контейнер при посеве
+        solution: 0.2
     },
-    water: 0.2,      // полив
-    spray: 0.05      // опрыскивание
+    water: 0.2,
+    spray: 0.05
 };
 
 // Вместимость различных зон
-const CAPACITY = {
+export const CAPACITY = {
     MAX_SEEDS_PER_BUCKET: 4,
     TABLE_CAPACITY: 8,
     LIGHT_CAPACITY: 16,
@@ -59,14 +59,14 @@ const CAPACITY = {
 };
 
 // Настройки времени
-const TIME_SETTINGS = {
+export const TIME_SETTINGS = {
     DAY_INCREMENT: 0.1,
     TICK_INTERVAL: 6000,
     REAL_SECONDS_PER_DAY: 60
 };
 
 // Достижения
-const ACHIEVEMENTS = {
+export const ACHIEVEMENTS = {
     FIRST_CROP: {
         id: 'first_crop',
         title: '👶 Первый урожай',
@@ -134,7 +134,7 @@ const ACHIEVEMENTS = {
 };
 
 // Начальная статистика
-const INITIAL_STATS = {
+export const INITIAL_STATS = {
     totalHarvested: 0,
     totalWaterUsed: 0,
     totalSolutionUsed: 0,
