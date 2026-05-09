@@ -1,48 +1,66 @@
-Вот обновлённый README.md:
+Вот обновлённый README.md для версии с реальным временем:
 
 ```markdown
 # 🌾 Wheat Farm Simulator
 
-A browser-based wheat microgreens farm simulator with spatial workflow zones, resource management, and real-time progression.
+A browser-based wheat microgreens farm simulator with spatial workflow zones, resource management, and **real-time progression** (actual hours/days, not game time).
 
 ## 🚀 How to Run
 
 **Requires a local web server** (ES modules don't work via `file://`).
 
-Pick one:
+### Option 1: PowerShell (Windows, no install)
+```powershell
+powershell -ExecutionPolicy ByPass -File server.ps1
+```
+
+### Option 2: Any OS with Node.js / Python / PHP
 ```bash
-# Node.js (recommended)
 npx live-server
-
-# Python
+# or
 python -m http.server
-
-# PHP
+# or
 php -S localhost:8000
 ```
 
-Then open `http://localhost:8080` (or the port shown in terminal).
+Then open `http://localhost:8000`.
 
 ## 🌱 Gameplay
 
 Manage a microgreens farm through five growth stages across four spatial zones:
 
-| Zone | Stage | Capacity |
-|------|-------|----------|
-| 🪣 Buckets (2×2) | Soak → Air | 4 seeds each |
-| 🌱 Sowing Table | Sow | 8 containers |
-| 📦 Press Shelves (3×4) | Press | 12 containers |
-| 💡 Light Pallets (2×8) | Light | 16 containers |
+| Zone | Stage | Real Duration |
+|------|-------|---------------|
+| 🪣 Buckets (2×2) | Soak → Air | 24h + 24h |
+| 🌱 Sowing Table (2×4) | Sow | Instant |
+| 📦 Press Shelves (3×4) | Press | 48 hours |
+| 💡 Light Pallets (2×8) | Light | **7 days** |
 
-**Full cycle:** Soak (1 day) → Air (1 day) → Sow (instant) → Press (2 days) → Light (5 days) → Harvest
+**Full cycle:** ~10 days real time (Soak 1d → Air 1d → Sow instant → Press 2d → Light 7d → Harvest)
+
+**Care schedule:**
+- 💦 Spraying: every 24 hours (air/press/light stages)
+- 🚰 Watering: every 24 hours (light stage only)
 
 ## 🎮 Controls
 
-- **Click** — select a single container or bucket
-- **Ctrl+Click** — multi-select
-- **Click zone headers** — select all items in a zone
-- **Sidebar buttons** — perform actions on selected items
-- **Hotkeys:** `Ctrl+1` add 1 seed, `Ctrl+4` add 4 seeds, `Ctrl+S` soak, `Ctrl+A` air, `Ctrl+P` plant
+| Action | How |
+|--------|-----|
+| Select single | Click container or bucket |
+| Multi-select | Ctrl+Click |
+| Select all in zone | Click zone header (💡 СВЕТ, 📦 ПРИЖИМ, etc.) |
+| All containers | 🔲 ВЫБРАТЬ ВСЕ in sidebar |
+| Actions on selected | Zone buttons or sidebar buttons |
+| Hotkeys | `Ctrl+1` add seed, `Ctrl+4` add 4 seeds |
+
+## ⏱️ Real-Time System
+
+- **No game days** — everything runs on actual Unix timestamps
+- Clock shows current 📅 date and 🕒 time (updates every second)
+- Progress bars reflect real elapsed time vs stage duration
+- Timer can be paused ⏸️ (freezes progress)
+- UI refreshes every 60 seconds automatically
+- Page refresh recalculates all progress instantly
 
 ## 📦 Resources
 
@@ -50,17 +68,13 @@ Manage a microgreens farm through five growth stages across four spatial zones:
 - **Solution** — required for sowing
 - **Seeds** — placed in buckets before soaking
 
+## 💾 Persistence
+
+Game state auto-saves to `localStorage` on every change. Timestamps are preserved — if you close the browser for 3 days and reopen, the plants will have progressed 3 days.
+
 ## 🏆 Achievements
 
 8 achievements tracking harvest count, zone utilization, speed, and water efficiency.
-
-## ⏱️ Time
-
-1 game day = 60 real seconds. Progress bars show stage completion. Timer can be paused.
-
-## 💾 Persistence
-
-Game state auto-saves to `localStorage` on every change. Includes save migration for backward compatibility.
 
 ## 🛠️ Tech Stack
 
@@ -75,7 +89,8 @@ Game state auto-saves to `localStorage` on every change. Includes save migration
 gimin_green/
 ├── index.html              # Entry point
 ├── style.css               # All styles
-├── constants.js            # Game constants (exported)
+├── constants.js            # Game constants (durations, costs, capacities)
+├── server.ps1             # Windows PowerShell server (no install needed)
 ├── src/
 │   ├── main.js             # App initialization
 │   ├── store/index.js      # Central state (pub/sub)
@@ -117,8 +132,8 @@ gimin_green/
 | Problem | Solution |
 |---------|----------|
 | Blank page / CORS errors | Run a local server, don't open `index.html` directly |
-| `store.addLog is not a function` | Clear browser cache and reload |
-| Old save breaks UI | Click "СБРОСИТЬ ИГРУ" in sidebar to reset |
+| Progress not updating | Click ⏸️ to resume if paused, or refresh page |
+| Old save breaks UI | Click 🔄 СБРОСИТЬ ИГРУ in sidebar to reset |
 | Buttons don't work | Select a container/bucket first, then click action button |
 
 ## 📝 License
