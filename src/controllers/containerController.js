@@ -29,7 +29,6 @@ export const containerController = {
       const target = shelfSpace.find(s => s.free > 0);
       if (!target) break;
 
-      // Передаём locationId = target.shelf.id
       container.moveTo('shelf', 'press', store.gameDay, target.shelf.id);
       target.shelf.addContainer(container.id);
       target.free--;
@@ -39,6 +38,10 @@ export const containerController = {
     store.table.containers = store.table.containers.filter(id => !moved.includes(id));
     
     store.notify();
+
+    // После перемещения сбрасываем выделение (как в старой версии)
+    store.clearSelection();
+
     if (moved.length > 0) {
       store.addLog(`📦 Перемещено на прижим: ${moved.length} контейнеров`);
     } else {
@@ -77,7 +80,7 @@ export const containerController = {
       lightNumbers.add(number);
       
       const shelfId = container.locationId;
-      container.moveTo('light', 'light', store.gameDay, null, number); // locationId не нужен для света, передаём null
+      container.moveTo('light', 'light', store.gameDay, null, number);
       
       const shelf = store.getShelf(shelfId);
       if (shelf) shelf.removeContainer(container.id);
@@ -86,6 +89,10 @@ export const containerController = {
     }
 
     store.notify();
+
+    // После перемещения сбрасываем выделение (как в старой версии)
+    store.clearSelection();
+
     if (moved.length > 0) {
       store.addLog(`💡 Перемещено на свет: ${moved.length} контейнеров`);
     } else {
@@ -96,13 +103,16 @@ export const containerController = {
   },
 
   spray(containerIds) {
+    // Сохраняем текущее выделение для последующего восстановления
+    const originalSelection = Array.from(store.selectedContainerIds);
+    
     const containers = containerIds.map(id => store.getContainer(id)).filter(c => c?.needsSpray);
     if (containers.length === 0) {
       store.addLog('❌ Нет контейнеров, нуждающихся в опрыскивании');
       return false;
     }
 
-    const costPer = RESOURCE_COSTS.spray; // используем константу
+    const costPer = RESOURCE_COSTS.spray;
     const totalCost = containers.length * costPer;
     if (!store.resources.hasWater(totalCost)) {
       store.addLog(`❌ Недостаточно воды (нужно ${totalCost.toFixed(2)})`);
@@ -113,18 +123,25 @@ export const containerController = {
     store.stats.totalWaterUsed += totalCost;
     containers.forEach(c => c.spray(Math.floor(store.gameDay)));
     store.notify();
+    
+    // Восстанавливаем выделение (оно должно сохраниться после опрыскивания)
+    store.selectContainers(originalSelection);
+    
     store.addLog(`💦 Опрыскано контейнеров: ${containers.length}`);
     return true;
   },
 
   water(containerIds) {
+    // Сохраняем текущее выделение для последующего восстановления
+    const originalSelection = Array.from(store.selectedContainerIds);
+    
     const containers = containerIds.map(id => store.getContainer(id)).filter(c => c?.stage === 'light' && c.needsWater);
     if (containers.length === 0) {
       store.addLog('❌ Нет контейнеров, нуждающихся в поливе');
       return false;
     }
 
-    const costPer = RESOURCE_COSTS.water; // используем константу
+    const costPer = RESOURCE_COSTS.water;
     const totalCost = containers.length * costPer;
     if (!store.resources.hasWater(totalCost)) {
       store.addLog(`❌ Недостаточно воды (нужно ${totalCost.toFixed(2)})`);
@@ -135,6 +152,10 @@ export const containerController = {
     store.stats.totalWaterUsed += totalCost;
     containers.forEach(c => c.water(Math.floor(store.gameDay)));
     store.notify();
+    
+    // Восстанавливаем выделение (оно должно сохраниться после полива)
+    store.selectContainers(originalSelection);
+    
     store.addLog(`💧 Полито контейнеров: ${containers.length}`);
     return true;
   }

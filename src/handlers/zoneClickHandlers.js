@@ -7,7 +7,7 @@ export function initZoneClickHandlers() {
     const tableZone = document.getElementById('tableZoneHeader');
     if (tableZone) {
         tableZone.addEventListener('click', (e) => {
-            if (e.target.tagName === 'BUTTON') return;
+            if (e.target.tagName === 'BUTTON') return; // игнорируем клики по кнопкам
             const ids = store.containers.filter(c => c.location === 'table').map(c => c.id);
             store.selectContainers(ids);
             store.addLog(`🔲 Выбраны все контейнеры на столе (${ids.length})`);
@@ -18,6 +18,7 @@ export function initZoneClickHandlers() {
     document.querySelectorAll('.shelf-header').forEach((header, index) => {
         header.addEventListener('click', (e) => {
             e.stopPropagation();
+            if (e.target.tagName === 'BUTTON') return; // игнорируем кнопки
             const shelf = store.shelves[index];
             if (shelf) {
                 store.selectContainers(shelf.containers);
@@ -30,6 +31,7 @@ export function initZoneClickHandlers() {
     document.querySelectorAll('.pallet-header').forEach((header, index) => {
         header.addEventListener('click', (e) => {
             e.stopPropagation();
+            if (e.target.tagName === 'BUTTON') return;
             const palletNumber = index + 1;
             const start = (palletNumber - 1) * 8 + 1;
             const end = palletNumber * 8;
@@ -44,7 +46,8 @@ export function initZoneClickHandlers() {
     // Зона света (заголовок)
     const lightZone = document.getElementById('lightZoneHeader');
     if (lightZone) {
-        lightZone.addEventListener('click', () => {
+        lightZone.addEventListener('click', (e) => {
+            if (e.target.tagName === 'BUTTON') return; // ← важно для кнопок внутри
             const ids = store.containers.filter(c => c.location === 'light').map(c => c.id);
             store.selectContainers(ids);
             store.addLog(`🔲 Выбраны все контейнеры на свету (${ids.length})`);

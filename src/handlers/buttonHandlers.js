@@ -92,7 +92,10 @@ export function initButtonHandlers() {
     });
 
     // --- УХОД ЗА КОНТЕЙНЕРАМИ ---
-    document.getElementById('spraySelectedBtn')?.addEventListener('click', () => {
+    // Внутри функции initButtonHandlers():
+
+    document.getElementById('spraySelectedBtn')?.addEventListener('click', (e) => {
+        e.stopPropagation(); // ← предотвращаем всплытие к родительскому заголовку
         if (store.selectedContainerIds.size === 0) {
             store.addLog('⚠️ Сначала выбери контейнеры');
             return;
