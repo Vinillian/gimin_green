@@ -8,8 +8,132 @@
 </head>
 <body>
 <div class="container">
-    <!-- Левая панель с кнопками -->
-    <div class="sidebar">
+    <!-- Левая основная область -->
+    <div class="main-content">
+        <!-- Верхняя панель с ресурсами -->
+        <div class="top-resources">
+            <div class="resource-card large">
+                <span class="resource-icon">💧</span>
+                <span class="resource-label">ВОДА</span>
+                <span class="resource-value" id="waterCount">20</span>
+            </div>
+            <div class="resource-card large">
+                <span class="resource-icon">🧪</span>
+                <span class="resource-label">РАСТВОР</span>
+                <span class="resource-value" id="solutionCount">15</span>
+            </div>
+            <div class="resource-card large">
+                <span class="resource-icon">🌱</span>
+                <span class="resource-label">СЕМЕНА</span>
+                <span class="resource-value" id="seedCount">30</span>
+            </div>
+            <div class="resource-card large">
+                <span class="resource-icon">📦</span>
+                <span class="resource-label">КОНТ.</span>
+                <span class="resource-value" id="totalContainers">0</span>/20
+            </div>
+            <div class="resource-card large">
+                <span class="resource-icon">⏱️</span>
+                <span class="resource-label">ДЕНЬ</span>
+                <span class="resource-value" id="currentDay">0.0</span>
+            </div>
+        </div>
+
+        <!-- Рабочая область -->
+        <div class="workspace">
+            <!-- Левая колонка - поддоны (расширены) -->
+            <div class="pallets-column">
+                <div class="pallet-wrapper">
+                    <div class="pallet-header">
+                        <span>🌾 ПОДДОН 1 (1-8)</span>
+                        <span>✅ <span id="readyCount1">0</span></span>
+                    </div>
+                    <div class="pallet">
+                        <div class="pallet-grid" id="containerGrid1"></div>
+                    </div>
+                </div>
+                <div class="pallet-wrapper">
+                    <div class="pallet-header">
+                        <span>🌾 ПОДДОН 2 (9-16)</span>
+                        <span>✅ <span id="readyCount2">0</span></span>
+                    </div>
+                    <div class="pallet">
+                        <div class="pallet-grid" id="containerGrid2"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Правая колонка - процессы -->
+            <div class="processes-column">
+                <!-- Левая часть: вёдра и стол посева -->
+                <div class="processes-left">
+                    <!-- Секция вёдер -->
+                    <div class="buckets-section">
+                        <div class="zone-header">
+                            <span>💧 ВЁДРА</span>
+                            <span class="bucket-count-indicator"><span id="totalSeedsInBuckets">0</span>/16 🌱</span>
+                        </div>
+                        
+                        <!-- Сетка вёдер 2x2 -->
+                        <div class="buckets-grid" id="bucketsCompactContainer"></div>
+                        
+                        <!-- Панель управления вёдрами (с понятными кнопками) -->
+                        <div class="buckets-control-panel">
+                            <!-- Ряд 1: добавление семян -->
+                            <div class="control-row">
+                                <button class="btn-bucket-add" id="compactAdd1Btn">➕1 СЕМЯ</button>
+                                <button class="btn-bucket-add" id="compactAdd4Btn">➕4 СЕМЯН</button>
+                            </div>
+                            <!-- Ряд 2: действия (текстовые кнопки) -->
+                            <div class="control-row">
+                                <button class="btn-bucket-action" id="compactSoakBtn">💧 ЗАМОЧИТЬ</button>
+                                <button class="btn-bucket-action" id="compactAirBtn">🌬 ПРОВЕТРИТЬ</button>
+                                <button class="btn-bucket-action sow" id="compactSowBtn">🌱 ПОСАДИТЬ</button>
+                            </div>
+                            <!-- Ряд 3: выбор вёдер (полные названия) -->
+                            <div class="control-row">
+                                <button class="btn-bucket-select" id="compactSelectFreeBtn">СВОБОДНЫЕ</button>
+                                <button class="btn-bucket-select" id="compactSelectSoakBtn">ЗАМАЧИВАНИЕ</button>
+                                <button class="btn-bucket-select" id="compactSelectAirBtn">ПРОВЕТРИВАНИЕ</button>
+                                <button class="btn-bucket-select clear" id="compactClearBucketSelectionBtn">СНЯТЬ</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Стол посева (растягивается вниз) -->
+                    <div class="sowing-section">
+                        <div class="zone-header">🌱 СТОЛ ПОСЕВА</div>
+                        <div class="table-container" id="tableContainer"></div>
+                    </div>
+                </div>
+                
+                <!-- Правая часть: вертикальный стеллаж (ширина как у блока вёдер) -->
+                <div class="processes-right">
+                    <div class="press-vertical">
+                        <div class="shelf-vertical">
+                            <div class="shelf-header">ПОЛКА 1</div>
+                            <div class="shelf-vertical-containers" id="shelf1Container"></div>
+                        </div>
+                        <div class="shelf-vertical">
+                            <div class="shelf-header">ПОЛКА 2</div>
+                            <div class="shelf-vertical-containers" id="shelf2Container"></div>
+                        </div>
+                        <div class="shelf-vertical">
+                            <div class="shelf-header">ПОЛКА 3</div>
+                            <div class="shelf-vertical-containers" id="shelf3Container"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="log-panel" id="logPanel">
+            📋 Добро пожаловать в ферму!
+        </div>
+    </div>
+
+    <!-- Правая панель с кнопками (без изменений) -->
+    <div class="sidebar-right">
         <!-- Кнопки добавления ресурсов -->
         <div class="resources-buttons">
             <button class="resource-add-btn water" id="addWaterBtn">🚰 +5 ВОДЫ</button>
@@ -17,25 +141,8 @@
             <button class="resource-add-btn seeds" id="addSeedsBtn">🌱 +10 СЕМЯН</button>
         </div>
 
-        <!-- Кнопки добавления семян в вёдра -->
-        <button class="btn btn-primary btn-block" id="newBatch1Btn">
-            <span>🌱</span> +1 СЕМЯ В ВЕДРО
-        </button>
-        <button class="btn btn-warning btn-block" id="newBatch4Btn">
-            <span>⚡</span> +4 СЕМЯН В ВЕДРО
-        </button>
-
         <div class="section-title">УПРАВЛЕНИЕ СТАДИЯМИ</div>
         
-        <button class="btn btn-stage soak" id="stageSoakBtn">
-            <span>💧</span> ЗАМАЧИВАНИЕ
-        </button>
-        <button class="btn btn-stage air" id="stageAirBtn">
-            <span>🌬</span> ПРОВЕТРИВАНИЕ
-        </button>
-        <button class="btn btn-stage sow" id="stageSowBtn">
-            <span>🌱</span> ПОСЕВ
-        </button>
         <button class="btn btn-stage press" id="stagePressBtn">
             <span>📦</span> ПРИЖИМ
         </button>
@@ -68,6 +175,15 @@
             </button>
         </div>
 
+        <div class="section-title">УМНОЕ ПЕРЕМЕЩЕНИЕ</div>
+
+        <button class="btn btn-info btn-block" id="smartPressBtn">
+            <span>📦➡️</span> УМНЫЙ ПРИЖИМ
+        </button>
+        <button class="btn btn-warning btn-block" id="smartLightBtn" style="margin-top: 5px;">
+            <span>💡➡️</span> УМНЫЙ СВЕТ
+        </button>
+
         <div class="section-title">ДЕЙСТВИЯ</div>
 
         <div class="action-grid">
@@ -79,101 +195,16 @@
             </button>
         </div>
 
+        <button class="btn btn-purple btn-block" id="achievementsBtn">
+            <span>🏆</span> ДОСТИЖЕНИЯ
+        </button>
+
+        <button class="btn btn-primary btn-block" id="pauseBtn" onclick="toggleGamePause()">
+            <span>⏸️</span> ПАУЗА
+        </button>
+
         <div class="selected-info" id="selectedInfo">
-            👆 Нажми на контейнер или ведро
-        </div>
-    </div>
-
-    <!-- Правая панель -->
-    <div class="main-content">
-        <!-- Верхняя панель с ресурсами -->
-        <div class="top-resources">
-            <div class="resource-card large">
-                <span class="resource-icon">💧</span>
-                <span class="resource-label">ВОДА</span>
-                <span class="resource-value" id="waterCount">20</span>
-            </div>
-            <div class="resource-card large">
-                <span class="resource-icon">🧪</span>
-                <span class="resource-label">РАСТВОР</span>
-                <span class="resource-value" id="solutionCount">15</span>
-            </div>
-            <div class="resource-card large">
-                <span class="resource-icon">🌱</span>
-                <span class="resource-label">СЕМЕНА</span>
-                <span class="resource-value" id="seedCount">30</span>
-            </div>
-            <div class="resource-card large">
-                <span class="resource-icon">📦</span>
-                <span class="resource-label">КОНТ.</span>
-                <span class="resource-value" id="totalContainers">0</span>/20
-            </div>
-        </div>
-
-        <!-- Рабочая область -->
-        <div class="workspace">
-            <!-- Левая колонка - поддоны -->
-            <div class="pallets-column">
-                <div class="pallet-wrapper">
-                    <div class="pallet-header">
-                        <span>🌾 ПОДДОН 1 (1-8)</span>
-                        <span>✅ <span id="readyCount1">0</span></span>
-                    </div>
-                    <div class="pallet">
-                        <div class="pallet-grid" id="containerGrid1"></div>
-                    </div>
-                </div>
-                <div class="pallet-wrapper">
-                    <div class="pallet-header">
-                        <span>🌾 ПОДДОН 2 (9-16)</span>
-                        <span>✅ <span id="readyCount2">0</span></span>
-                    </div>
-                    <div class="pallet">
-                        <div class="pallet-grid" id="containerGrid2"></div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Правая колонка - процессы -->
-            <div class="processes-column">
-                <!-- Вёдра -->
-                <div class="zone">
-                    <div class="zone-header">💧 ЗАМАЧИВАНИЕ / ПРОВЕТРИВАНИЕ</div>
-                    <div class="buckets-container" id="bucketsContainer"></div>
-                </div>
-
-                <!-- Двойная зона: посев + прижим -->
-                <div class="double-zone">
-                    <!-- Посев -->
-                    <div class="sowing-zone zone">
-                        <div class="zone-header">🌱 ПОСЕВ (2x4)</div>
-                        <div class="table-container" id="tableContainer"></div>
-                    </div>
-
-                    <!-- Прижим -->
-                    <div class="press-zone zone">
-                        <div class="zone-header">📦 ПРИЖИМ (стопки по 4)</div>
-                        <div class="shelves-container">
-                            <div class="shelf">
-                                <div class="shelf-header">ПОЛКА 1</div>
-                                <div class="shelf-vertical" id="shelf1Container"></div>
-                            </div>
-                            <div class="shelf">
-                                <div class="shelf-header">ПОЛКА 2</div>
-                                <div class="shelf-vertical" id="shelf2Container"></div>
-                            </div>
-                            <div class="shelf">
-                                <div class="shelf-header">ПОЛКА 3</div>
-                                <div class="shelf-vertical" id="shelf3Container"></div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="log-panel" id="logPanel">
-            📋 Добро пожаловать в ферму!
+            👆 Нажми на контейнер
         </div>
     </div>
 </div>

@@ -1,4 +1,4 @@
-/* style.css - оптимизированная версия с увеличенными элементами */
+/* style.css - финальная версия с широкими поддонами, вертикальным стеллажом и понятными кнопками */
 
 * {
     margin: 0;
@@ -25,9 +25,9 @@ body {
     height: 99vh;
 }
 
-/* Левая панель */
-.sidebar {
-    flex: 0 0 340px;
+/* ===== ПРАВАЯ ПАНЕЛЬ УПРАВЛЕНИЯ ===== */
+.sidebar-right {
+    flex: 0 0 260px;
     background: rgba(20, 40, 25, 0.95);
     backdrop-filter: blur(10px);
     border-radius: 25px;
@@ -43,21 +43,20 @@ body {
     scrollbar-color: #e4c87b #1a472a;
 }
 
-.sidebar::-webkit-scrollbar {
+.sidebar-right::-webkit-scrollbar {
     width: 6px;
 }
 
-.sidebar::-webkit-scrollbar-track {
+.sidebar-right::-webkit-scrollbar-track {
     background: #1a472a;
     border-radius: 10px;
 }
 
-.sidebar::-webkit-scrollbar-thumb {
+.sidebar-right::-webkit-scrollbar-thumb {
     background: #e4c87b;
     border-radius: 10px;
 }
 
-/* Кнопки добавления ресурсов - увеличенные */
 .resources-buttons {
     display: flex;
     flex-direction: column;
@@ -91,12 +90,11 @@ body {
 .resource-add-btn.solution { background: #8a4f9c; }
 .resource-add-btn.seeds { background: #ff9800; }
 
-/* Основные кнопки - увеличенные */
 .btn {
     border: none;
     border-radius: 35px;
-    padding: 12px 15px;
-    font-size: 1.1rem;
+    padding: 10px 12px;
+    font-size: 1rem;
     font-weight: bold;
     display: flex;
     align-items: center;
@@ -115,6 +113,10 @@ body {
     box-shadow: 0 1px 0 rgba(0, 0, 0, 0.3);
 }
 
+.btn-block {
+    width: 100%;
+}
+
 .btn-primary { background: #4caf50; }
 .btn-warning { background: #ff9800; }
 .btn-info { background: #00acc1; box-shadow: 0 4px 0 #00838f; }
@@ -124,21 +126,16 @@ body {
 .btn-success { background: #45a049; }
 .btn-danger { background: #b34f4f; }
 
-/* Кнопки стадий - увеличенные */
 .btn-stage {
     margin-bottom: 8px;
-    padding: 12px 15px;
-    font-size: 1.1rem;
+    padding: 10px 12px;
+    font-size: 1rem;
 }
 
-.btn-stage.soak { background: #4a6fa5; }
-.btn-stage.air { background: #7b6c5c; }
-.btn-stage.sow { background: #4CAF50; }
 .btn-stage.press { background: #b68b40; }
 .btn-stage.light { background: #f2b84b; color: #1e3a1e; }
 .btn-stage.reset { background: #a55e5e; }
 
-/* Заголовки секций */
 .section-title {
     color: #ffdb8e;
     font-size: 1rem;
@@ -149,7 +146,6 @@ body {
     text-transform: uppercase;
 }
 
-/* Сетка действий */
 .action-grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
@@ -166,12 +162,11 @@ body {
 
 .action-grid .btn, .double-action-row .btn {
     margin-bottom: 0;
-    padding: 12px 8px;
-    font-size: 1rem;
+    padding: 10px 8px;
+    font-size: 0.9rem;
     white-space: nowrap;
 }
 
-/* Информация о выбранных */
 .selected-info {
     background: #1f4727;
     border-radius: 25px;
@@ -180,7 +175,7 @@ body {
     margin: 12px 0 0;
     border: 2px solid #b8a45a;
     color: #f0ffe6;
-    font-size: 0.95rem;
+    font-size: 0.85rem;
     font-weight: bold;
     min-height: 55px;
     display: flex;
@@ -189,7 +184,7 @@ body {
     word-break: break-word;
 }
 
-/* Правая панель */
+/* ===== ОСНОВНАЯ ОБЛАСТЬ ===== */
 .main-content {
     flex: 1;
     display: flex;
@@ -198,7 +193,6 @@ body {
     overflow: hidden;
 }
 
-/* Верхняя панель с ресурсами */
 .top-resources {
     background: rgba(20, 40, 25, 0.9);
     border-radius: 20px;
@@ -227,7 +221,7 @@ body {
 .resource-label { font-size: 0.75rem; color: #9ccc7c; white-space: nowrap; }
 .resource-value { color: #ffeb99; font-size: 1.1rem; font-weight: bold; margin-left: auto; min-width: 28px; text-align: right; }
 
-/* Рабочая область */
+/* ===== РАБОЧАЯ ОБЛАСТЬ ===== */
 .workspace {
     display: flex;
     gap: 8px;
@@ -236,13 +230,12 @@ body {
     overflow: hidden;
 }
 
-/* Левая колонка - поддоны (8 мест) */
+/* ===== ПОДДОНЫ (РАСШИРЕНЫ) ===== */
 .pallets-column {
-    flex: 1;
+    flex: 0 0 300px;
     display: flex;
     flex-direction: column;
     gap: 8px;
-    min-width: 210px;
 }
 
 .pallet-wrapper {
@@ -254,7 +247,7 @@ body {
 
 .pallet-header {
     background: rgba(0, 0, 0, 0.3);
-    border-radius: 12px;
+    border-radius: 10px;
     padding: 4px 8px;
     margin-bottom: 4px;
     border: 2px solid #f7d44a;
@@ -262,6 +255,12 @@ body {
     display: flex;
     justify-content: space-between;
     color: #f0ffe6;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.pallet-header:hover {
+    background-color: rgba(255, 255, 255, 0.2);
 }
 
 .pallet {
@@ -284,138 +283,278 @@ body {
     height: 100%;
 }
 
-/* Карточки на поддонах */
-.pallet .container-card {
-    min-height: 75px;
-    padding: 6px;
-    border-radius: 8px;
+/* ===== ПРАВАЯ КОЛОНКА - ПРОЦЕССЫ ===== */
+.processes-column {
+    flex: 1;
+    display: flex;
+    flex-direction: row;
+    gap: 8px;
+    min-width: 0;
+    overflow: hidden;
 }
 
-/* Правая колонка - процессы */
-.processes-column {
-    flex: 1.2;
+/* Левая часть (вёдра + стол) */
+.processes-left {
+    flex: 0 0 260px;
     display: flex;
     flex-direction: column;
     gap: 8px;
-    min-width: 300px;
     overflow-y: auto;
-    padding-right: 3px;
+    padding-right: 2px;
 }
 
-/* Зоны процессов */
-.zone {
-    background: rgba(20, 40, 25, 0.8);
+/* Правая часть (вертикальный стеллаж) */
+.processes-right {
+    flex: 0 0 260px;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+}
+
+/* Секция вёдер */
+.buckets-section {
+    background: rgba(20, 40, 25, 0.9);
     border-radius: 12px;
-    padding: 10px;
+    padding: 8px;
     border: 2px solid #e4c87b;
 }
 
 .zone-header {
     color: #ffdb8e;
     font-weight: bold;
-    font-size: 0.9rem;
-    margin-bottom: 8px;
+    font-size: 0.8rem;
+    margin-bottom: 6px;
     text-align: center;
-}
-
-/* Вёдра - увеличенные в 1.5 раза */
-.buckets-container {
     display: flex;
-    gap: 12px;
-    justify-content: space-around;
-}
-
-.bucket {
-    width: 95px;
-    height: 125px;
-    background: linear-gradient(135deg, #4a6fa5, #2f4f7f);
-    border-radius: 0 0 35px 35px;
-    border: 3px solid #8b9a6b;
-    position: relative;
-    display: flex;
-    flex-direction: column;
+    justify-content: space-between;
     align-items: center;
-    justify-content: flex-end;
-    padding: 10px 5px;
-    cursor: pointer;
-    transition: all 0.1s ease;
+    padding: 0 5px;
 }
 
-.bucket::before {
-    content: "🪣";
-    position: absolute;
-    top: -18px;
-    font-size: 30px;
+.bucket-count-indicator {
+    font-size: 0.7rem;
+    background: #1f4727;
+    padding: 2px 6px;
+    border-radius: 10px;
+    border: 1px solid #e4c87b;
 }
 
-.bucket.active { border-color: #ffaa00; }
-.bucket.selected { border: 4px solid #ffaa00; }
-
-.bucket-icon { font-size: 24px; margin-bottom: 5px; }
-.bucket-count { font-size: 18px; color: white; font-weight: bold; }
-.bucket-progress { font-size: 14px; color: #9ccc7c; font-weight: bold; }
-.bucket-status { font-size: 18px; display: flex; gap: 4px; margin-top: 3px; }
-
-/* Двойная зона */
-.double-zone {
-    display: flex;
-    gap: 8px;
-}
-
-/* Посев - вертикальный (2x4) */
-.sowing-zone {
-    flex: 1;
-}
-
-.table-container {
+/* Сетка вёдер 2x2 */
+.buckets-grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     gap: 6px;
-    background: #8b5a2b;
-    background-image: repeating-linear-gradient(45deg, #b78c4a 0px, #b78c4a 1px, transparent 1px, transparent 8px);
-    padding: 8px;
-    border-radius: 8px;
-    min-height: 290px;
+    background: #2d5a3a;
+    padding: 6px;
+    border-radius: 10px;
+    border: 2px solid #b8a45a;
+    margin-bottom: 8px;
 }
 
-.table-cell, .table-container .container-card {
-    background: #4f7a4f;
-    border: 2px solid #dbb158;
-    border-radius: 6px;
+.buckets-grid .bucket {
+    background: #7a5a3a;
+    border: 2px solid #c9a459;
+    border-radius: 0 0 15px 15px;
+    padding: 6px 2px;
     min-height: 70px;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    font-size: 0.8rem;
-    padding: 5px;
+    position: relative;
+    box-shadow: 0 4px 0 #4f3a2a;
+    cursor: pointer;
+    transition: all 0.1s ease;
 }
 
-.table-cell.empty {
-    opacity: 0.3;
-    border-style: dashed;
+.buckets-grid .bucket::before {
+    content: '🪣';
+    position: absolute;
+    top: -12px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 20px;
+    filter: drop-shadow(0 2px 2px rgba(0,0,0,0.5));
 }
 
-/* Прижим - компактный вертикальный стеллаж */
-.press-zone {
-    flex: 0.9;
+.buckets-grid .bucket.active {
+    background: #5a7a5a;
 }
 
-.shelves-container {
+.buckets-grid .bucket.selected {
+    border: 3px solid #ffaa00;
+    background: #3d874a;
+    box-shadow: 0 0 15px #ffaa00;
+}
+
+.buckets-grid .bucket:hover {
+    transform: scale(1.02);
+    border-color: #ffd966;
+}
+
+.buckets-grid .bucket-icon {
+    font-size: 16px;
+    margin-bottom: 2px;
+}
+
+.buckets-grid .bucket-count {
+    font-size: 12px;
+    font-weight: bold;
+    color: #ffeb99;
+}
+
+.buckets-grid .bucket-status {
+    font-size: 10px;
+    margin-top: 2px;
+}
+
+.buckets-grid .progress-container {
+    width: 85%;
+    height: 4px;
+    margin: 2px 0;
+}
+
+/* Панель управления вёдрами (увеличенные кнопки с текстом) */
+.buckets-control-panel {
     display: flex;
     flex-direction: column;
     gap: 6px;
+    background: #1f4727;
+    border-radius: 10px;
+    padding: 8px;
+    border: 2px solid #e4c87b;
+}
+
+.control-row {
+    display: flex;
+    gap: 5px;
+    justify-content: space-between;
+    flex-wrap: wrap;
+}
+
+.btn-bucket-add {
+    background: #ff9800;
+    border: none;
+    border-radius: 20px;
+    padding: 6px 10px;
+    font-size: 0.8rem;
+    font-weight: bold;
+    color: white;
+    cursor: pointer;
+    box-shadow: 0 2px 0 #b16500;
+    transition: all 0.1s ease;
+    flex: 1;
+    min-width: 70px;
+}
+
+.btn-bucket-add#compactAdd4Btn {
+    background: #f44336;
+    box-shadow: 0 2px 0 #b32d2d;
+}
+
+.btn-bucket-add:active {
+    transform: translateY(2px);
+    box-shadow: none;
+}
+
+.btn-bucket-action {
+    background: #4a6fa5;
+    border: none;
+    border-radius: 20px;
+    padding: 6px 8px;
+    font-size: 0.8rem;
+    font-weight: bold;
+    color: white;
+    cursor: pointer;
+    box-shadow: 0 2px 0 #2d4a6f;
+    transition: all 0.1s ease;
+    flex: 1;
+    min-width: 70px;
+    white-space: nowrap;
+}
+
+.btn-bucket-action#compactAirBtn {
+    background: #7b6c5c;
+    box-shadow: 0 2px 0 #5a4e42;
+}
+
+.btn-bucket-action.sow {
+    background: #4CAF50;
+    box-shadow: 0 2px 0 #2d6b2d;
+}
+
+.btn-bucket-action:active {
+    transform: translateY(2px);
+    box-shadow: none;
+}
+
+.btn-bucket-select {
+    background: #8a4f9c;
+    border: none;
+    border-radius: 16px;
+    padding: 4px 6px;
+    font-size: 0.7rem;
+    font-weight: bold;
+    color: white;
+    cursor: pointer;
+    box-shadow: 0 2px 0 #4a2b55;
+    transition: all 0.1s ease;
+    flex: 1;
+    min-width: 55px;
+    white-space: nowrap;
+}
+
+.btn-bucket-select.clear {
+    background: #a55e5e;
+    box-shadow: 0 2px 0 #6b3d3d;
+}
+
+.btn-bucket-select:active {
+    transform: translateY(2px);
+    box-shadow: none;
+}
+
+/* Стол посева (растягивается вниз) */
+.sowing-section {
+    background: rgba(20, 40, 25, 0.9);
+    border-radius: 12px;
+    padding: 8px;
+    border: 2px solid #e4c87b;
+    flex: 1; /* занимает всё оставшееся место */
+    display: flex;
+    flex-direction: column;
+    min-height: 0; /* важно для flex-ребёнка */
+}
+
+.table-container {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 5px;
+    background: #8b5a2b;
+    background-image: repeating-linear-gradient(45deg, #b78c4a 0px, #b78c4a 1px, transparent 1px, transparent 8px);
+    padding: 6px;
+    border-radius: 8px;
+    flex: 1; /* заполняет доступную высоту */
+    overflow-y: auto;
+}
+
+/* Вертикальный стеллаж */
+.press-vertical {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
     height: 100%;
 }
 
-.shelf {
+.shelf-vertical {
     background: #8b6b4b;
-    padding: 6px 4px;
-    border-radius: 6px;
+    border-radius: 10px;
+    padding: 6px;
     border: 2px solid #c9a459;
+    flex: 1;
     display: flex;
     flex-direction: column;
-    gap: 4px;
+    min-height: 0;
 }
 
 .shelf-header {
@@ -425,149 +564,143 @@ body {
     font-weight: bold;
     border-bottom: 1px dashed #c9a459;
     padding-bottom: 2px;
+    margin-bottom: 4px;
+    cursor: pointer;
+    transition: background-color 0.2s;
 }
 
-.shelf-vertical {
+.shelf-header:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.shelf-vertical-containers {
     display: flex;
     flex-direction: column;
     gap: 3px;
-    width: 100%;
+    flex: 1;
+    overflow-y: auto;
 }
 
-.shelf-cell, .shelf-vertical .container-card {
-    width: 100%;
-    height: 40px;
+/* Контейнеры на полках (маленькие) */
+.shelf-vertical-containers .container-card {
+    height: 45px;
+    min-height: 45px;
     background: #4f7a4f;
     border: 2px solid #dbb158;
     border-radius: 5px;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 0 6px;
-    font-size: 0.7rem;
+    padding: 0 5px;
+    font-size: 0.65rem;
     position: relative;
-    box-shadow: 0 2px 0 #1f4727;
-}
-
-/* Эффект "стопки" - тень снизу */
-.shelf-vertical .container-card:not(:last-child)::after {
-    content: '';
-    position: absolute;
-    bottom: -3px;
-    left: 4px;
-    right: 4px;
-    height: 3px;
-    background: rgba(0,0,0,0.2);
-    border-radius: 0 0 3px 3px;
-    z-index: 1;
-}
-
-/* Эффект "стопки" для пустых ячеек */
-.shelf-vertical .shelf-cell:not(:last-child)::after {
-    content: '';
-    position: absolute;
-    bottom: -3px;
-    left: 4px;
-    right: 4px;
-    height: 3px;
-    background: rgba(0,0,0,0.2);
-    border-radius: 0 0 3px 3px;
-    z-index: 1;
-}
-
-.shelf-cell.empty {
-    opacity: 0.4;
-    border-style: dashed;
-    background: #2d5a2d;
-    justify-content: center;
-}
-
-.shelf-cell.empty .container-number {
-    color: #9ccc7c;
-}
-
-/* Содержимое ячейки */
-.shelf-cell .container-number {
-    font-size: 0.7rem;
-    font-weight: bold;
-    color: #ffeb99;
-}
-
-.shelf-cell .container-icons {
-    display: flex;
-    gap: 3px;
-    font-size: 0.75rem;
-}
-
-.shelf-cell .progress-container {
-    width: 50px;
-    height: 4px;
-    margin: 0 3px;
-}
-
-/* Общие стили для карточек контейнеров */
-.container-card {
-    background: #31663d;
-    border: 2px solid #dbb158;
     box-shadow: 0 2px 0 #1f4727;
     cursor: pointer;
     transition: all 0.1s ease;
-    position: relative;
+    flex-direction: row;
+    gap: 3px;
 }
 
-.container-card:hover {
+.shelf-vertical-containers .container-card:hover {
     transform: scale(1.02);
     border-color: #ffd966;
 }
 
-.container-card.selected {
+.shelf-vertical-containers .container-card.selected {
     border: 3px solid #ffaa00;
     background: #3d874a;
+    box-shadow: 0 0 12px #ffaa00;
 }
 
-.container-number {
+/* Эффект стопки */
+.shelf-vertical-containers .container-card:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    bottom: -3px;
+    left: 4px;
+    right: 4px;
+    height: 3px;
+    background: rgba(0,0,0,0.2);
+    border-radius: 0 0 3px 3px;
+    z-index: 1;
+}
+
+.shelf-vertical-containers .shelf-cell.empty {
+    height: 45px;
+    background: #2d5a2d;
+    border: 2px dashed #dbb158;
+    border-radius: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    color: #9ccc7c;
+    opacity: 0.5;
+}
+
+/* Общие стили для контейнеров */
+.container-card .container-number {
     font-weight: bold;
     color: #ffeb99;
-    font-size: 0.8rem;
+    font-size: 0.75rem;
 }
 
-.container-icons {
+.container-card .container-icons {
     display: flex;
-    gap: 3px;
-    justify-content: center;
-    font-size: 0.9rem;
+    gap: 2px;
+    font-size: 0.75rem;
 }
 
-/* Прогресс-бар */
-.progress-container {
-    width: 85%;
-    height: 5px;
-    background-color: #1f4727;
-    border-radius: 3px;
-    margin: 4px 0;
-    overflow: hidden;
-    border: 1px solid #b8a45a;
+.container-card .progress-container {
+    width: 35px;
+    height: 4px;
+    margin: 0 2px;
 }
 
-.progress-fill {
-    height: 100%;
-    background: linear-gradient(90deg, #4caf50, #8bc34a);
-    border-radius: 3px;
-    transition: width 0.3s ease;
-}
-
-.container-card.soak .progress-fill { background: linear-gradient(90deg, #4a6fa5, #6d8fd1); }
-.container-card.air .progress-fill { background: linear-gradient(90deg, #7b6c5c, #a5927a); }
-.container-card.sow .progress-fill { background: linear-gradient(90deg, #4caf50, #8bc34a); }
-.container-card.press .progress-fill { background: linear-gradient(90deg, #b68b40, #e6b450); }
-.container-card.light .progress-fill { background: linear-gradient(90deg, #f2b84b, #ffd966); }
-
-.container-day {
-    font-size: 0.65rem;
+.container-card .container-day {
+    font-size: 0.6rem;
     color: #9ccc7c;
 }
 
-/* Предупреждение */
+/* Контейнеры на поддонах */
+.pallet .container-card {
+    min-height: 70px;
+    background: #5a8f5a;
+    border: 2px solid #ffd966;
+    box-shadow: 0 0 5px rgba(255, 215, 0, 0.3);
+    flex-direction: column;
+}
+
+.pallet .container-card.light {
+    background: #6a9f6a;
+    border: 3px solid #ffaa00;
+    box-shadow: 0 0 10px #ffaa00;
+}
+
+/* Лог */
+.log-panel {
+    background: #1b3d23;
+    border-radius: 10px;
+    padding: 6px 10px;
+    border: 2px solid #b8a45a;
+    max-height: 50px;
+    overflow-y: auto;
+    font-size: 0.7rem;
+    color: #f0ffe6;
+    margin-top: 5px;
+}
+
+/* Скрытые элементы */
+#stageSowBtn {
+    display: none;
+}
+
+/* Анимации */
+@keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+
 .warning {
     position: absolute;
     top: -5px;
@@ -578,108 +711,6 @@ body {
     animation: blink 1s infinite;
 }
 
-@keyframes blink {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.5; }
-}
-
-/* Лог */
-.log-panel {
-    background: #1b3d23;
-    border-radius: 12px;
-    padding: 8px;
-    border: 2px solid #b8a45a;
-    max-height: 60px;
-    overflow-y: auto;
-    font-size: 0.75rem;
-    color: #f0ffe6;
-    margin-top: 5px;
-}
-
-/* Адаптивность */
-@media (max-width: 1400px) {
-    .container {
-        flex-direction: column;
-        height: auto;
-    }
-    
-    .sidebar {
-        flex: auto;
-        width: 100%;
-        max-width: none;
-    }
-}
-
-/* Дополнительные стили для новых элементов */
-
-.bucket-actions {
-    display: flex;
-    gap: 5px;
-    margin-top: 10px;
-    flex-wrap: wrap;
-    justify-content: center;
-}
-
-.btn-small {
-    font-size: 0.8rem;
-    padding: 6px 10px;
-    border-radius: 20px;
-    background: #2d5a3a;
-    border: 2px solid #e4c87b;
-    color: white;
-    cursor: pointer;
-    flex: 1 1 auto;
-    min-width: 100px;
-}
-
-.btn-small:active {
-    transform: translateY(2px);
-}
-
-.btn-small.soak {
-    background: #4a6fa5;
-}
-
-.btn-small.air {
-    background: #7b6c5c;
-}
-
-.zone-header, .shelf-header, .pallet-header {
-    cursor: pointer;
-    transition: all 0.2s ease;
-    user-select: none;
-}
-
-.zone-header:hover, .shelf-header:hover, .pallet-header:hover {
-    background-color: rgba(255, 255, 255, 0.2);
-    transform: scale(1.02);
-}
-
-#smartPressBtn, #smartLightBtn {
-    background: linear-gradient(135deg, #4a6fa5, #2f4f7f);
-    font-weight: bold;
-}
-
-#smartPressBtn {
-    background: linear-gradient(135deg, #b68b40, #8b6b2b);
-}
-
-#smartLightBtn {
-    background: linear-gradient(135deg, #f2b84b, #c99c2b);
-}
-
-/* Индикация множественного выбора */
-.bucket.selected {
-    border: 4px solid #ffaa00;
-    box-shadow: 0 0 15px #ffaa00;
-}
-
-.container-card.selected {
-    border: 4px solid #ffaa00;
-    box-shadow: 0 0 15px #ffaa00;
-}
-
-/* Анимация для новых достижений */
 @keyframes achievement-pop {
     0% { transform: scale(0) rotate(-180deg); opacity: 0; }
     50% { transform: scale(1.2) rotate(10deg); }
@@ -700,28 +731,4 @@ body {
     font-weight: bold;
     font-size: 1.2rem;
     box-shadow: 0 10px 0 #b37b2e;
-}
-
-/* Подсказка для множественного выбора */
-.hint {
-    font-size: 0.7rem;
-    color: #9ccc7c;
-    text-align: center;
-    margin-top: 5px;
-    font-style: italic;
-}
-
-/* Улучшенные пустые ячейки */
-.table-cell.empty, .shelf-cell.empty, .container-card.empty {
-    opacity: 0.5;
-    background: #2d5a2d;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.5rem;
-    color: #9ccc7c;
-}
-
-.shelf-cell.empty {
-    font-size: 1rem;
 }
