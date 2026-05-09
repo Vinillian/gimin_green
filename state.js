@@ -68,6 +68,56 @@ function addLog(msg) {
     if (state.log.length > 15) state.log.pop();
 }
 
+// Миграция данных для совместимости со старыми сохранениями
+function migrateGameData() {
+    const currentDay = Math.floor(state.gameDay);
+
+    // Миграция контейнеров
+    state.containers.forEach(container => {
+        // Поле needsTransition
+        if (container.needsTransition === undefined) {
+            const totalDays = STAGE_DURATION[container.stage];
+            if (totalDays === 0) {
+                container.needsTransition = true; // стадия с нулевой длительностью сразу готова
+            } else if (container.stageStartDay !== undefined && container.stageStartDay !== null) {
+                const daysPassed = state.gameDay - container.stageStartDay;
+                container.needsTransition = daysPassed >= totalDays;
+            } else {
+                container.needsTransition = false;
+            }
+        }
+
+        // Поля lastSprayDay, lastWaterDay
+        if (container.lastSprayDay === undefined) {
+            container.lastSprayDay = currentDay;
+        }
+        if (container.lastWaterDay === undefined) {
+            container.lastWaterDay = currentDay;
+        }
+
+        // Поля needsSpray, needsWater
+        if (container.needsSpray === undefined) {
+            container.needsSpray = false;
+        }
+        if (container.needsWater === undefined) {
+            container.needsWater = false;
+        }
+    });
+
+    // Миграция вёдер
+    state.buckets.forEach(bucket => {
+        if (bucket.needsTransition === undefined) {
+            if (bucket.stage && bucket.stageStartDay !== undefined && bucket.stageStartDay !== null) {
+                const daysPassed = state.gameDay - bucket.stageStartDay;
+                const totalDays = STAGE_DURATION[bucket.stage];
+                bucket.needsTransition = daysPassed >= totalDays;
+            } else {
+                bucket.needsTransition = false;
+            }
+        }
+    });
+}
+
 // Сохранение в localStorage
 function saveToLocalStorage() {
     try {
@@ -130,6 +180,9 @@ function loadFromLocalStorage() {
             // Статистика и настройки
             state.stats = { ...INITIAL_STATS, ...(data.stats || {}) };
             state.settings = { ...state.settings, ...(data.settings || {}) };
+            
+            // Миграция данных для совместимости
+            migrateGameData();
             
             // Валидация целостности
             validateStructures();
