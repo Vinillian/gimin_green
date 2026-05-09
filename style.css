@@ -549,3 +549,201 @@ body {
     font-weight: bold;
     filter: drop-shadow(0 0 2px #ff0000);
 }
+
+/* Дополнительные стили для новой структуры */
+
+.workspace {
+    display: flex;
+    gap: 20px;
+    flex: 1;
+    min-height: 0;
+}
+
+.pallets-column {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.processes-column {
+    flex: 2;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    overflow-y: auto;
+    padding-right: 5px;
+}
+
+.zone {
+    background: rgba(20, 40, 25, 0.8);
+    border-radius: 15px;
+    padding: 10px;
+    border: 2px solid #e4c87b;
+}
+
+.zone-header {
+    color: #ffdb8e;
+    font-weight: bold;
+    margin-bottom: 10px;
+    text-align: center;
+}
+
+/* Вёдра */
+.buckets-container {
+    display: flex;
+    gap: 10px;
+    justify-content: space-around;
+}
+
+.bucket {
+    width: 80px;
+    height: 100px;
+    background: linear-gradient(135deg, #4a6fa5, #2f4f7f);
+    border-radius: 0 0 40px 40px;
+    border: 3px solid #8b9a6b;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-end;
+    padding: 10px 5px;
+    cursor: pointer;
+    transition: all 0.1s ease;
+}
+
+.bucket::before {
+    content: "🪣";
+    position: absolute;
+    top: -15px;
+    font-size: 24px;
+}
+
+.bucket.active {
+    border-color: #ffaa00;
+    box-shadow: 0 0 10px #ffaa00;
+}
+
+.bucket.selected {
+    border: 4px solid #ffaa00;
+    transform: scale(1.05);
+}
+
+.bucket-icon {
+    font-size: 20px;
+    margin-bottom: 5px;
+}
+
+.bucket-count {
+    color: white;
+    font-weight: bold;
+}
+
+.bucket-progress {
+    font-size: 12px;
+    color: #9ccc7c;
+}
+
+/* Стол посева */
+.table-container {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 5px;
+    background: #8b5a2b;
+    background-image: repeating-linear-gradient(45deg, #b78c4a 0px, #b78c4a 2px, transparent 2px, transparent 10px);
+    padding: 10px;
+    border-radius: 10px;
+    min-height: 120px;
+}
+
+.table-cell {
+    background: #4f7a4f;
+    border: 2px solid #dbb158;
+    border-radius: 5px;
+    min-height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.table-cell.empty {
+    opacity: 0.3;
+    border-style: dashed;
+}
+
+/* Полки */
+.shelves-container {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.shelf {
+    background: #8b6b4b;
+    padding: 5px;
+    border-radius: 5px;
+    border: 2px solid #c9a459;
+}
+
+.shelf-header {
+    color: #ffeb99;
+    font-size: 12px;
+    margin-bottom: 5px;
+}
+
+.shelf-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 3px;
+}
+
+.shelf-cell {
+    background: #4f7a4f;
+    border: 1px solid #dbb158;
+    border-radius: 3px;
+    min-height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+}
+
+.shelf-cell.empty {
+    opacity: 0.3;
+    border-style: dashed;
+}
+
+/* Уменьшенные поддоны */
+.pallet.small .pallet-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 5px;
+}
+
+.pallet.small .container-card {
+    min-height: 80px;
+    padding: 5px;
+}
+
+.pallet.small .container-number {
+    font-size: 12px;
+}
+
+.pallet.small .container-icons {
+    font-size: 14px;
+}
+
+/* Предупреждение */
+.warning {
+    position: absolute;
+    top: -10px;
+    right: -10px;
+    font-size: 20px;
+    color: red;
+    filter: drop-shadow(0 0 3px red);
+    animation: blink 1s infinite;
+}
+
+@keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}

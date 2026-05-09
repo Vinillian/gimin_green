@@ -1,137 +1,335 @@
 // containerManager.js
 
-function createContainer() {
-    if (state.containers.length >= MAX_CONTAINERS) {
-        addLog("❌ Достигнут максимум контейнеров (20)");
-        return false;
-    }
-
-    if (state.seeds < RESOURCE_COSTS.soak.seeds) {
-        addLog(`❌ Нет семян для посадки (нужно ${RESOURCE_COSTS.soak.seeds} кг)`);
-        return false;
-    }
-
-    if (state.water < RESOURCE_COSTS.soak.water) {
-        addLog(`❌ Нужно ${RESOURCE_COSTS.soak.water} л воды для замачивания`);
-        return false;
-    }
-
-    // Находим первый свободный номер от 1 до 20
-    let number = 1;
-    const existingNumbers = new Set(state.containers.map(c => c.number));
-    while (existingNumbers.has(number)) {
-        number++;
-    }
-
-    const id = state.nextId++;
+// Добавление семян в ведро
+function addSeedsToBucket(count) {
+    // Ищем первое ведро, которое НЕ в процессе (stage === null)
+    const availableBucket = state.buckets.find(b => b.stage === null);
     
-    // Списываем ресурсы
-    state.seeds = Math.round((state.seeds - RESOURCE_COSTS.soak.seeds) * 100) / 100;
-    state.water = Math.round((state.water - RESOURCE_COSTS.soak.water) * 100) / 100;
-
-    const currentDay = Math.floor(state.gameDay);
+    if (!availableBucket) {
+        addLog("❌ Все вёдра заняты процессами, нужно дождаться освобождения");
+        return false;
+    }
     
-    state.containers.push({
-        id: id,
-        stage: 'soak',
-        number: number,
-        stageStartDay: state.gameDay,
-        lastSprayDay: currentDay,
-        lastWaterDay: currentDay,
-        needsSpray: false,
-        needsWater: false,
-        needsTransition: false
-    });
-
-    addLog(`🌱 Добавлен контейнер #${number} (стадия: замачивание, день ${state.gameDay.toFixed(1)})`);
+    if (availableBucket.seeds + count > 4) {
+        addLog(`❌ В ведре максимум 4 семени, сейчас ${availableBucket.seeds}`);
+        return false;
+    }
+    
+    if (state.seeds < RESOURCE_COSTS.soak.seeds * count) {
+        addLog(`❌ Недостаточно семян! Нужно ${(RESOURCE_COSTS.soak.seeds * count).toFixed(2)} кг`);
+        return false;
+    }
+    
+    // Списываем семена
+    state.seeds = Math.round((state.seeds - RESOURCE_COSTS.soak.seeds * count) * 100) / 100;
+    
+    // Добавляем семена в ведро
+    availableBucket.seeds += count;
+    
+    addLog(`🌱 Добавлено ${count} семян в ведро #${availableBucket.id} (всего ${availableBucket.seeds})`);
     saveToLocalStorage();
     render();
     return true;
 }
 
-function create4Containers() {
-    let created = 0;
-    for (let i = 0; i < 4; i++) {
-        if (createContainer()) created++;
-    }
-    if (created > 0) addLog(`⚡ Добавлено ${created} контейнеров`);
+function createContainer() {
+    return addSeedsToBucket(1);
 }
 
-function setStageForSelected(stage) {
-    if (state.selectedIds.size === 0) {
-        addLog("⚠️ Сначала выбери контейнеры (нажми на них)");
+function create4Containers() {
+    return addSeedsToBucket(4);
+}
+
+// Запуск замачивания в выбранном ведре
+function startSoaking() {
+    if (state.selectedBucketId === null) {
+        addLog("⚠️ Сначала выбери ведро (нажми на него)");
         return;
     }
-
-    // Проверяем ресурсы перед изменением стадии
-    let requiredWater = 0;
-    let requiredSolution = 0;
     
-    state.containers.forEach(c => {
-        if (state.selectedIds.has(c.id)) {
-            if (stage === 'soak' && c.stage !== 'soak') {
-                requiredWater += RESOURCE_COSTS.soak.water;
-            }
-            if (stage === 'sow' && c.stage !== 'sow') {
-                requiredSolution += RESOURCE_COSTS.sow.solution;
-            }
-        }
-    });
-
-    if (requiredWater > 0 && state.water < requiredWater) {
-        addLog(`❌ Недостаточно воды! Нужно ${requiredWater.toFixed(2)} л, есть ${state.water.toFixed(2)} л`);
-        return;
-    }
-    if (requiredSolution > 0 && state.solution < requiredSolution) {
-        addLog(`❌ Недостаточно раствора! Нужно ${requiredSolution.toFixed(2)} л, есть ${state.solution.toFixed(2)} л`);
-        return;
-    }
-
-    state.water = Math.round((state.water - requiredWater) * 100) / 100;
-    state.solution = Math.round((state.solution - requiredSolution) * 100) / 100;
-
-    let changed = 0;
-    const currentDay = Math.floor(state.gameDay);
+    const bucket = state.buckets.find(b => b.id === state.selectedBucketId);
     
-    state.containers.forEach(c => {
-        if (state.selectedIds.has(c.id)) {
-            const oldStage = c.stage;
-            
-            // Если стадия не меняется - пропускаем
-            if (oldStage === stage) return;
-            
-            c.stage = stage;
-            c.stageStartDay = state.gameDay;
-            // Сбрасываем все флаги при смене стадии
-            c.lastSprayDay = currentDay;
-            c.lastWaterDay = currentDay;
-            c.needsSpray = false;
-            c.needsWater = false;
-            c.needsTransition = false;
-            changed++;
-            
-            if (stage === 'soak' && requiredWater > 0) {
-                addLog(`💧 Контейнер #${c.number}: замачивание (день ${state.gameDay.toFixed(1)})`);
-            } else if (stage === 'sow' && requiredSolution > 0) {
-                addLog(`🌱 Контейнер #${c.number}: посев (день ${state.gameDay.toFixed(1)})`);
-            } else {
-                addLog(`🔄 Контейнер #${c.number}: ${STAGE_NAMES[stage]} (день ${state.gameDay.toFixed(1)})`);
-            }
-        }
-    });
-
-    if (changed > 0) {
-        addLog(`🔄 ${changed} контейнеров переведены в ${STAGE_NAMES[stage]}`);
+    if (!bucket) {
+        addLog("❌ Ведро не найдено");
+        return;
     }
+    
+    if (bucket.stage !== null) {
+        addLog("❌ Это ведро уже в процессе");
+        return;
+    }
+    
+    if (bucket.seeds === 0) {
+        addLog("❌ В ведре нет семян");
+        return;
+    }
+    
+    // Проверяем воду
+    const waterNeeded = RESOURCE_COSTS.soak.water * bucket.seeds;
+    if (state.water < waterNeeded) {
+        addLog(`❌ Недостаточно воды! Нужно ${waterNeeded.toFixed(2)} л, есть ${state.water.toFixed(2)} л`);
+        return;
+    }
+    
+    // Списываем воду
+    state.water = Math.round((state.water - waterNeeded) * 100) / 100;
+    
+    // Запускаем замачивание
+    bucket.stage = 'soak';
+    bucket.stageStartDay = state.gameDay;
+    bucket.needsTransition = false;
+    
+    addLog(`💧 Запущено замачивание в ведре #${bucket.id} (${bucket.seeds} семян, потрачено ${waterNeeded.toFixed(2)} л воды)`);
     saveToLocalStorage();
     render();
 }
 
-function resetSelectedStage() {
-    setStageForSelected('soak');
+// Проветривание в выбранном ведре
+function startAiring() {
+    if (state.selectedBucketId === null) {
+        addLog("⚠️ Сначала выбери ведро (нажми на него)");
+        return;
+    }
+    
+    const bucket = state.buckets.find(b => b.id === state.selectedBucketId);
+    
+    if (!bucket) {
+        addLog("❌ Ведро не найдено");
+        return;
+    }
+    
+    if (bucket.stage !== 'soak') {
+        addLog("❌ Это ведро не в стадии замачивания");
+        return;
+    }
+    
+    if (!bucket.needsTransition) {
+        addLog("❌ Замачивание ещё не завершено (нужен ⚠️)");
+        return;
+    }
+    
+    // Переводим в проветривание
+    bucket.stage = 'air';
+    bucket.stageStartDay = state.gameDay;
+    bucket.needsTransition = false;
+    
+    addLog(`🌬 Начато проветривание в ведре #${bucket.id} (${bucket.seeds} семян)`);
+    saveToLocalStorage();
+    render();
 }
 
-// ИСПРАВЛЕНО: убраны все бонусы при сборе урожая
+// Посев из выбранного ведра
+function startSowing() {
+    if (state.selectedBucketId === null) {
+        addLog("⚠️ Сначала выбери ведро (нажми на него)");
+        return;
+    }
+    
+    const bucket = state.buckets.find(b => b.id === state.selectedBucketId);
+    
+    if (!bucket) {
+        addLog("❌ Ведро не найдено");
+        return;
+    }
+    
+    if (bucket.stage !== 'air') {
+        addLog("❌ Это ведро не в стадии проветривания");
+        return;
+    }
+    
+    if (!bucket.needsTransition) {
+        addLog("❌ Проветривание ещё не завершено (нужен ⚠️)");
+        return;
+    }
+    
+    // Проверяем место на столе
+    if (state.table.containers.length + bucket.seeds > 8) {
+        addLog(`❌ На столе недостаточно места! Свободно ${8 - state.table.containers.length}`);
+        return;
+    }
+    
+    // Проверяем раствор
+    const solutionNeeded = RESOURCE_COSTS.sow.solution * bucket.seeds;
+    if (state.solution < solutionNeeded) {
+        addLog(`❌ Недостаточно раствора! Нужно ${solutionNeeded.toFixed(2)} л, есть ${state.solution.toFixed(2)} л`);
+        return;
+    }
+    
+    // Списываем раствор
+    state.solution = Math.round((state.solution - solutionNeeded) * 100) / 100;
+    
+    // Создаем контейнеры для каждого семени
+    const currentDay = Math.floor(state.gameDay);
+    const newContainerIds = [];
+    
+    for (let i = 0; i < bucket.seeds; i++) {
+        // Находим свободный номер
+        let number = 1;
+        const existingNumbers = new Set(state.containers.map(c => c.number));
+        while (existingNumbers.has(number)) {
+            number++;
+        }
+        
+        const id = state.nextId++;
+        
+        const container = {
+            id: id,
+            number: number,
+            stage: 'sow',
+            location: 'table',
+            locationId: null,
+            stageStartDay: state.gameDay,
+            lastSprayDay: currentDay,
+            lastWaterDay: currentDay,
+            needsSpray: false,
+            needsWater: false,
+            needsTransition: false
+        };
+        
+        state.containers.push(container);
+        newContainerIds.push(id);
+    }
+    
+    // Добавляем контейнеры на стол
+    state.table.containers.push(...newContainerIds);
+    
+    // Очищаем ведро
+    const bucketId = bucket.id;
+    bucket.seeds = 0;
+    bucket.stage = null;
+    bucket.stageStartDay = null;
+    bucket.needsTransition = false;
+    state.selectedBucketId = null;
+    
+    addLog(`🌱 Посеяно ${newContainerIds.length} контейнеров (потрачено ${solutionNeeded.toFixed(2)} л раствора)`);
+    saveToLocalStorage();
+    render();
+}
+
+// Перемещение выбранных контейнеров на прижим
+function moveToPress() {
+    if (state.selectedIds.size === 0) {
+        addLog("⚠️ Сначала выбери контейнеры на столе");
+        return;
+    }
+    
+    // Проверяем, что все выбранные контейнеры на столе
+    const selectedContainers = state.containers.filter(c => 
+        state.selectedIds.has(c.id) && c.location === 'table'
+    );
+    
+    if (selectedContainers.length === 0) {
+        addLog("❌ Среди выбранных нет контейнеров на столе");
+        return;
+    }
+    
+    // Проверяем место на полках
+    let totalToMove = selectedContainers.length;
+    let availableSpace = 0;
+    
+    for (let shelf of state.shelves) {
+        availableSpace += 4 - shelf.containers.length;
+    }
+    
+    if (totalToMove > availableSpace) {
+        addLog(`❌ Недостаточно места на полках! Свободно ${availableSpace}`);
+        return;
+    }
+    
+    // Распределяем по полкам
+    const currentDay = Math.floor(state.gameDay);
+    let moved = [];
+    
+    for (let container of selectedContainers) {
+        // Ищем полку с местом
+        const targetShelf = state.shelves.find(s => s.containers.length < 4);
+        
+        if (targetShelf) {
+            container.stage = 'press';
+            container.location = 'shelf';
+            container.locationId = targetShelf.id;
+            container.stageStartDay = state.gameDay;
+            container.needsTransition = false;
+            
+            targetShelf.containers.push(container.id);
+            moved.push(`#${container.number}`);
+        }
+    }
+    
+    // Удаляем со стола
+    state.table.containers = state.table.containers.filter(id => !state.selectedIds.has(id));
+    
+    // Очищаем выделение
+    state.selectedIds.clear();
+    
+    addLog(`📦 ${moved.length} контейнеров перемещены на прижим: ${moved.join(', ')}`);
+    saveToLocalStorage();
+    render();
+}
+
+// Перемещение выбранных контейнеров на свет
+function moveToLight() {
+    if (state.selectedIds.size === 0) {
+        addLog("⚠️ Сначала выбери контейнеры на полках");
+        return;
+    }
+    
+    // Проверяем, что все выбранные контейнеры на полках
+    const selectedContainers = state.containers.filter(c => 
+        state.selectedIds.has(c.id) && c.location === 'shelf'
+    );
+    
+    if (selectedContainers.length === 0) {
+        addLog("❌ Среди выбранных нет контейнеров на полках");
+        return;
+    }
+    
+    // Проверяем, что стадия завершена
+    for (let container of selectedContainers) {
+        if (!container.needsTransition) {
+            addLog(`❌ Контейнер #${container.number} ещё не готов к переводу (нужен ⚠️)`);
+            return;
+        }
+    }
+    
+    // Проверяем место на поддонах
+    const containersOnLight = state.containers.filter(c => c.location === 'light').length;
+    if (containersOnLight + selectedContainers.length > MAX_CONTAINERS) {
+        addLog(`❌ Недостаточно места на поддонах! Свободно ${MAX_CONTAINERS - containersOnLight}`);
+        return;
+    }
+    
+    // Перемещаем
+    const currentDay = Math.floor(state.gameDay);
+    let moved = [];
+    
+    for (let container of selectedContainers) {
+        // Сохраняем номер полки для удаления
+        const shelfId = container.locationId;
+        
+        container.stage = 'light';
+        container.location = 'light';
+        container.locationId = container.number; // номер контейнера = место на поддоне
+        container.stageStartDay = state.gameDay;
+        container.needsTransition = false;
+        
+        moved.push(`#${container.number}`);
+        
+        // Удаляем с полки
+        const shelf = state.shelves.find(s => s.id === shelfId);
+        if (shelf) {
+            shelf.containers = shelf.containers.filter(id => id !== container.id);
+        }
+    }
+    
+    state.selectedIds.clear();
+    
+    addLog(`💡 ${moved.length} контейнеров перемещены на свет: ${moved.join(', ')}`);
+    saveToLocalStorage();
+    render();
+}
+
+// Сбор урожая
 function harvestSelected() {
     if (state.selectedIds.size === 0) return;
 
@@ -142,7 +340,7 @@ function harvestSelected() {
         if (state.selectedIds.has(c.id)) {
             harvested++;
             harvestedNumbers.push(`#${c.number}`);
-            return false; // удаляем контейнер
+            return false;
         }
         return true;
     });
@@ -157,6 +355,7 @@ function harvestSelected() {
     render();
 }
 
+// Удаление выбранных
 function deleteSelected() {
     if (state.selectedIds.size === 0) return;
 
@@ -171,55 +370,22 @@ function deleteSelected() {
         return true;
     });
     
+    // Очищаем также из table и shelves
+    state.table.containers = state.table.containers.filter(id => !state.selectedIds.has(id));
+    state.shelves.forEach(shelf => {
+        shelf.containers = shelf.containers.filter(id => !state.selectedIds.has(id));
+    });
+    
     state.selectedIds.clear();
     addLog(`🗑️ Удалено ${count} контейнеров: ${deletedNumbers.join(', ')}`);
     saveToLocalStorage();
     render();
 }
 
-function addWater() {
-    state.water = Math.round((state.water + 5) * 100) / 100;
-    addLog("🚰 +5 литров воды");
-    saveToLocalStorage();
-    render();
-}
-
-function addSolution() {
-    if (state.water < 4) {
-        addLog(`❌ Недостаточно воды для создания раствора! Нужно 4 л воды, есть ${state.water.toFixed(2)} л`);
-        return;
-    }
-    
-    state.water = Math.round((state.water - 4) * 100) / 100;
-    state.solution = Math.round((state.solution + 4) * 100) / 100;
-    addLog("🧪 +4 литра раствора (потрачено 4 л воды)");
-    saveToLocalStorage();
-    render();
-}
-
-function addSeeds() {
-    state.seeds = Math.round((state.seeds + 10) * 100) / 100;
-    addLog("🌱 +10 кг семян");
-    saveToLocalStorage();
-    render();
-}
-
-function selectAll() {
-    state.selectedIds = new Set(state.containers.map(c => c.id));
-    addLog(`🔲 Выбраны все контейнеры (${state.selectedIds.size})`);
-    render();
-}
-
-function clearSelection() {
-    state.selectedIds.clear();
-    addLog(`❌ Выбор снят со всех контейнеров`);
-    render();
-}
-
-// Функция для опрыскивания
+// Опрыскивание
 function spraySelected() {
     if (state.selectedIds.size === 0) {
-        addLog("⚠️ Сначала выбери контейнеры (нажми на них)");
+        addLog("⚠️ Сначала выбери контейнеры");
         return;
     }
 
@@ -262,10 +428,10 @@ function spraySelected() {
     render();
 }
 
-// Функция для полива
+// Полив
 function waterSelected() {
     if (state.selectedIds.size === 0) {
-        addLog("⚠️ Сначала выбери контейнеры (нажми на них)");
+        addLog("⚠️ Сначала выбери контейнеры");
         return;
     }
 
@@ -308,35 +474,98 @@ function waterSelected() {
     render();
 }
 
-// Функция для обновления прогресса и проверки напоминаний
+// Добавление ресурсов
+function addWater() {
+    state.water = Math.round((state.water + 5) * 100) / 100;
+    addLog("🚰 +5 литров воды");
+    saveToLocalStorage();
+    render();
+}
+
+function addSolution() {
+    if (state.water < 4) {
+        addLog(`❌ Недостаточно воды для создания раствора! Нужно 4 л воды, есть ${state.water.toFixed(2)} л`);
+        return;
+    }
+    
+    state.water = Math.round((state.water - 4) * 100) / 100;
+    state.solution = Math.round((state.solution + 4) * 100) / 100;
+    addLog("🧪 +4 литра раствора (потрачено 4 л воды)");
+    saveToLocalStorage();
+    render();
+}
+
+function addSeeds() {
+    state.seeds = Math.round((state.seeds + 10) * 100) / 100;
+    addLog("🌱 +10 кг семян");
+    saveToLocalStorage();
+    render();
+}
+
+// Выделение всего
+function selectAll() {
+    state.selectedIds = new Set(state.containers.map(c => c.id));
+    addLog(`🔲 Выбраны все контейнеры (${state.selectedIds.size})`);
+    render();
+}
+
+function clearSelection() {
+    state.selectedIds.clear();
+    state.selectedBucketId = null;
+    addLog(`❌ Выбор снят`);
+    render();
+}
+
+// Выбор ведра
+function selectBucket(bucketId) {
+    if (state.selectedBucketId === bucketId) {
+        state.selectedBucketId = null;
+        addLog(`🔓 Ведро #${bucketId} снято с выбора`);
+    } else {
+        // Снимаем выделение с контейнеров при выборе ведра
+        state.selectedIds.clear();
+        state.selectedBucketId = bucketId;
+        addLog(`🔒 Выбрано ведро #${bucketId}`);
+    }
+    render();
+}
+
+// Обновление прогресса
 function updateProgress() {
     const currentDay = Math.floor(state.gameDay);
     
+    // Обновляем вёдра
+    state.buckets.forEach(bucket => {
+        if (bucket.stage) {
+            const daysPassed = state.gameDay - bucket.stageStartDay;
+            const totalDays = STAGE_DURATION[bucket.stage];
+            
+            bucket.needsTransition = daysPassed >= totalDays;
+        }
+    });
+    
+    // Обновляем контейнеры
     state.containers.forEach(c => {
-        // Проверка на опрыскивание (для air, press, light)
+        // Опрыскивание (для air, press, light)
         if (['air', 'press', 'light'].includes(c.stage)) {
             if (currentDay > c.lastSprayDay) {
                 c.needsSpray = true;
             }
         }
         
-        // Проверка на полив (только для light)
+        // Полив (только для light)
         if (c.stage === 'light') {
             if (currentDay > c.lastWaterDay) {
                 c.needsWater = true;
             }
         }
         
-        // Проверка на завершение стадии
+        // Завершение стадии
         const daysPassed = state.gameDay - c.stageStartDay;
         const totalDays = STAGE_DURATION[c.stage];
         
         if (totalDays > 0) {
-            if (daysPassed >= totalDays) {
-                c.needsTransition = true;
-            } else {
-                c.needsTransition = false;
-            }
+            c.needsTransition = daysPassed >= totalDays;
         } else {
             c.needsTransition = false;
         }

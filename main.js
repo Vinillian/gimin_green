@@ -3,28 +3,102 @@
 document.addEventListener('DOMContentLoaded', () => {
     loadFromLocalStorage();
 
-    // Добавляем отображение текущего дня в верхнюю панель
+    // Добавляем отображение текущего дня
     addDayDisplay();
     
-    // Привязка кнопок
-    document.getElementById('newBatch1Btn')?.addEventListener('click', createContainer);
-    document.getElementById('newBatch4Btn')?.addEventListener('click', create4Containers);
+    // КНОПКИ ДОБАВЛЕНИЯ СЕМЯН В ВЁДРА
+    document.getElementById('newBatch1Btn')?.addEventListener('click', () => {
+        addSeedsToBucket(1);
+    });
     
-    document.getElementById('stageSoakBtn')?.addEventListener('click', () => setStageForSelected('soak'));
-    document.getElementById('stageAirBtn')?.addEventListener('click', () => setStageForSelected('air'));
-    document.getElementById('spraySelectedBtn')?.addEventListener('click', spraySelected);
-    document.getElementById('waterSelectedBtn')?.addEventListener('click', waterSelected); // Новая кнопка
-    document.getElementById('stageSowBtn')?.addEventListener('click', () => setStageForSelected('sow'));
-    document.getElementById('stagePressBtn')?.addEventListener('click', () => setStageForSelected('press'));
-    document.getElementById('stageLightBtn')?.addEventListener('click', () => setStageForSelected('light'));
-    document.getElementById('resetStageBtn')?.addEventListener('click', resetSelectedStage);
+    document.getElementById('newBatch4Btn')?.addEventListener('click', () => {
+        addSeedsToBucket(4);
+    });
     
+    // КНОПКИ СТАДИЙ (работают с выбранным ведром или контейнерами)
+    document.getElementById('stageSoakBtn')?.addEventListener('click', () => {
+        if (state.selectedBucketId !== null) {
+            startSoaking();
+        } else {
+            addLog("⚠️ Сначала выбери ведро");
+        }
+    });
+    
+    document.getElementById('stageAirBtn')?.addEventListener('click', () => {
+        if (state.selectedBucketId !== null) {
+            startAiring();
+        } else {
+            addLog("⚠️ Сначала выбери ведро");
+        }
+    });
+    
+    document.getElementById('stageSowBtn')?.addEventListener('click', () => {
+        if (state.selectedBucketId !== null) {
+            startSowing();
+        } else {
+            addLog("⚠️ Сначала выбери ведро");
+        }
+    });
+    
+    document.getElementById('stagePressBtn')?.addEventListener('click', () => {
+        if (state.selectedIds.size > 0) {
+            moveToPress();
+        } else {
+            addLog("⚠️ Сначала выбери контейнеры на столе");
+        }
+    });
+    
+    document.getElementById('stageLightBtn')?.addEventListener('click', () => {
+        if (state.selectedIds.size > 0) {
+            moveToLight();
+        } else {
+            addLog("⚠️ Сначала выбери контейнеры на полках");
+        }
+    });
+    
+    document.getElementById('resetStageBtn')?.addEventListener('click', () => {
+        clearSelection();
+    });
+    
+    // КНОПКИ ОПРЫСКИВАНИЯ И ПОЛИВА
+    document.getElementById('spraySelectedBtn')?.addEventListener('click', () => {
+        if (state.selectedIds.size > 0) {
+            spraySelected();
+        } else {
+            addLog("⚠️ Сначала выбери контейнеры");
+        }
+    });
+    
+    document.getElementById('waterSelectedBtn')?.addEventListener('click', () => {
+        if (state.selectedIds.size > 0) {
+            waterSelected();
+        } else {
+            addLog("⚠️ Сначала выбери контейнеры на свету");
+        }
+    });
+    
+    // КНОПКИ ВЫДЕЛЕНИЯ
     document.getElementById('selectAllBtn')?.addEventListener('click', selectAll);
     document.getElementById('clearSelectionBtn')?.addEventListener('click', clearSelection);
     
-    document.getElementById('harvestSelectedBtn')?.addEventListener('click', harvestSelected);
-    document.getElementById('deleteSelectedBtn')?.addEventListener('click', deleteSelected);
+    // КНОПКИ ДЕЙСТВИЙ
+    document.getElementById('harvestSelectedBtn')?.addEventListener('click', () => {
+        if (state.selectedIds.size > 0) {
+            harvestSelected();
+        } else {
+            addLog("⚠️ Сначала выбери контейнеры для сбора");
+        }
+    });
     
+    document.getElementById('deleteSelectedBtn')?.addEventListener('click', () => {
+        if (state.selectedIds.size > 0) {
+            deleteSelected();
+        } else {
+            addLog("⚠️ Сначала выбери контейнеры для удаления");
+        }
+    });
+    
+    // КНОПКИ ДОБАВЛЕНИЯ РЕСУРСОВ
     document.getElementById('addWaterBtn')?.addEventListener('click', addWater);
     document.getElementById('addSolutionBtn')?.addEventListener('click', addSolution);
     document.getElementById('addSeedsBtn')?.addEventListener('click', addSeeds);

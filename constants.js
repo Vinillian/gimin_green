@@ -27,14 +27,15 @@ const STAGE_DURATION = {
     'light': 5
 };
 
+// Расход ресурсов
 const RESOURCE_COSTS = {
     soak: {
-        water: 0.2,
-        seeds: 0.08
+        water: 0.2,  // на один контейнер в ведре
+        seeds: 0.08   // на один контейнер в ведре
     },
     sow: {
-        solution: 0.2
+        solution: 0.2 // на один контейнер при посеве
     },
-    water: 0.2,      // 200 мл на полив
-    spray: 0.05       // 50 мл на опрыскивание
+    water: 0.2,      // полив
+    spray: 0.05      // опрыскивание
 };
