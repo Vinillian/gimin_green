@@ -12,6 +12,7 @@ document.addEventListener('DOMContentLoaded', () => {
     
     document.getElementById('stageSoakBtn')?.addEventListener('click', () => setStageForSelected('soak'));
     document.getElementById('stageAirBtn')?.addEventListener('click', () => setStageForSelected('air'));
+    document.getElementById('spraySelectedBtn')?.addEventListener('click', spraySelected); // Новая кнопка
     document.getElementById('stageSowBtn')?.addEventListener('click', () => setStageForSelected('sow'));
     document.getElementById('stagePressBtn')?.addEventListener('click', () => setStageForSelected('press'));
     document.getElementById('stageLightBtn')?.addEventListener('click', () => setStageForSelected('light'));
@@ -35,7 +36,6 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 function addDayDisplay() {
-    // Добавляем отображение дня в верхнюю панель ресурсов
     const topResources = document.querySelector('.top-resources');
     if (topResources) {
         const dayCard = document.createElement('div');
@@ -56,16 +56,16 @@ function startGameTimer() {
             // Увеличиваем игровой день на 0.1
             state.gameDay = Math.round((state.gameDay + 0.1) * 10) / 10;
             
-            // Обновляем прогресс всех контейнеров
+            // Обновляем прогресс и проверяем напоминания
             updateProgress();
             
             // Сохраняем состояние
             saveToLocalStorage();
             
-            // Можно добавить редкое логирование (например, каждый целый день)
+            // Логируем каждый целый день
             if (Number.isInteger(state.gameDay)) {
                 addLog(`📆 Наступил день ${state.gameDay}`);
             }
         }
-    }, 6000); // 6000 мс = 6 секунд = 0.1 дня (значит 1 день = 60 секунд)
+    }, 6000);
 }

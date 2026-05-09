@@ -29,11 +29,15 @@ function createContainer() {
     state.seeds = Math.round((state.seeds - RESOURCE_COSTS.soak.seeds) * 100) / 100;
     state.water = Math.round((state.water - RESOURCE_COSTS.soak.water) * 100) / 100;
 
+    const currentDay = Math.floor(state.gameDay);
+    
     state.containers.push({
         id: id,
         stage: 'soak',
         number: number,
-        stageStartDay: state.gameDay // Запоминаем день начала стадии
+        stageStartDay: state.gameDay,
+        lastSprayDay: currentDay,
+        needsSpray: false
     });
 
     addLog(`🌱 Добавлен контейнер #${number} (стадия: замачивание, день ${state.gameDay.toFixed(1)})`);
@@ -60,7 +64,6 @@ function setStageForSelected(stage) {
     let requiredWater = 0;
     let requiredSolution = 0;
     
-    // Считаем, сколько ресурсов нужно для всех выбранных контейнеров
     state.containers.forEach(c => {
         if (state.selectedIds.has(c.id)) {
             if (stage === 'soak' && c.stage !== 'soak') {
@@ -72,7 +75,6 @@ function setStageForSelected(stage) {
         }
     });
 
-    // Проверяем достаточно ли ресурсов
     if (requiredWater > 0 && state.water < requiredWater) {
         addLog(`❌ Недостаточно воды! Нужно ${requiredWater.toFixed(2)} л, есть ${state.water.toFixed(2)} л`);
         return;
@@ -82,18 +84,20 @@ function setStageForSelected(stage) {
         return;
     }
 
-    // Списываем ресурсы
     state.water = Math.round((state.water - requiredWater) * 100) / 100;
     state.solution = Math.round((state.solution - requiredSolution) * 100) / 100;
 
-    // Меняем стадии
     let changed = 0;
+    const currentDay = Math.floor(state.gameDay);
+    
     state.containers.forEach(c => {
         if (state.selectedIds.has(c.id)) {
             const oldStage = c.stage;
             c.stage = stage;
-            // Обновляем день начала стадии
             c.stageStartDay = state.gameDay;
+            // Сбрасываем опрыскивание при смене стадии
+            c.lastSprayDay = currentDay;
+            c.needsSpray = false;
             changed++;
             
             if (oldStage !== stage) {
@@ -188,8 +192,70 @@ function clearSelection() {
     render();
 }
 
-// Функция для обновления прогресса (будет вызываться таймером)
+// Новая функция для опрыскивания
+function spraySelected() {
+    if (state.selectedIds.size === 0) {
+        addLog("⚠️ Сначала выбери контейнеры (нажми на них)");
+        return;
+    }
+
+    const sprayCost = 0.05; // 50 мл = 0.05 литра на контейнер
+    let sprayCount = 0;
+    let totalCost = 0;
+
+    // Считаем, сколько контейнеров действительно нужно опрыскать
+    state.containers.forEach(c => {
+        if (state.selectedIds.has(c.id) && c.needsSpray) {
+            sprayCount++;
+            totalCost += sprayCost;
+        }
+    });
+
+    if (sprayCount === 0) {
+        addLog("❌ Среди выбранных нет контейнеров, которым нужно опрыскивание");
+        return;
+    }
+
+    // Проверяем, хватает ли воды
+    if (state.water < totalCost) {
+        addLog(`❌ Недостаточно воды! Нужно ${totalCost.toFixed(2)} л, есть ${state.water.toFixed(2)} л`);
+        return;
+    }
+
+    // Списываем воду
+    state.water = Math.round((state.water - totalCost) * 100) / 100;
+
+    // Обновляем контейнеры
+    const currentDay = Math.floor(state.gameDay);
+    let sprayed = [];
+
+    state.containers.forEach(c => {
+        if (state.selectedIds.has(c.id) && c.needsSpray) {
+            c.lastSprayDay = currentDay;
+            c.needsSpray = false;
+            sprayed.push(`#${c.number}`);
+        }
+    });
+
+    addLog(`💦 Опрыскано ${sprayCount} контейнеров: ${sprayed.join(', ')} (потрачено ${totalCost.toFixed(2)} л воды)`);
+    saveToLocalStorage();
+    render();
+}
+
+// Функция для обновления прогресса и проверки напоминаний
 function updateProgress() {
-    // Просто перерисовываем - вся логика отображения в ui.js
+    const currentDay = Math.floor(state.gameDay);
+    
+    // Проверяем напоминания об опрыскивании
+    state.containers.forEach(c => {
+        // Только для стадий air, press, light
+        if (['air', 'press', 'light'].includes(c.stage)) {
+            // Если наступил новый день и ещё не опрыскивали сегодня
+            if (currentDay > c.lastSprayDay) {
+                c.needsSpray = true;
+            }
+        }
+    });
+    
     render();
 }

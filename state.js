@@ -8,11 +8,11 @@ const state = {
     nextId: 1,
     log: ["📋 Добро пожаловать в тестовую ферму!"],
     
-    // Новые поля для времени
-    gameDay: 0,           // текущий игровой день (может быть дробным)
-    lastUpdateTime: null, // для отслеживания реального времени
-    timeMultiplier: 1,    // множитель скорости (1 день = 20 сек)
-    isRunning: true       // запущен ли таймер
+    // Поля для времени
+    gameDay: 0,
+    lastUpdateTime: null,
+    timeMultiplier: 1,
+    isRunning: true
 };
 
 function addLog(msg) {
