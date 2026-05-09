@@ -34,5 +34,7 @@ const RESOURCE_COSTS = {
     },
     sow: {
         solution: 0.2
-    }
+    },
+    water: 0.2,      // 200 мл на полив
+    spray: 0.05       // 50 мл на опрыскивание
 };

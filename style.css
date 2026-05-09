@@ -11,7 +11,7 @@
 body {
     background: linear-gradient(135deg, #1a472a 0%, #2d5a3a 100%);
     min-height: 100vh;
-    padding: 15px;
+    padding: ;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -486,6 +486,55 @@ body {
 }
 
 /* Стиль для восклицательного знака */
+.container-stage-icon {
+    font-size: 1.5rem;
+    display: flex;
+    gap: 3px;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Красный цвет для восклицательного знака */
+.container-stage-icon span:last-child {
+    color: #ff4444;
+    font-weight: bold;
+    filter: drop-shadow(0 0 2px #ff0000);
+}
+
+/* Добавить в конец файла */
+
+/* Стиль для кнопки полива */
+.btn-water {
+    background: #2f77b3;
+    box-shadow: 0 4px 0 #1d4a73;
+}
+
+.btn-water:active {
+    transform: translateY(3px);
+    box-shadow: 0 1px 0 #1d4a73;
+}
+
+/* Обновляем сетку действий для 2 колонок */
+.action-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 5px;
+    margin: 5px 0;
+}
+
+/* Специально для ряда с кнопками опрыскивания и полива */
+.double-action-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 5px;
+    margin-bottom: 5px;
+}
+
+.double-action-row .btn {
+    margin-bottom: 0;
+}
+
+/* Цвета для иконок */
 .container-stage-icon {
     font-size: 1.5rem;
     display: flex;

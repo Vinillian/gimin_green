@@ -98,10 +98,11 @@ function renderContainer(container, grid) {
         currentDayText = 'Готово';
     }
     
-    // Иконки: стадия + опрыскивание + восклицательный знак
+    // Иконки: стадия + опрыскивание + полив + восклицательный знак
     const stageIcon = STAGE_ICONS[container.stage];
     const sprayIcon = container.needsSpray ? ' 💦' : '';
-    const transitionIcon = container.needsTransition ? ' ⚠️' : ''; // Красный восклицательный знак
+    const waterIcon = container.needsWater ? ' 🚰' : '';    // Иконка полива
+    const transitionIcon = container.needsTransition ? ' ⚠️' : '';
     
     const progressBar = `
         <div class="progress-container">
@@ -111,7 +112,7 @@ function renderContainer(container, grid) {
     
     card.innerHTML = `
         <div class="container-number">#${container.number}</div>
-        <div class="container-stage-icon">${stageIcon}${sprayIcon}${transitionIcon}</div>
+        <div class="container-stage-icon">${stageIcon}${sprayIcon}${waterIcon}${transitionIcon}</div>
         ${progressBar}
         <div class="container-day">${currentDayText}</div>
     `;

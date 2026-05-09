@@ -37,8 +37,10 @@ function createContainer() {
         number: number,
         stageStartDay: state.gameDay,
         lastSprayDay: currentDay,
+        lastWaterDay: currentDay,
         needsSpray: false,
-        needsTransition: false // Новый флаг для восклицательного знака
+        needsWater: false,
+        needsTransition: false
     });
 
     addLog(`🌱 Добавлен контейнер #${number} (стадия: замачивание, день ${state.gameDay.toFixed(1)})`);
@@ -94,27 +96,33 @@ function setStageForSelected(stage) {
     state.containers.forEach(c => {
         if (state.selectedIds.has(c.id)) {
             const oldStage = c.stage;
+            
+            // Если стадия не меняется - пропускаем
+            if (oldStage === stage) return;
+            
             c.stage = stage;
             c.stageStartDay = state.gameDay;
-            // Сбрасываем флаги при смене стадии
+            // Сбрасываем все флаги при смене стадии
             c.lastSprayDay = currentDay;
+            c.lastWaterDay = currentDay;
             c.needsSpray = false;
-            c.needsTransition = false; // Сбрасываем восклицательный знак
+            c.needsWater = false;
+            c.needsTransition = false;
             changed++;
             
-            if (oldStage !== stage) {
-                if (stage === 'soak' && requiredWater > 0) {
-                    addLog(`💧 Контейнер #${c.number}: замачивание (день ${state.gameDay.toFixed(1)})`);
-                } else if (stage === 'sow' && requiredSolution > 0) {
-                    addLog(`🌱 Контейнер #${c.number}: посев (день ${state.gameDay.toFixed(1)})`);
-                } else {
-                    addLog(`🔄 Контейнер #${c.number}: ${STAGE_NAMES[stage]} (день ${state.gameDay.toFixed(1)})`);
-                }
+            if (stage === 'soak' && requiredWater > 0) {
+                addLog(`💧 Контейнер #${c.number}: замачивание (день ${state.gameDay.toFixed(1)})`);
+            } else if (stage === 'sow' && requiredSolution > 0) {
+                addLog(`🌱 Контейнер #${c.number}: посев (день ${state.gameDay.toFixed(1)})`);
+            } else {
+                addLog(`🔄 Контейнер #${c.number}: ${STAGE_NAMES[stage]} (день ${state.gameDay.toFixed(1)})`);
             }
         }
     });
 
-    addLog(`🔄 ${changed} контейнеров переведены в ${STAGE_NAMES[stage]}`);
+    if (changed > 0) {
+        addLog(`🔄 ${changed} контейнеров переведены в ${STAGE_NAMES[stage]}`);
+    }
     saveToLocalStorage();
     render();
 }
@@ -123,23 +131,28 @@ function resetSelectedStage() {
     setStageForSelected('soak');
 }
 
+// ИСПРАВЛЕНО: убраны все бонусы при сборе урожая
 function harvestSelected() {
     if (state.selectedIds.size === 0) return;
 
     let harvested = 0;
+    const harvestedNumbers = [];
+    
     state.containers = state.containers.filter(c => {
         if (state.selectedIds.has(c.id)) {
-            if (Math.random() > 0.3) state.water = Math.round((state.water + 1) * 100) / 100;
-            if (Math.random() > 0.5) state.solution = Math.round((state.solution + 1) * 100) / 100;
-            if (Math.random() > 0.7) state.seeds = Math.round((state.seeds + 1) * 100) / 100;
             harvested++;
-            return false;
+            harvestedNumbers.push(`#${c.number}`);
+            return false; // удаляем контейнер
         }
         return true;
     });
 
     state.selectedIds.clear();
-    addLog(`✂️ Собрано ${harvested} контейнеров пшеницы (день ${state.gameDay.toFixed(1)})`);
+    
+    if (harvested > 0) {
+        addLog(`✂️ Собрано ${harvested} контейнеров: ${harvestedNumbers.join(', ')} (день ${state.gameDay.toFixed(1)})`);
+    }
+    
     saveToLocalStorage();
     render();
 }
@@ -148,9 +161,18 @@ function deleteSelected() {
     if (state.selectedIds.size === 0) return;
 
     const count = state.selectedIds.size;
-    state.containers = state.containers.filter(c => !state.selectedIds.has(c.id));
+    const deletedNumbers = [];
+    
+    state.containers = state.containers.filter(c => {
+        if (state.selectedIds.has(c.id)) {
+            deletedNumbers.push(`#${c.number}`);
+            return false;
+        }
+        return true;
+    });
+    
     state.selectedIds.clear();
-    addLog(`🗑️ Удалено ${count} контейнеров`);
+    addLog(`🗑️ Удалено ${count} контейнеров: ${deletedNumbers.join(', ')}`);
     saveToLocalStorage();
     render();
 }
@@ -201,7 +223,7 @@ function spraySelected() {
         return;
     }
 
-    const sprayCost = 0.05;
+    const sprayCost = RESOURCE_COSTS.spray;
     let sprayCount = 0;
     let totalCost = 0;
 
@@ -240,31 +262,82 @@ function spraySelected() {
     render();
 }
 
+// Функция для полива
+function waterSelected() {
+    if (state.selectedIds.size === 0) {
+        addLog("⚠️ Сначала выбери контейнеры (нажми на них)");
+        return;
+    }
+
+    const waterCost = RESOURCE_COSTS.water;
+    let waterCount = 0;
+    let totalCost = 0;
+
+    state.containers.forEach(c => {
+        if (state.selectedIds.has(c.id) && c.stage === 'light' && c.needsWater) {
+            waterCount++;
+            totalCost += waterCost;
+        }
+    });
+
+    if (waterCount === 0) {
+        addLog("❌ Среди выбранных нет контейнеров на свету, которым нужен полив");
+        return;
+    }
+
+    if (state.water < totalCost) {
+        addLog(`❌ Недостаточно воды! Нужно ${totalCost.toFixed(2)} л, есть ${state.water.toFixed(2)} л`);
+        return;
+    }
+
+    state.water = Math.round((state.water - totalCost) * 100) / 100;
+
+    const currentDay = Math.floor(state.gameDay);
+    let watered = [];
+
+    state.containers.forEach(c => {
+        if (state.selectedIds.has(c.id) && c.stage === 'light' && c.needsWater) {
+            c.lastWaterDay = currentDay;
+            c.needsWater = false;
+            watered.push(`#${c.number}`);
+        }
+    });
+
+    addLog(`💧 Полито ${waterCount} контейнеров: ${watered.join(', ')} (потрачено ${totalCost.toFixed(2)} л воды)`);
+    saveToLocalStorage();
+    render();
+}
+
 // Функция для обновления прогресса и проверки напоминаний
 function updateProgress() {
     const currentDay = Math.floor(state.gameDay);
     
     state.containers.forEach(c => {
-        // Проверка на опрыскивание
+        // Проверка на опрыскивание (для air, press, light)
         if (['air', 'press', 'light'].includes(c.stage)) {
             if (currentDay > c.lastSprayDay) {
                 c.needsSpray = true;
             }
         }
         
-        // Проверка на завершение стадии (для восклицательного знака)
+        // Проверка на полив (только для light)
+        if (c.stage === 'light') {
+            if (currentDay > c.lastWaterDay) {
+                c.needsWater = true;
+            }
+        }
+        
+        // Проверка на завершение стадии
         const daysPassed = state.gameDay - c.stageStartDay;
         const totalDays = STAGE_DURATION[c.stage];
         
         if (totalDays > 0) {
-            // Если прошло больше или равно длительности стадии
             if (daysPassed >= totalDays) {
                 c.needsTransition = true;
             } else {
                 c.needsTransition = false;
             }
         } else {
-            // Для мгновенных стадий (посев)
             c.needsTransition = false;
         }
     });

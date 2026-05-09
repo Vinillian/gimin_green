@@ -13,6 +13,7 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('stageSoakBtn')?.addEventListener('click', () => setStageForSelected('soak'));
     document.getElementById('stageAirBtn')?.addEventListener('click', () => setStageForSelected('air'));
     document.getElementById('spraySelectedBtn')?.addEventListener('click', spraySelected);
+    document.getElementById('waterSelectedBtn')?.addEventListener('click', waterSelected); // Новая кнопка
     document.getElementById('stageSowBtn')?.addEventListener('click', () => setStageForSelected('sow'));
     document.getElementById('stagePressBtn')?.addEventListener('click', () => setStageForSelected('press'));
     document.getElementById('stageLightBtn')?.addEventListener('click', () => setStageForSelected('light'));
