@@ -1,4 +1,5 @@
-/* style.css - финальная версия с нижней панелью */
+/* style.css - финальная версия с улучшениями */
+
 * {
     margin: 0;
     padding: 0;
@@ -111,22 +112,7 @@ body {
     box-shadow: 0 1px 0 rgba(0, 0, 0, 0.3);
 }
 
-.btn-vertical {
-    margin-bottom: 0;
-}
-
-.btn-block {
-    width: 100%;
-}
-
-.btn-primary { background: #4caf50; }
-.btn-warning { background: #ff9800; }
-.btn-info { background: #00acc1; box-shadow: 0 4px 0 #00838f; }
-.btn-water { background: #2f77b3; box-shadow: 0 4px 0 #1d4a73; }
-.btn-blue { background: #2f77b3; }
-.btn-purple { background: #8a4f9c; }
-.btn-success { background: #45a049; }
-.btn-danger { background: #b34f4f; }
+.btn-stage.reset { background: #a55e5e; }
 
 .btn-small {
     border: none;
@@ -153,16 +139,6 @@ body {
 .btn-small.btn-info { background: #00acc1; }
 .btn-small.btn-warning { background: #ff9800; }
 
-.btn-stage {
-    margin-bottom: 8px;
-    padding: 10px 12px;
-    font-size: 1rem;
-}
-
-.btn-stage.press { background: #b68b40; }
-.btn-stage.light { background: #f2b84b; color: #1e3a1e; }
-.btn-stage.reset { background: #a55e5e; }
-
 .section-title {
     color: #ffdb8e;
     font-size: 1rem;
@@ -171,20 +147,6 @@ body {
     text-align: center;
     letter-spacing: 0.5px;
     text-transform: uppercase;
-}
-
-.action-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 8px;
-    margin: 8px 0;
-}
-
-.action-grid .btn {
-    margin-bottom: 0;
-    padding: 10px 8px;
-    font-size: 0.9rem;
-    white-space: nowrap;
 }
 
 .main-content {
@@ -259,13 +221,8 @@ body {
     box-shadow: 0 1px 0 rgba(0, 0, 0, 0.3);
 }
 
-.top-btn.achievements-btn {
-    background: #8a4f9c;
-}
-
-.top-btn.pause-btn {
-    background: #4caf50;
-}
+.top-btn.achievements-btn { background: #8a4f9c; }
+.top-btn.pause-btn { background: #4caf50; }
 
 .workspace {
     display: flex;
@@ -286,23 +243,13 @@ body {
     padding: 8px;
     border: 2px solid #e4c87b;
     box-shadow: 0 5px 0 #6d8f4a;
+    max-height: calc(100vh - 180px); /* увеличено место для лога */
 }
 
-.pallets-column {
-    flex: 0 0 450px;
-}
-
-.press-column {
-    flex: 0 0 220px;
-}
-
-.sowing-column {
-    flex: 0 0 280px;
-}
-
-.buckets-column {
-    flex: 0 0 300px;
-}
+.pallets-column { flex: 0 0 450px; }
+.press-column { flex: 0 0 220px; }
+.sowing-column { flex: 0 0 280px; }
+.buckets-column { flex: 0 0 300px; }
 
 .zone-header {
     color: #ffdb8e;
@@ -316,6 +263,26 @@ body {
     padding: 0 5px;
 }
 
+.zone-header.with-button {
+    padding-right: 5px;
+}
+
+.zone-btn {
+    background: #4a6fa5;
+    border: none;
+    border-radius: 15px;
+    padding: 4px 10px;
+    font-size: 0.7rem;
+    font-weight: bold;
+    color: white;
+    cursor: pointer;
+    box-shadow: 0 2px 0 #2d4a6f;
+    transition: 0.1s;
+    white-space: nowrap;
+}
+.zone-btn:active { transform: translateY(2px); box-shadow: none; }
+.zone-btn.light-btn { background: #f2b84b; color: #1e3a1e; box-shadow: 0 2px 0 #b87e2e; }
+
 .bucket-count-indicator {
     font-size: 0.7rem;
     background: #1f4727;
@@ -323,6 +290,32 @@ body {
     border-radius: 10px;
     border: 1px solid #e4c87b;
 }
+
+/* Панель действий над светом */
+.light-actions {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 6px;
+    flex-wrap: wrap;
+}
+.action-btn {
+    flex: 1;
+    background: #4f7a4f;
+    border: 2px solid #dbb158;
+    border-radius: 15px;
+    padding: 4px 0;
+    font-size: 0.7rem;
+    font-weight: bold;
+    color: white;
+    cursor: pointer;
+    box-shadow: 0 2px 0 #1f4727;
+    transition: 0.1s;
+    text-align: center;
+}
+.action-btn:active { transform: translateY(2px); box-shadow: none; }
+.action-btn.harvest-btn { background: #45a049; }
+.action-btn.spray-btn { background: #00acc1; }
+.action-btn.water-btn { background: #2f77b3; }
 
 .pallet-wrapper {
     flex: 1;
@@ -345,9 +338,7 @@ body {
     transition: background-color 0.2s;
 }
 
-.pallet-header:hover {
-    background-color: rgba(255, 255, 255, 0.2);
-}
+.pallet-header:hover { background-color: rgba(255, 255, 255, 0.2); }
 
 .pallet {
     background: #8b6b4b;
@@ -397,10 +388,7 @@ body {
     margin-bottom: 4px;
     cursor: pointer;
 }
-
-.shelf-header:hover {
-    background-color: rgba(255, 255, 255, 0.1);
-}
+.shelf-header:hover { background-color: rgba(255, 255, 255, 0.1); }
 
 .shelf-vertical-containers {
     display: flex;
@@ -459,9 +447,7 @@ body {
     filter: drop-shadow(0 2px 2px rgba(0,0,0,0.5));
 }
 
-.buckets-grid .bucket.active {
-    background: #5a7a5a;
-}
+.buckets-grid .bucket.active { background: #5a7a5a; }
 
 .buckets-grid .bucket.selected {
     border: 3px solid #ffaa00;
@@ -474,21 +460,9 @@ body {
     border-color: #ffd966;
 }
 
-.buckets-grid .bucket-icon {
-    font-size: 18px;
-    margin-bottom: 2px;
-}
-
-.buckets-grid .bucket-count {
-    font-size: 13px;
-    font-weight: bold;
-    color: #ffeb99;
-}
-
-.buckets-grid .bucket-status {
-    font-size: 11px;
-    margin-top: 2px;
-}
+.buckets-grid .bucket-icon { font-size: 18px; margin-bottom: 2px; }
+.buckets-grid .bucket-count { font-size: 13px; font-weight: bold; color: #ffeb99; }
+.buckets-grid .bucket-status { font-size: 11px; margin-top: 2px; }
 
 .buckets-control-vertical {
     display: flex;
@@ -526,10 +500,7 @@ body {
     flex: 1;
 }
 
-.btn-bucket-add#compactAdd4Btn {
-    background: #f44336;
-    box-shadow: 0 2px 0 #b32d2d;
-}
+.btn-bucket-add#compactAdd4Btn { background: #f44336; box-shadow: 0 2px 0 #b32d2d; }
 
 .btn-bucket-add:active {
     transform: translateY(2px);
@@ -551,10 +522,7 @@ body {
     white-space: nowrap;
 }
 
-.btn-bucket-action#compactAirBtn {
-    background: #7b6c5c;
-    box-shadow: 0 2px 0 #5a4e42;
-}
+.btn-bucket-action#compactAirBtn { background: #7b6c5c; box-shadow: 0 2px 0 #5a4e42; }
 
 .btn-bucket-action:active {
     transform: translateY(2px);
@@ -576,9 +544,7 @@ body {
     margin-bottom: 5px;
 }
 
-.btn-bucket-special.sow {
-    background: #4CAF50;
-}
+.btn-bucket-special.sow { background: #4CAF50; }
 
 .btn-bucket-special:active {
     transform: translateY(2px);
@@ -600,10 +566,7 @@ body {
     text-align: center;
 }
 
-.btn-bucket-select.clear {
-    background: #a55e5e;
-    box-shadow: 0 2px 0 #6b3d3d;
-}
+.btn-bucket-select.clear { background: #a55e5e; box-shadow: 0 2px 0 #6b3d3d; }
 
 .btn-bucket-select:active {
     transform: translateY(2px);
@@ -625,6 +588,13 @@ body {
     cursor: pointer;
     transition: all 0.1s ease;
     min-height: 70px;
+}
+
+/* Универсальное выделение для всех контейнеров */
+.container-card.selected {
+    border: 3px solid #ffaa00 !important;
+    background: #3d874a !important;
+    box-shadow: 0 0 15px #ffaa00 !important;
 }
 
 .sowing-column .container-card {
@@ -667,12 +637,6 @@ body {
     box-shadow: 0 2px 0 #1f4727;
 }
 
-.shelf-vertical-containers .container-card.selected {
-    border: 3px solid #ffaa00;
-    background: #3d874a;
-    box-shadow: 0 0 12px #ffaa00;
-}
-
 .shelf-vertical-containers .container-card:not(:last-child)::after {
     content: '';
     position: absolute;
@@ -683,12 +647,6 @@ body {
     background: rgba(0,0,0,0.2);
     border-radius: 0 0 3px 3px;
     z-index: 1;
-}
-
-.container-card.selected {
-    border: 3px solid #ffaa00;
-    background: #3d874a;
-    box-shadow: 0 0 15px #ffaa00;
 }
 
 .container-number {
@@ -749,10 +707,13 @@ body {
     opacity: 0.6;
     min-height: 70px;
 }
+.shelf-cell.empty { height: 48px; min-height: 48px; }
 
-.shelf-cell.empty {
-    height: 48px;
-    min-height: 48px;
+/* Пустые ячейки не должны иметь выделение */
+.container-card.empty.selected {
+    border: 2px dashed #ffaa00;
+    background: #2d5a2d;
+    box-shadow: none;
 }
 
 .bottom-panel {
@@ -780,10 +741,6 @@ body {
     display: flex;
     align-items: center;
     word-break: break-word;
-}
-
-#stageSowBtn {
-    display: none;
 }
 
 @keyframes blink {

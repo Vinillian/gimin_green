@@ -55,7 +55,7 @@ setTimeout(() => {
     initZoneClickHandlers();
 }, 200);
 
-// Добавляем обработчики для кнопок паузы и сброса через ID
+// Обработчики для кнопок, которые не входят в модули (пауза, сброс игры, новая кнопка "ВСЕ" на свету)
 document.getElementById('pauseBtn')?.addEventListener('click', () => {
     timeService.toggle();
     store.addLog(timeService.isRunning ? '▶️ Игра запущена' : '⏸️ Игра на паузе');
@@ -66,6 +66,15 @@ document.getElementById('resetGameBtn')?.addEventListener('click', () => {
         localStorage.removeItem('farmState');
         location.reload();
     }
+});
+
+// Новая кнопка "ВСЕ" на свету
+document.getElementById('selectAllLightBtn')?.addEventListener('click', () => {
+    const lightIds = store.containers
+        .filter(c => c.location === 'light')
+        .map(c => c.id);
+    store.selectContainers(lightIds);
+    store.addLog(`🔲 Выбраны все контейнеры на свету (${lightIds.length})`);
 });
 
 // Для отладки
