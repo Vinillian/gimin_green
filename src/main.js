@@ -32,7 +32,6 @@ store.subscribe(() => {
 
 persistenceService.load();
 
-// Убираем setTimeout, используем DOMContentLoaded для гарантии загрузки DOM
 document.addEventListener('DOMContentLoaded', () => {
     fullRender();
     store.addLog("🚀 Ферма запущена");
@@ -40,12 +39,10 @@ document.addEventListener('DOMContentLoaded', () => {
     persistenceService.autoSave();
     timeService.start();
 
-    // Инициализация обработчиков после полной загрузки DOM
     initButtonHandlers();
     initKeyboardHandlers();
     initZoneClickHandlers();
 
-    // Обработчики для паузы и сброса (без onclick в HTML)
     document.getElementById('pauseBtn')?.addEventListener('click', () => {
         timeService.toggle();
         store.addLog(timeService.isRunning ? '▶️ Игра запущена' : '⏸️ Игра на паузе');

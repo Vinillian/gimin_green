@@ -3,15 +3,7 @@ import { store } from '../store/index.js';
 export function initZoneClickHandlers() {
     console.log('🖱️ Initializing zone click handlers');
 
-    const selectAllBtn = document.getElementById('selectAllBtn');
-    if (selectAllBtn) {
-        selectAllBtn.addEventListener('click', () => {
-            const ids = store.containers.map(c => c.id);
-            store.selectContainers(ids);
-            store.addLog(`🔲 Выбраны все контейнеры (${ids.length})`);
-        });
-    }
-
+    // Стол посева
     const tableZone = document.getElementById('tableZoneHeader');
     if (tableZone) {
         tableZone.addEventListener('click', (e) => {
@@ -22,6 +14,7 @@ export function initZoneClickHandlers() {
         });
     }
 
+    // Полки
     document.querySelectorAll('.shelf-header').forEach((header, index) => {
         header.addEventListener('click', (e) => {
             e.stopPropagation();
@@ -33,6 +26,7 @@ export function initZoneClickHandlers() {
         });
     });
 
+    // Поддоны
     document.querySelectorAll('.pallet-header').forEach((header, index) => {
         header.addEventListener('click', (e) => {
             e.stopPropagation();
@@ -47,6 +41,7 @@ export function initZoneClickHandlers() {
         });
     });
 
+    // Зона света (заголовок)
     const lightZone = document.getElementById('lightZoneHeader');
     if (lightZone) {
         lightZone.addEventListener('click', () => {
@@ -56,6 +51,7 @@ export function initZoneClickHandlers() {
         });
     }
 
+    // Зона прижима (заголовок)
     const pressZone = document.getElementById('pressZoneHeader');
     if (pressZone) {
         pressZone.addEventListener('click', (e) => {
@@ -66,6 +62,7 @@ export function initZoneClickHandlers() {
         });
     }
 
+    // Вёдра (заголовок)
     const bucketsZone = document.getElementById('bucketsZoneHeader');
     if (bucketsZone) {
         bucketsZone.addEventListener('click', () => {

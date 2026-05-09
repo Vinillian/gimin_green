@@ -8,6 +8,34 @@
 </head>
 <body>
 <div class="container">
+    <!-- Левая панель управления -->
+    <div class="sidebar-left">
+        <div class="resources-buttons">
+            <button class="resource-add-btn water" id="addWaterBtn">🚰 +5 ВОДЫ</button>
+            <button class="resource-add-btn solution" id="addSolutionBtn">🧪 +4 РАСТВОРА</button>
+            <button class="resource-add-btn seeds" id="addSeedsBtn">🌱 +10 СЕМЯН</button>
+        </div>
+
+        <div class="section-title">ДЕЙСТВИЯ С КОНТЕЙНЕРАМИ</div>
+        <button class="btn-action" id="selectAllBtn">🔲 ВЫБРАТЬ ВСЕ</button>
+        <!-- Кнопки СОБРАТЬ, ОПРЫСКАТЬ, ПОЛИТЬ УБРАНЫ ОТСЮДА -->
+        <button class="btn-action delete" id="deleteSelectedBtn">🗑️ УДАЛИТЬ</button>
+
+        <div class="section-title">УПРАВЛЕНИЕ СТАДИЯМИ</div>
+        <button class="btn-stage reset" id="resetStageBtn"><span>🔄</span> СБРОС ВЫБОРА</button>
+
+        <div class="section-title">УМНОЕ ПЕРЕМЕЩЕНИЕ</div>
+        <button class="btn-smart" id="smartPressBtn"><span>📦➡️</span> УМНЫЙ ПРИЖИМ</button>
+        <button class="btn-smart" id="smartLightBtn"><span>💡➡️</span> УМНЫЙ СВЕТ</button>
+
+        <div class="section-title" style="margin-top:15px;">📋 ЛОГ СОБЫТИЙ</div>
+        <div class="log-panel" id="logPanel">Добро пожаловать в ферму!</div>
+
+        <div class="section-title" style="margin-top:15px;">СИСТЕМА</div>
+        <button class="btn-system" id="resetGameBtn"><span>🔄</span> СБРОСИТЬ ИГРУ</button>
+    </div>
+
+    <!-- Основная рабочая область -->
     <div class="main-content">
         <!-- Верхняя панель -->
         <div class="top-bar">
@@ -20,7 +48,7 @@
             </div>
             <div class="top-buttons-group">
                 <button class="top-btn achievements-btn" id="achievementsBtn">🏆 ДОСТИЖЕНИЯ</button>
-                <button class="top-btn pause-btn" id="pauseBtn">⏸️ ПАУЗА</button> <!-- Убран onclick -->
+                <button class="top-btn pause-btn" id="pauseBtn">⏸️ ПАУЗА</button>
             </div>
         </div>
 
@@ -31,7 +59,6 @@
                 <div class="zone-header with-button" id="lightZoneHeader">
                     <span>💡 СВЕТ</span>
                     <div class="zone-buttons">
-                        <button class="zone-btn" id="selectAllBtn">🔲 ВСЕ</button>
                         <button class="zone-btn harvest-btn" id="harvestSelectedBtn">✂️ СОБРАТЬ</button>
                         <button class="zone-btn spray-btn" id="spraySelectedBtn">💦 ОПРЫСКАТЬ</button>
                         <button class="zone-btn water-btn" id="waterSelectedBtn">🚰 ПОЛИТЬ</button>
@@ -89,24 +116,6 @@
 
         <!-- Нижняя панель выбранных -->
         <div class="selected-bottom-panel" id="selectedInfoBottom">👆 Нажми на контейнер или ведро (Ctrl+клик для нескольких)</div>
-    </div>
-
-    <!-- Правая панель -->
-    <div class="sidebar-right">
-        <div class="resources-buttons">
-            <button class="resource-add-btn water" id="addWaterBtn">🚰 +5 ВОДЫ</button>
-            <button class="resource-add-btn solution" id="addSolutionBtn">🧪 +4 РАСТВОРА</button>
-            <button class="resource-add-btn seeds" id="addSeedsBtn">🌱 +10 СЕМЯН</button>
-        </div>
-        <div class="section-title">УПРАВЛЕНИЕ СТАДИЯМИ</div>
-        <button class="btn btn-stage reset" id="resetStageBtn"><span>🔄</span> СБРОС ВЫБОРА</button>
-        <div class="section-title">УМНОЕ ПЕРЕМЕЩЕНИЕ</div>
-        <button class="btn-small btn-info" id="smartPressBtn"><span>📦➡️</span> УМНЫЙ ПРИЖИМ</button>
-        <button class="btn-small btn-warning" id="smartLightBtn"><span>💡➡️</span> УМНЫЙ СВЕТ</button>
-        <div class="section-title" style="margin-top:15px;">📋 ЛОГ СОБЫТИЙ</div>
-        <div class="log-panel" id="logPanel">Добро пожаловать в ферму!</div> <!-- Убран лишний 📋 -->
-        <div class="section-title" style="margin-top:15px;">СИСТЕМА</div>
-        <button class="btn btn-danger" id="resetGameBtn"><span>🔄</span> СБРОСИТЬ ИГРУ</button> <!-- Убран onclick -->
     </div>
 </div>
 <script type="module" src="src/main.js"></script>

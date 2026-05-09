@@ -7,8 +7,8 @@ import { ACHIEVEMENTS } from '../../constants.js';
 export function initButtonHandlers() {
     console.log('🔘 Initializing button handlers');
     
+    // --- ВЁДРА ---
     document.getElementById('compactAdd1Btn')?.addEventListener('click', () => {
-        console.log('Click: Add 1 seed');
         if (store.selectedBucketIds.size === 0) {
             store.addLog('⚠️ Сначала выбери вёдра');
             return;
@@ -17,7 +17,6 @@ export function initButtonHandlers() {
     });
 
     document.getElementById('compactAdd4Btn')?.addEventListener('click', () => {
-        console.log('Click: Add 4 seeds');
         if (store.selectedBucketIds.size === 0) {
             store.addLog('⚠️ Сначала выбери вёдра');
             return;
@@ -26,7 +25,6 @@ export function initButtonHandlers() {
     });
 
     document.getElementById('compactSoakBtn')?.addEventListener('click', () => {
-        console.log('Click: Soak');
         if (store.selectedBucketIds.size === 0) {
             store.addLog('⚠️ Сначала выбери вёдра');
             return;
@@ -35,7 +33,6 @@ export function initButtonHandlers() {
     });
 
     document.getElementById('compactAirBtn')?.addEventListener('click', () => {
-        console.log('Click: Air');
         if (store.selectedBucketIds.size === 0) {
             store.addLog('⚠️ Сначала выбери вёдра');
             return;
@@ -44,7 +41,6 @@ export function initButtonHandlers() {
     });
 
     document.getElementById('compactSowBtn')?.addEventListener('click', () => {
-        console.log('Click: Sow');
         if (store.selectedBucketIds.size === 0) {
             store.addLog('⚠️ Сначала выбери вёдра');
             return;
@@ -52,35 +48,32 @@ export function initButtonHandlers() {
         store.selectedBucketIds.forEach(id => bucketController.sow(id));
     });
 
+    // Выбор вёдер по фильтрам
     document.getElementById('compactSelectFreeBtn')?.addEventListener('click', () => {
-        console.log('Click: Select free buckets');
         const ids = store.buckets.filter(b => b.stage === null).map(b => b.id);
         store.selectBuckets(ids);
         store.addLog(`🔲 Выбраны свободные вёдра (${ids.length})`);
     });
 
     document.getElementById('compactSelectSoakBtn')?.addEventListener('click', () => {
-        console.log('Click: Select soak buckets');
         const ids = store.buckets.filter(b => b.stage === 'soak').map(b => b.id);
         store.selectBuckets(ids);
         store.addLog(`🔲 Выбраны вёдра в замачивании (${ids.length})`);
     });
 
     document.getElementById('compactSelectAirBtn')?.addEventListener('click', () => {
-        console.log('Click: Select air buckets');
         const ids = store.buckets.filter(b => b.stage === 'air').map(b => b.id);
         store.selectBuckets(ids);
         store.addLog(`🔲 Выбраны вёдра в проветривании (${ids.length})`);
     });
 
     document.getElementById('compactClearBucketSelectionBtn')?.addEventListener('click', () => {
-        console.log('Click: Clear bucket selection');
         store.clearSelection();
         store.addLog('🔄 Выбор снят');
     });
 
+    // --- КОНТЕЙНЕРЫ: перемещение между зонами ---
     document.getElementById('stagePressBtn')?.addEventListener('click', () => {
-        console.log('Click: Press stage');
         if (store.selectedContainerIds.size === 0) {
             store.addLog('⚠️ Сначала выбери контейнеры на столе');
             return;
@@ -90,7 +83,6 @@ export function initButtonHandlers() {
     });
 
     document.getElementById('stageLightBtn')?.addEventListener('click', () => {
-        console.log('Click: Light stage');
         if (store.selectedContainerIds.size === 0) {
             store.addLog('⚠️ Сначала выбери контейнеры на полках');
             return;
@@ -99,14 +91,8 @@ export function initButtonHandlers() {
         containerController.moveToLight(ids);
     });
 
-    document.getElementById('resetStageBtn')?.addEventListener('click', () => {
-        console.log('Click: Reset selection');
-        store.clearSelection();
-        store.addLog('🔄 Выбор сброшен');
-    });
-
+    // --- УХОД ЗА КОНТЕЙНЕРАМИ ---
     document.getElementById('spraySelectedBtn')?.addEventListener('click', () => {
-        console.log('Click: Spray');
         if (store.selectedContainerIds.size === 0) {
             store.addLog('⚠️ Сначала выбери контейнеры');
             return;
@@ -116,7 +102,6 @@ export function initButtonHandlers() {
     });
 
     document.getElementById('waterSelectedBtn')?.addEventListener('click', () => {
-        console.log('Click: Water');
         if (store.selectedContainerIds.size === 0) {
             store.addLog('⚠️ Сначала выбери контейнеры на свету');
             return;
@@ -125,21 +110,8 @@ export function initButtonHandlers() {
         containerController.water(ids);
     });
 
-    document.getElementById('selectAllBtn')?.addEventListener('click', () => {
-        console.log('Click: Select all');
-        const ids = store.containers.map(c => c.id);
-        store.selectContainers(ids);
-        store.addLog(`🔲 Выбраны все контейнеры (${ids.length})`);
-    });
-
-    document.getElementById('clearSelectionBtn')?.addEventListener('click', () => {
-        console.log('Click: Clear selection');
-        store.clearSelection();
-        store.addLog('🔄 Выбор снят');
-    });
-
+    // --- СБОР И УДАЛЕНИЕ ---
     document.getElementById('harvestSelectedBtn')?.addEventListener('click', () => {
-        console.log('Click: Harvest');
         if (store.selectedContainerIds.size === 0) {
             store.addLog('⚠️ Сначала выбери контейнеры для сбора');
             return;
@@ -149,7 +121,6 @@ export function initButtonHandlers() {
     });
 
     document.getElementById('deleteSelectedBtn')?.addEventListener('click', () => {
-        console.log('Click: Delete');
         if (store.selectedContainerIds.size === 0) {
             store.addLog('⚠️ Сначала выбери контейнеры для удаления');
             return;
@@ -158,15 +129,31 @@ export function initButtonHandlers() {
         harvestController.delete(ids);
     });
 
+    // --- УПРАВЛЕНИЕ ВЫДЕЛЕНИЕМ ---
+    document.getElementById('selectAllBtn')?.addEventListener('click', () => {
+        const ids = store.containers.map(c => c.id);
+        store.selectContainers(ids);
+        store.addLog(`🔲 Выбраны все контейнеры (${ids.length})`);
+    });
+
+    document.getElementById('clearSelectionBtn')?.addEventListener('click', () => {
+        store.clearSelection();
+        store.addLog('🔄 Выбор снят');
+    });
+
+    document.getElementById('resetStageBtn')?.addEventListener('click', () => {
+        store.clearSelection();
+        store.addLog('🔄 Выбор сброшен');
+    });
+
+    // --- РЕСУРСЫ ---
     document.getElementById('addWaterBtn')?.addEventListener('click', () => {
-        console.log('Click: Add water');
         store.resources.addWater(5);
         store.addLog('🚰 +5 воды');
         store.notify();
     });
 
     document.getElementById('addSolutionBtn')?.addEventListener('click', () => {
-        console.log('Click: Add solution');
         if (store.resources.water < 4) {
             store.addLog(`❌ Недостаточно воды для создания раствора! Нужно 4 л воды, есть ${store.resources.water.toFixed(2)} л`);
             return;
@@ -179,15 +166,13 @@ export function initButtonHandlers() {
     });
 
     document.getElementById('addSeedsBtn')?.addEventListener('click', () => {
-        console.log('Click: Add seeds');
         store.resources.addSeeds(10);
         store.addLog('🌱 +10 семян');
         store.notify();
     });
 
-    // Новые обработчики для умных кнопок
+    // --- УМНЫЕ КНОПКИ ---
     document.getElementById('smartPressBtn')?.addEventListener('click', () => {
-        console.log('Click: Smart press');
         const readyIds = store.containers
             .filter(c => c.location === 'table' && c.needsTransition)
             .map(c => c.id);
@@ -199,7 +184,6 @@ export function initButtonHandlers() {
     });
 
     document.getElementById('smartLightBtn')?.addEventListener('click', () => {
-        console.log('Click: Smart light');
         const readyIds = store.containers
             .filter(c => c.location === 'shelf' && c.needsTransition)
             .map(c => c.id);
@@ -210,6 +194,7 @@ export function initButtonHandlers() {
         }
     });
 
+    // --- ДОСТИЖЕНИЯ ---
     document.getElementById('achievementsBtn')?.addEventListener('click', () => {
         const achievements = store.stats.achievements.map(id => {
             const ach = Object.values(ACHIEVEMENTS).find(a => a.id === id);
