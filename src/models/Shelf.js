@@ -1,16 +1,15 @@
-// Полка для прижима
+import { CAPACITY } from '../../constants.js';
+
 export class Shelf {
   constructor(id) {
     this.id = id;
-    this.containers = []; // массив id контейнеров
+    this.containers = [];
   }
 
-  // Свободное место
   get freeSpace() {
-    return 4 - this.containers.length; // CAPACITY.SHELF_CAPACITY
+    return CAPACITY.SHELF_CAPACITY - this.containers.length;
   }
 
-  // Добавить контейнер
   addContainer(containerId) {
     if (this.freeSpace > 0) {
       this.containers.push(containerId);
@@ -19,7 +18,6 @@ export class Shelf {
     return false;
   }
 
-  // Удалить контейнер
   removeContainer(containerId) {
     const index = this.containers.indexOf(containerId);
     if (index !== -1) {

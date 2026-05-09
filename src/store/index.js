@@ -2,20 +2,7 @@ import { Bucket } from '../models/Bucket.js';
 import { Container } from '../models/Container.js';
 import { Shelf } from '../models/Shelf.js';
 import { ResourceStock } from '../models/ResourceStock.js';
-
-// Константы
-const INITIAL_STATS = {
-    totalHarvested: 0,
-    totalWaterUsed: 0,
-    totalSolutionUsed: 0,
-    totalSeedsUsed: 0,
-    fastestCycle: null,
-    maxFullBuckets: 0,
-    maxFullTable: false,
-    maxFullShelves: false,
-    maxFullLight: false,
-    achievements: []
-};
+import { INITIAL_STATS } from '../../constants.js'; // импортируем из констант
 
 class Store {
     constructor() {
@@ -25,7 +12,7 @@ class Store {
         this.buckets = [1, 2, 3, 4].map(id => new Bucket(id));
         this.table = { containers: [] };
         this.shelves = [1, 2, 3].map(id => new Shelf(id));
-        this.resources = new ResourceStock(20, 15, 30); // water, solution, seeds
+        this.resources = new ResourceStock(20, 15, 30);
         this.gameDay = 0;
         this.nextId = 1;
         this.stats = { ...INITIAL_STATS };
@@ -52,10 +39,10 @@ class Store {
     }
 
     notify() {
-        // console.log('📢 Store notify, subscribers:', this._subscribers.length);
         this._subscribers.forEach(cb => cb(this));
     }
 
+    // ИСПРАВЛЕНО: обратные кавычки для шаблонной строки
     addLog(msg) {
         const timeStr = new Date().toLocaleTimeString().slice(0,5);
         this.log.unshift(`⏱️ ${timeStr} • ${msg}`);

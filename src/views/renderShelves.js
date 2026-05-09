@@ -1,5 +1,6 @@
 import { store } from '../store/index.js';
 import { createContainerCard } from './containerCard.js';
+import { CAPACITY } from '../../constants.js';
 
 export function renderShelves() {
     console.log('📚 renderShelves called');
@@ -19,8 +20,8 @@ export function renderShelves() {
 
         shelfContainers.forEach(c => shelfContainer.appendChild(createContainerCard(c)));
 
-        // Заполняем пустые ячейки
-        for (let i = shelfContainers.length; i < 4; i++) {
+        // Используем константу вместо 4
+        for (let i = shelfContainers.length; i < CAPACITY.SHELF_CAPACITY; i++) {
             const empty = document.createElement('div');
             empty.className = 'shelf-cell empty';
             empty.innerHTML = '📦';

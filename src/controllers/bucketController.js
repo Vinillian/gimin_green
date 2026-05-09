@@ -40,7 +40,8 @@ export const bucketController = {
 
   startAiring(bucketId) {
     const bucket = store.getBucket(bucketId);
-    if (!bucket || bucket.stage !== 'soak' || !bucket.needsTransition) return false;
+    // Добавлена проверка на наличие семян (хотя стадия 'soak' подразумевает их наличие)
+    if (!bucket || bucket.stage !== 'soak' || !bucket.needsTransition || bucket.seeds === 0) return false;
 
     bucket.startStage('air', store.gameDay);
     store.notify();
@@ -65,7 +66,6 @@ export const bucketController = {
     const currentDay = store.gameDay;
     const newIds = [];
     for (let i = 0; i < seedsCount; i++) {
-      // Генерация уникального номера
       let number = 1;
       const existingNumbers = new Set(store.containers.map(c => c.number));
       while (existingNumbers.has(number)) number++;

@@ -1,5 +1,6 @@
 import { store } from '../store/index.js';
 import { createContainerCard } from './containerCard.js';
+import { CAPACITY } from '../../constants.js';
 
 export function renderPallets() {
     console.log('📦 renderPallets called');
@@ -19,11 +20,10 @@ export function renderPallets() {
         .filter(c => c.location === 'light')
         .sort((a, b) => a.number - b.number);
 
-    const containers1 = lightContainers.filter(c => c.number <= 8);
-    const containers2 = lightContainers.filter(c => c.number > 8);
+    const containers1 = lightContainers.filter(c => c.number <= CAPACITY.PALLET_SIZE);
+    const containers2 = lightContainers.filter(c => c.number > CAPACITY.PALLET_SIZE);
 
-    // Первый поддон (1-8)
-    for (let i = 1; i <= 8; i++) {
+    for (let i = 1; i <= CAPACITY.PALLET_SIZE; i++) {
         const container = containers1.find(c => c.number === i);
         if (container) {
             grid1.appendChild(createContainerCard(container));
@@ -35,8 +35,7 @@ export function renderPallets() {
         }
     }
 
-    // Второй поддон (9-16)
-    for (let i = 9; i <= 16; i++) {
+    for (let i = CAPACITY.PALLET_SIZE + 1; i <= CAPACITY.LIGHT_CAPACITY; i++) {
         const container = containers2.find(c => c.number === i);
         if (container) {
             grid2.appendChild(createContainerCard(container));
@@ -48,7 +47,6 @@ export function renderPallets() {
         }
     }
 
-    // Обновление счётчиков готовности
     const ready1 = containers1.filter(c => c.stage === 'light' && c.needsTransition).length;
     const ready2 = containers2.filter(c => c.stage === 'light' && c.needsTransition).length;
     

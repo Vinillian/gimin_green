@@ -16,9 +16,7 @@ import { renderResources } from './views/renderResources.js';
 import { renderLog } from './views/renderLog.js';
 import { renderSelectedInfo } from './views/renderSelectedInfo.js';
 
-// Функция для полного обновления UI
 function fullRender() {
-    console.log('🔄 Full render called', store.gameDay);
     renderBuckets();
     renderTable();
     renderShelves();
@@ -28,57 +26,37 @@ function fullRender() {
     renderLog();
 }
 
-// Подписка на изменения store
 store.subscribe(() => {
     fullRender();
 });
 
-// Загрузка сохранения
 persistenceService.load();
 
-// Принудительный первый рендер
-setTimeout(() => {
+// Убираем setTimeout, используем DOMContentLoaded для гарантии загрузки DOM
+document.addEventListener('DOMContentLoaded', () => {
     fullRender();
     store.addLog("🚀 Ферма запущена");
-}, 100);
 
-// Запуск автосохранения
-persistenceService.autoSave();
+    persistenceService.autoSave();
+    timeService.start();
 
-// Запуск таймера
-timeService.start();
-
-// Инициализация обработчиков
-setTimeout(() => {
+    // Инициализация обработчиков после полной загрузки DOM
     initButtonHandlers();
     initKeyboardHandlers();
     initZoneClickHandlers();
-}, 200);
 
-// Обработчики для кнопок, которые не входят в модули (пауза, сброс игры, новая кнопка "ВСЕ" на свету)
-document.getElementById('pauseBtn')?.addEventListener('click', () => {
-    timeService.toggle();
-    store.addLog(timeService.isRunning ? '▶️ Игра запущена' : '⏸️ Игра на паузе');
+    // Обработчики для паузы и сброса (без onclick в HTML)
+    document.getElementById('pauseBtn')?.addEventListener('click', () => {
+        timeService.toggle();
+        store.addLog(timeService.isRunning ? '▶️ Игра запущена' : '⏸️ Игра на паузе');
+    });
+
+    document.getElementById('resetGameBtn')?.addEventListener('click', () => {
+        if (confirm('Сбросить всю игру? Это действие нельзя отменить!')) {
+            localStorage.removeItem('farmState');
+            location.reload();
+        }
+    });
 });
-
-document.getElementById('resetGameBtn')?.addEventListener('click', () => {
-    if (confirm('Сбросить всю игру? Это действие нельзя отменить!')) {
-        localStorage.removeItem('farmState');
-        location.reload();
-    }
-});
-
-// Для отладки
-window.store = store;
-window.debug = {
-    render: fullRender,
-    addContainer: () => {
-        store.resources.addSeeds(10);
-        store.resources.addWater(20);
-        store.resources.addSolution(10);
-        fullRender();
-        console.log('Debug: resources added');
-    }
-};
 
 console.log('✅ Main.js loaded');

@@ -3,7 +3,6 @@ import { store } from '../store/index.js';
 export function initZoneClickHandlers() {
     console.log('🖱️ Initializing zone click handlers');
 
-    // Кнопка "ВСЕ" над светом – выбирает все контейнеры вообще
     const selectAllBtn = document.getElementById('selectAllBtn');
     if (selectAllBtn) {
         selectAllBtn.addEventListener('click', () => {
@@ -13,7 +12,6 @@ export function initZoneClickHandlers() {
         });
     }
 
-    // Стол посева (по id)
     const tableZone = document.getElementById('tableZoneHeader');
     if (tableZone) {
         tableZone.addEventListener('click', (e) => {
@@ -24,7 +22,6 @@ export function initZoneClickHandlers() {
         });
     }
 
-    // Полки (по заголовкам)
     document.querySelectorAll('.shelf-header').forEach((header, index) => {
         header.addEventListener('click', (e) => {
             e.stopPropagation();
@@ -36,7 +33,6 @@ export function initZoneClickHandlers() {
         });
     });
 
-    // Поддоны (по заголовкам)
     document.querySelectorAll('.pallet-header').forEach((header, index) => {
         header.addEventListener('click', (e) => {
             e.stopPropagation();
@@ -51,7 +47,6 @@ export function initZoneClickHandlers() {
         });
     });
 
-    // Зона света (общий заголовок)
     const lightZone = document.getElementById('lightZoneHeader');
     if (lightZone) {
         lightZone.addEventListener('click', () => {
@@ -61,7 +56,6 @@ export function initZoneClickHandlers() {
         });
     }
 
-    // Зона прижима (общий заголовок)
     const pressZone = document.getElementById('pressZoneHeader');
     if (pressZone) {
         pressZone.addEventListener('click', (e) => {
@@ -72,7 +66,6 @@ export function initZoneClickHandlers() {
         });
     }
 
-    // Вёдра (общий заголовок)
     const bucketsZone = document.getElementById('bucketsZoneHeader');
     if (bucketsZone) {
         bucketsZone.addEventListener('click', () => {

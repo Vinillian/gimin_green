@@ -2,81 +2,56 @@ import { store } from '../store/index.js';
 import { bucketController } from '../controllers/bucketController.js';
 import { containerController } from '../controllers/containerController.js';
 import { harvestController } from '../controllers/harvestController.js';
+import { ACHIEVEMENTS } from '../../constants.js';
 
 export function initButtonHandlers() {
     console.log('🔘 Initializing button handlers');
     
-    // Добавление семян +1
     document.getElementById('compactAdd1Btn')?.addEventListener('click', () => {
         console.log('Click: Add 1 seed');
         if (store.selectedBucketIds.size === 0) {
             store.addLog('⚠️ Сначала выбери вёдра');
             return;
         }
-        let success = false;
-        store.selectedBucketIds.forEach(id => {
-            if (bucketController.addSeeds(id, 1)) success = true;
-        });
-        if (success) store.addLog('🌱 Добавлено по 1 семени в выбранные вёдра');
+        store.selectedBucketIds.forEach(id => bucketController.addSeeds(id, 1));
     });
 
-    // Добавление семян +4
     document.getElementById('compactAdd4Btn')?.addEventListener('click', () => {
         console.log('Click: Add 4 seeds');
         if (store.selectedBucketIds.size === 0) {
             store.addLog('⚠️ Сначала выбери вёдра');
             return;
         }
-        let success = false;
-        store.selectedBucketIds.forEach(id => {
-            if (bucketController.addSeeds(id, 4)) success = true;
-        });
-        if (success) store.addLog('🌱 Добавлено по 4 семени в выбранные вёдра');
+        store.selectedBucketIds.forEach(id => bucketController.addSeeds(id, 4));
     });
 
-    // Замачивание
     document.getElementById('compactSoakBtn')?.addEventListener('click', () => {
         console.log('Click: Soak');
         if (store.selectedBucketIds.size === 0) {
             store.addLog('⚠️ Сначала выбери вёдра');
             return;
         }
-        let success = false;
-        store.selectedBucketIds.forEach(id => {
-            if (bucketController.startSoaking(id)) success = true;
-        });
-        if (success) store.addLog('💧 Запущено замачивание в выбранных вёдрах');
+        store.selectedBucketIds.forEach(id => bucketController.startSoaking(id));
     });
 
-    // Проветривание
     document.getElementById('compactAirBtn')?.addEventListener('click', () => {
         console.log('Click: Air');
         if (store.selectedBucketIds.size === 0) {
             store.addLog('⚠️ Сначала выбери вёдра');
             return;
         }
-        let success = false;
-        store.selectedBucketIds.forEach(id => {
-            if (bucketController.startAiring(id)) success = true;
-        });
-        if (success) store.addLog('🌬 Запущено проветривание в выбранных вёдрах');
+        store.selectedBucketIds.forEach(id => bucketController.startAiring(id));
     });
 
-    // Посев
     document.getElementById('compactSowBtn')?.addEventListener('click', () => {
         console.log('Click: Sow');
         if (store.selectedBucketIds.size === 0) {
             store.addLog('⚠️ Сначала выбери вёдра');
             return;
         }
-        let success = false;
-        store.selectedBucketIds.forEach(id => {
-            if (bucketController.sow(id)) success = true;
-        });
-        if (success) store.addLog('🌱 Посеяны контейнеры из выбранных вёдер');
+        store.selectedBucketIds.forEach(id => bucketController.sow(id));
     });
 
-    // Выбор свободных вёдер
     document.getElementById('compactSelectFreeBtn')?.addEventListener('click', () => {
         console.log('Click: Select free buckets');
         const ids = store.buckets.filter(b => b.stage === null).map(b => b.id);
@@ -84,7 +59,6 @@ export function initButtonHandlers() {
         store.addLog(`🔲 Выбраны свободные вёдра (${ids.length})`);
     });
 
-    // Выбор вёдер в замачивании
     document.getElementById('compactSelectSoakBtn')?.addEventListener('click', () => {
         console.log('Click: Select soak buckets');
         const ids = store.buckets.filter(b => b.stage === 'soak').map(b => b.id);
@@ -92,7 +66,6 @@ export function initButtonHandlers() {
         store.addLog(`🔲 Выбраны вёдра в замачивании (${ids.length})`);
     });
 
-    // Выбор вёдер в проветривании
     document.getElementById('compactSelectAirBtn')?.addEventListener('click', () => {
         console.log('Click: Select air buckets');
         const ids = store.buckets.filter(b => b.stage === 'air').map(b => b.id);
@@ -100,14 +73,12 @@ export function initButtonHandlers() {
         store.addLog(`🔲 Выбраны вёдра в проветривании (${ids.length})`);
     });
 
-    // Снять выбор с вёдер
     document.getElementById('compactClearBucketSelectionBtn')?.addEventListener('click', () => {
         console.log('Click: Clear bucket selection');
         store.clearSelection();
         store.addLog('🔄 Выбор снят');
     });
 
-    // Прижим
     document.getElementById('stagePressBtn')?.addEventListener('click', () => {
         console.log('Click: Press stage');
         if (store.selectedContainerIds.size === 0) {
@@ -115,14 +86,9 @@ export function initButtonHandlers() {
             return;
         }
         const ids = Array.from(store.selectedContainerIds);
-        if (containerController.moveToPress(ids)) {
-            store.addLog(`📦 Перемещено на прижим`);
-        } else {
-            store.addLog('❌ Не удалось переместить (проверь готовность и место)');
-        }
+        containerController.moveToPress(ids);
     });
 
-    // Свет
     document.getElementById('stageLightBtn')?.addEventListener('click', () => {
         console.log('Click: Light stage');
         if (store.selectedContainerIds.size === 0) {
@@ -130,21 +96,15 @@ export function initButtonHandlers() {
             return;
         }
         const ids = Array.from(store.selectedContainerIds);
-        if (containerController.moveToLight(ids)) {
-            store.addLog(`💡 Перемещено на свет`);
-        } else {
-            store.addLog('❌ Не удалось переместить (проверь готовность и место)');
-        }
+        containerController.moveToLight(ids);
     });
 
-    // Сброс выделения
     document.getElementById('resetStageBtn')?.addEventListener('click', () => {
         console.log('Click: Reset selection');
         store.clearSelection();
         store.addLog('🔄 Выбор сброшен');
     });
 
-    // Опрыскивание
     document.getElementById('spraySelectedBtn')?.addEventListener('click', () => {
         console.log('Click: Spray');
         if (store.selectedContainerIds.size === 0) {
@@ -152,14 +112,9 @@ export function initButtonHandlers() {
             return;
         }
         const ids = Array.from(store.selectedContainerIds);
-        if (containerController.spray(ids)) {
-            store.addLog(`💦 Контейнеры опрысканы`);
-        } else {
-            store.addLog('❌ Не удалось опрыскать (нет воды или нечего опрыскивать)');
-        }
+        containerController.spray(ids);
     });
 
-    // Полив
     document.getElementById('waterSelectedBtn')?.addEventListener('click', () => {
         console.log('Click: Water');
         if (store.selectedContainerIds.size === 0) {
@@ -167,14 +122,9 @@ export function initButtonHandlers() {
             return;
         }
         const ids = Array.from(store.selectedContainerIds);
-        if (containerController.water(ids)) {
-            store.addLog(`💧 Контейнеры политы`);
-        } else {
-            store.addLog('❌ Не удалось полить (нет воды или нечего поливать)');
-        }
+        containerController.water(ids);
     });
 
-    // Выделить все
     document.getElementById('selectAllBtn')?.addEventListener('click', () => {
         console.log('Click: Select all');
         const ids = store.containers.map(c => c.id);
@@ -182,14 +132,12 @@ export function initButtonHandlers() {
         store.addLog(`🔲 Выбраны все контейнеры (${ids.length})`);
     });
 
-    // Снять выделение
     document.getElementById('clearSelectionBtn')?.addEventListener('click', () => {
         console.log('Click: Clear selection');
         store.clearSelection();
         store.addLog('🔄 Выбор снят');
     });
 
-    // Сбор урожая
     document.getElementById('harvestSelectedBtn')?.addEventListener('click', () => {
         console.log('Click: Harvest');
         if (store.selectedContainerIds.size === 0) {
@@ -197,14 +145,9 @@ export function initButtonHandlers() {
             return;
         }
         const ids = Array.from(store.selectedContainerIds);
-        if (harvestController.harvest(ids)) {
-            // лог внутри контроллера
-        } else {
-            store.addLog('❌ Не удалось собрать (контейнеры не на свету или не готовы)');
-        }
+        harvestController.harvest(ids);
     });
 
-    // Удаление
     document.getElementById('deleteSelectedBtn')?.addEventListener('click', () => {
         console.log('Click: Delete');
         if (store.selectedContainerIds.size === 0) {
@@ -212,12 +155,9 @@ export function initButtonHandlers() {
             return;
         }
         const ids = Array.from(store.selectedContainerIds);
-        if (harvestController.delete(ids)) {
-            store.addLog(`🗑️ Удалено контейнеров: ${ids.length}`);
-        }
+        harvestController.delete(ids);
     });
 
-    // Добавить воду
     document.getElementById('addWaterBtn')?.addEventListener('click', () => {
         console.log('Click: Add water');
         store.resources.addWater(5);
@@ -225,7 +165,6 @@ export function initButtonHandlers() {
         store.notify();
     });
 
-    // Добавить раствор
     document.getElementById('addSolutionBtn')?.addEventListener('click', () => {
         console.log('Click: Add solution');
         if (store.resources.water < 4) {
@@ -239,12 +178,44 @@ export function initButtonHandlers() {
         store.notify();
     });
 
-    // Добавить семена
     document.getElementById('addSeedsBtn')?.addEventListener('click', () => {
         console.log('Click: Add seeds');
         store.resources.addSeeds(10);
         store.addLog('🌱 +10 семян');
         store.notify();
+    });
+
+    // Новые обработчики для умных кнопок
+    document.getElementById('smartPressBtn')?.addEventListener('click', () => {
+        console.log('Click: Smart press');
+        const readyIds = store.containers
+            .filter(c => c.location === 'table' && c.needsTransition)
+            .map(c => c.id);
+        if (readyIds.length > 0) {
+            containerController.moveToPress(readyIds);
+        } else {
+            store.addLog('❌ Нет готовых контейнеров на столе');
+        }
+    });
+
+    document.getElementById('smartLightBtn')?.addEventListener('click', () => {
+        console.log('Click: Smart light');
+        const readyIds = store.containers
+            .filter(c => c.location === 'shelf' && c.needsTransition)
+            .map(c => c.id);
+        if (readyIds.length > 0) {
+            containerController.moveToLight(readyIds);
+        } else {
+            store.addLog('❌ Нет готовых контейнеров на полках');
+        }
+    });
+
+    document.getElementById('achievementsBtn')?.addEventListener('click', () => {
+        const achievements = store.stats.achievements.map(id => {
+            const ach = Object.values(ACHIEVEMENTS).find(a => a.id === id);
+            return ach ? `${ach.icon} ${ach.title}` : id;
+        }).join('\n');
+        alert(achievements.length ? `🏆 Достижения:\n${achievements}` : '🏆 Пока нет достижений');
     });
 
     console.log('✅ Button handlers initialized');
