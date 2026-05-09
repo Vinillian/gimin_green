@@ -22,11 +22,15 @@ export class Container {
       this.needsTransition = daysPassed >= totalDays;
     }
 
-    if (this.stage !== 'sow' && currentDay > this.lastSprayDay) {
+    // Опрыскивание нужно, если прошёл хотя бы 1 полный день с последнего опрыскивания
+    // и контейнер не в стадии 'sow'
+    if (this.stage !== 'sow' && currentDay - this.lastSprayDay >= 1) {
       this.needsSpray = true;
     }
 
-    if (this.stage === 'light' && currentDay > this.lastWaterDay) {
+    // Полив нужен, если прошёл хотя бы 1 полный день с последнего полива
+    // и контейнер на стадии 'light'
+    if (this.stage === 'light' && currentDay - this.lastWaterDay >= 1) {
       this.needsWater = true;
     }
   }
@@ -41,7 +45,6 @@ export class Container {
     this.needsWater = false;
   }
 
-  // УЛУЧШЕНО: принимает locationId и сохраняет его
   moveTo(newLocation, newStage, currentDay, locationId = null, newNumber = null) {
     this.location = newLocation;
     this.stage = newStage;
