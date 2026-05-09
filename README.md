@@ -1,6 +1,6 @@
 Вот обновлённый README.md для версии с реальным временем:
 
-```markdown
+
 # 🌾 Wheat Farm Simulator
 
 A browser-based wheat microgreens farm simulator with spatial workflow zones, resource management, and **real-time progression** (actual hours/days, not game time).
@@ -12,7 +12,7 @@ A browser-based wheat microgreens farm simulator with spatial workflow zones, re
 ### Option 1: PowerShell (Windows, no install)
 ```powershell
 powershell -ExecutionPolicy ByPass -File server.ps1
-```
+
 
 ### Option 2: Any OS with Node.js / Python / PHP
 ```bash
