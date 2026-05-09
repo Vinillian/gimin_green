@@ -2,20 +2,36 @@
 
 ## Supported Versions
 
-Use this section to tell people about which versions of your project are
-currently being supported with security updates.
-
 | Version | Supported          |
 | ------- | ------------------ |
-| 5.1.x   | :white_check_mark: |
-| 5.0.x   | :x:                |
-| 4.0.x   | :white_check_mark: |
-| < 4.0   | :x:                |
+| 5.x (real-time) | ✅ |
+| 4.x (modular)   | ✅ |
+| < 4.0 (legacy)  | ❌ |
 
 ## Reporting a Vulnerability
 
-Use this section to tell people how to report a vulnerability.
+This is a browser-based single-page application with no backend, no database, and no user authentication. Vulnerabilities are limited to client-side issues (XSS via localStorage manipulation, DOM injection).
 
-Tell them where to go, how often they can expect to get an update on a
-reported vulnerability, what to expect if the vulnerability is accepted or
-declined, etc.
+To report a vulnerability:
+1. Open an issue on [GitHub Issues](https://github.com/Vinillian/gimin_green/issues)
+2. Or email `ber07@inbox.ru` (from commit history)
+3. Include steps to reproduce and affected version
+
+**Response time:** Within 14 days (this is a hobby project)
+
+**If accepted:** Fix will be published in the next version with credit in release notes.
+
+**If declined:** Explanation will be provided in the issue thread.
+
+## Scope
+
+| In scope | Out of scope |
+|----------|--------------|
+| XSS via crafted localStorage data | Social engineering |
+| DOM injection through UI | Physical device access |
+| Data integrity issues | Browser vulnerabilities |
+| | DDoS (no server component) |
+
+## Acknowledgments
+
+Thank you to anyone who responsibly discloses security issues.
