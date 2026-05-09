@@ -1,24 +1,19 @@
 // ui.js
 
-// ========== ГЛАВНАЯ ФУНКЦИЯ РЕНДЕРИНГА ==========
-
 function render() {
-    renderBuckets();            // Вёдра в сетке 2x2
-    renderTable();              // Стол посева
-    renderShelves();            // Полки прижима
-    renderPallets();            // Поддоны на свету
-    renderResources();          // Ресурсы
-    renderSelectedInfo();       // Информация о выделенном
-    renderLog();                // Лог сообщений
+    renderBuckets();
+    renderTable();
+    renderShelves();
+    renderPallets();
+    renderResources();
+    renderSelectedInfo();
+    renderLog();
     
-    // Добавляем обработчики для новых элементов интерфейса (один раз)
     if (!window.uiElementsAdded) {
         addZoneSelectionHandlers();
         window.uiElementsAdded = true;
     }
 }
-
-// ========== РЕНДЕРИНГ ВЁДЕР (СЕТКА 2x2) ==========
 
 function renderBuckets() {
     const container = document.getElementById('bucketsCompactContainer');
@@ -31,20 +26,17 @@ function renderBuckets() {
         bucketEl.className = `bucket ${bucket.stage ? 'active' : ''} ${state.selectedBucketIds.has(bucket.id) ? 'selected' : ''}`;
         bucketEl.dataset.id = bucket.id;
         
-        // Выбираем иконку в зависимости от стадии
         let icon = '🪣';
         if (bucket.stage === 'soak') icon = '💧';
         else if (bucket.stage === 'air') icon = '🌬';
         
         const progress = bucket.stage ? getBucketProgress(bucket) : 0;
         
-        // Иконки статуса
         const statusIcons = [];
         if (bucket.stage === 'soak') statusIcons.push('💧');
         else if (bucket.stage === 'air') statusIcons.push('🌬');
         if (bucket.needsTransition) statusIcons.push('⚠️');
         
-        // Прогресс-бар для активных вёдер
         const progressBar = bucket.stage ? `
             <div class="progress-container">
                 <div class="progress-fill" style="width: ${progress}%;"></div>
@@ -58,15 +50,12 @@ function renderBuckets() {
             <div class="bucket-status">${statusIcons.join('')}</div>
         `;
         
-        // Обработчик клика для выбора ведра
         bucketEl.addEventListener('click', (e) => {
             e.stopPropagation();
             
             if (e.ctrlKey || e.shiftKey || state.multiselectModifier) {
-                // Множественный выбор с Ctrl/Shift
                 toggleBucketSelection(bucket.id);
             } else {
-                // Одиночный выбор
                 if (state.selectedBucketIds.has(bucket.id) && state.selectedBucketIds.size === 1) {
                     state.selectedBucketIds.clear();
                     addLog(`🔓 Ведро #${bucket.id} снято с выбора`);
@@ -83,15 +72,10 @@ function renderBuckets() {
         container.appendChild(bucketEl);
     });
     
-    // Обновляем счётчик семян в вёдрах
     const totalSeeds = state.buckets.reduce((sum, b) => sum + b.seeds, 0);
     const totalSeedsEl = document.getElementById('totalSeedsInBuckets');
-    if (totalSeedsEl) {
-        totalSeedsEl.innerText = totalSeeds;
-    }
+    if (totalSeedsEl) totalSeedsEl.innerText = totalSeeds;
 }
-
-// ========== РЕНДЕРИНГ ПОЛОК ==========
 
 function renderShelves() {
     for (let shelfId = 1; shelfId <= CAPACITY.SHELVES_COUNT; shelfId++) {
@@ -105,13 +89,11 @@ function renderShelves() {
             const shelfContainers = state.containers.filter(c => shelf.containers.includes(c.id));
             shelfContainers.sort((a, b) => a.number - b.number);
             
-            // Отрисовываем контейнеры на полке
             shelfContainers.forEach(containerObj => {
                 const card = createContainerCard(containerObj, true);
                 shelfContainer.appendChild(card);
             });
             
-            // Заполняем пустые ячейки до SHELF_CAPACITY
             for (let i = shelfContainers.length; i < CAPACITY.SHELF_CAPACITY; i++) {
                 const empty = document.createElement('div');
                 empty.className = 'shelf-cell empty';
@@ -121,8 +103,6 @@ function renderShelves() {
         }
     }
 }
-
-// ========== ФУНКЦИЯ СОЗДАНИЯ КАРТОЧКИ КОНТЕЙНЕРА ==========
 
 function createContainerCard(container, isShelfStyle = false) {
     const isSelected = state.selectedIds.has(container.id);
@@ -145,14 +125,12 @@ function createContainerCard(container, isShelfStyle = false) {
         dayText = '⚡';
     }
     
-    // Собираем иконки статуса
     const icons = [];
     icons.push(STAGE_ICONS[container.stage]);
     if (container.needsSpray) icons.push('💦');
     if (container.needsWater) icons.push('🚰');
     if (container.needsTransition) icons.push('⚠️');
     
-    // Разный HTML для полок (компактный) и для остальных мест
     if (isShelfStyle) {
         card.innerHTML = `
             <div class="container-number">#${container.number}</div>
@@ -173,13 +151,11 @@ function createContainerCard(container, isShelfStyle = false) {
         `;
     }
     
-    // Обработчик клика для выбора контейнера
     card.addEventListener('click', (e) => {
         e.stopPropagation();
         const id = Number(card.dataset.id);
         
         if (e.ctrlKey || e.shiftKey || state.multiselectModifier) {
-            // Множественный выбор
             if (state.selectedIds.has(id)) {
                 state.selectedIds.delete(id);
                 addLog(`🔓 Снят выбор с #${getContainerNumber(id)}`);
@@ -189,7 +165,6 @@ function createContainerCard(container, isShelfStyle = false) {
                 addLog(`🔒 Выбран #${getContainerNumber(id)}`);
             }
         } else {
-            // Одиночный выбор
             if (state.selectedIds.has(id) && state.selectedIds.size === 1) {
                 state.selectedIds.clear();
                 addLog(`🔓 Снят выбор с #${getContainerNumber(id)}`);
@@ -205,8 +180,6 @@ function createContainerCard(container, isShelfStyle = false) {
     
     return card;
 }
-
-// ========== РЕНДЕРИНГ СТОЛА ПОСЕВА ==========
 
 function renderTable() {
     const container = document.getElementById('tableContainer');
@@ -229,8 +202,6 @@ function renderTable() {
         container.appendChild(empty);
     }
 }
-
-// ========== РЕНДЕРИНГ ПОДДОНОВ (СВЕТ) ==========
 
 function renderPallets() {
     const grid1 = document.getElementById('containerGrid1');
@@ -278,8 +249,6 @@ function renderPallets() {
     if (readyCount2) readyCount2.innerText = ready2;
 }
 
-// ========== ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ ==========
-
 function getContainerNumber(id) {
     const container = state.containers.find(c => c.id === id);
     return container ? container.number : '?';
@@ -299,8 +268,6 @@ function renderEmptyCell(grid, number) {
     grid.appendChild(emptyCard);
 }
 
-// ========== РЕНДЕРИНГ РЕСУРСОВ ==========
-
 function renderResources() {
     const waterEl = document.getElementById('waterCount');
     const solutionEl = document.getElementById('solutionCount');
@@ -314,8 +281,6 @@ function renderResources() {
     if (containersEl) containersEl.innerText = state.containers.length;
     if (dayEl) dayEl.innerText = state.gameDay.toFixed(1);
 }
-
-// ========== РЕНДЕРИНГ ИНФОРМАЦИИ О ВЫДЕЛЕННОМ ==========
 
 function renderSelectedInfo() {
     const selectedInfo = document.getElementById('selectedInfo');
@@ -332,7 +297,6 @@ function renderSelectedInfo() {
                 bucketInfo.push(`#${bucket.id}${status}:${bucket.seeds}🌱`);
             }
         });
-        
         selectedInfo.innerHTML = `✅ Вёдра: ${bucketInfo.join(', ')}`;
         return;
     }
@@ -346,18 +310,14 @@ function renderSelectedInfo() {
                 if (c.location === 'table') location = ' (стол)';
                 else if (c.location === 'shelf') location = ` (полка ${c.locationId})`;
                 else if (c.location === 'light') location = ' (свет)';
-                
                 selectedItems.push(`#${c.number}${location}`);
             }
         });
-        
         selectedInfo.innerHTML = `✅ ${selectedItems.join(', ')}`;
     } else {
         selectedInfo.innerHTML = '👆 Нажми на контейнер или ведро (Ctrl+клик для нескольких)';
     }
 }
-
-// ========== РЕНДЕРИНГ ЛОГА ==========
 
 function renderLog() {
     const logPanel = document.getElementById('logPanel');
@@ -366,19 +326,17 @@ function renderLog() {
     }
 }
 
-// ========== ДОБАВЛЕНИЕ ОБРАБОТЧИКОВ ВЫБОРА ЗОН ==========
-
 function addZoneSelectionHandlers() {
     // Стол посева
-    const tableZone = document.querySelector('.sowing-section .zone-header');
-    if (tableZone && !tableZone._hasHandler) {
-        tableZone.style.cursor = 'pointer';
-        tableZone.title = 'Кликни для выбора всех контейнеров на столе';
-        tableZone.addEventListener('click', (e) => {
+    const tableHeader = document.getElementById('tableHeader');
+    if (tableHeader && !tableHeader._hasHandler) {
+        tableHeader.style.cursor = 'pointer';
+        tableHeader.title = 'Кликни для выбора всех контейнеров на столе';
+        tableHeader.addEventListener('click', (e) => {
             e.stopPropagation();
             selectAllTable();
         });
-        tableZone._hasHandler = true;
+        tableHeader._hasHandler = true;
     }
     
     // Полки
@@ -425,8 +383,6 @@ function showAchievements() {
         available.slice(0, 3).forEach(ach => addLog(ach));
     }
 }
-
-// ========== ЭКСПОРТ ФУНКЦИЙ ==========
 
 window.showAchievements = showAchievements;
 window.selectAllTable = selectAllTable;

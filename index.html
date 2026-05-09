@@ -10,39 +10,45 @@
 <div class="container">
     <!-- Левая основная область -->
     <div class="main-content">
-        <!-- Верхняя панель с ресурсами -->
-        <div class="top-resources">
-            <div class="resource-card large">
-                <span class="resource-icon">💧</span>
-                <span class="resource-label">ВОДА</span>
-                <span class="resource-value" id="waterCount">20</span>
+        <!-- Верхняя панель с ресурсами и кнопками -->
+        <div class="top-bar">
+            <div class="resources-group">
+                <div class="resource-card">
+                    <span class="resource-icon">💧</span>
+                    <span class="resource-label">ВОДА</span>
+                    <span class="resource-value" id="waterCount">20</span>
+                </div>
+                <div class="resource-card">
+                    <span class="resource-icon">🧪</span>
+                    <span class="resource-label">РАСТВОР</span>
+                    <span class="resource-value" id="solutionCount">15</span>
+                </div>
+                <div class="resource-card">
+                    <span class="resource-icon">🌱</span>
+                    <span class="resource-label">СЕМЕНА</span>
+                    <span class="resource-value" id="seedCount">30</span>
+                </div>
+                <div class="resource-card">
+                    <span class="resource-icon">📦</span>
+                    <span class="resource-label">КОНТ.</span>
+                    <span class="resource-value" id="totalContainers">0</span>/20
+                </div>
+                <div class="resource-card">
+                    <span class="resource-icon">⏱️</span>
+                    <span class="resource-label">ДЕНЬ</span>
+                    <span class="resource-value" id="currentDay">0.0</span>
+                </div>
             </div>
-            <div class="resource-card large">
-                <span class="resource-icon">🧪</span>
-                <span class="resource-label">РАСТВОР</span>
-                <span class="resource-value" id="solutionCount">15</span>
-            </div>
-            <div class="resource-card large">
-                <span class="resource-icon">🌱</span>
-                <span class="resource-label">СЕМЕНА</span>
-                <span class="resource-value" id="seedCount">30</span>
-            </div>
-            <div class="resource-card large">
-                <span class="resource-icon">📦</span>
-                <span class="resource-label">КОНТ.</span>
-                <span class="resource-value" id="totalContainers">0</span>/20
-            </div>
-            <div class="resource-card large">
-                <span class="resource-icon">⏱️</span>
-                <span class="resource-label">ДЕНЬ</span>
-                <span class="resource-value" id="currentDay">0.0</span>
+            <div class="top-buttons-group">
+                <button class="top-btn achievements-btn" id="achievementsBtn">🏆 ДОСТИЖЕНИЯ</button>
+                <button class="top-btn pause-btn" id="pauseBtn" onclick="toggleGamePause()">⏸️ ПАУЗА</button>
             </div>
         </div>
 
-        <!-- Рабочая область -->
+        <!-- Рабочая область (четыре колонки) -->
         <div class="workspace">
-            <!-- Левая колонка - поддоны (расширены) -->
-            <div class="pallets-column">
+            <!-- Колонка 1: Поддоны (свет) -->
+            <div class="column pallets-column">
                 <div class="pallet-wrapper">
                     <div class="pallet-header">
                         <span>🌾 ПОДДОН 1 (1-8)</span>
@@ -63,76 +69,76 @@
                 </div>
             </div>
 
-            <!-- Правая колонка - процессы -->
-            <div class="processes-column">
-                <!-- Левая часть: вёдра и стол посева -->
-                <div class="processes-left">
-                    <!-- Секция вёдер -->
-                    <div class="buckets-section">
-                        <div class="zone-header">
-                            <span>💧 ВЁДРА</span>
-                            <span class="bucket-count-indicator"><span id="totalSeedsInBuckets">0</span>/16 🌱</span>
-                        </div>
-                        
-                        <!-- Сетка вёдер 2x2 -->
-                        <div class="buckets-grid" id="bucketsCompactContainer"></div>
-                        
-                        <!-- Панель управления вёдрами (с понятными кнопками) -->
-                        <div class="buckets-control-panel">
-                            <!-- Ряд 1: добавление семян -->
-                            <div class="control-row">
-                                <button class="btn-bucket-add" id="compactAdd1Btn">➕1 СЕМЯ</button>
-                                <button class="btn-bucket-add" id="compactAdd4Btn">➕4 СЕМЯН</button>
-                            </div>
-                            <!-- Ряд 2: действия (текстовые кнопки) -->
-                            <div class="control-row">
-                                <button class="btn-bucket-action" id="compactSoakBtn">💧 ЗАМОЧИТЬ</button>
-                                <button class="btn-bucket-action" id="compactAirBtn">🌬 ПРОВЕТРИТЬ</button>
-                                <button class="btn-bucket-action sow" id="compactSowBtn">🌱 ПОСАДИТЬ</button>
-                            </div>
-                            <!-- Ряд 3: выбор вёдер (полные названия) -->
-                            <div class="control-row">
-                                <button class="btn-bucket-select" id="compactSelectFreeBtn">СВОБОДНЫЕ</button>
-                                <button class="btn-bucket-select" id="compactSelectSoakBtn">ЗАМАЧИВАНИЕ</button>
-                                <button class="btn-bucket-select" id="compactSelectAirBtn">ПРОВЕТРИВАНИЕ</button>
-                                <button class="btn-bucket-select clear" id="compactClearBucketSelectionBtn">СНЯТЬ</button>
-                            </div>
-                        </div>
+            <!-- Колонка 2: Стеллаж для прижима -->
+            <div class="column press-column">
+                <div class="press-vertical">
+                    <div class="shelf-vertical">
+                        <div class="shelf-header">ПОЛКА 1</div>
+                        <div class="shelf-vertical-containers" id="shelf1Container"></div>
                     </div>
-                    
-                    <!-- Стол посева (растягивается вниз) -->
-                    <div class="sowing-section">
-                        <div class="zone-header">🌱 СТОЛ ПОСЕВА</div>
-                        <div class="table-container" id="tableContainer"></div>
+                    <div class="shelf-vertical">
+                        <div class="shelf-header">ПОЛКА 2</div>
+                        <div class="shelf-vertical-containers" id="shelf2Container"></div>
+                    </div>
+                    <div class="shelf-vertical">
+                        <div class="shelf-header">ПОЛКА 3</div>
+                        <div class="shelf-vertical-containers" id="shelf3Container"></div>
                     </div>
                 </div>
+            </div>
+
+            <!-- Колонка 3: Стол посева (клик по заголовку выделяет все) -->
+            <div class="column sowing-column">
+                <div class="zone-header" id="tableHeader" style="cursor: pointer;" title="Кликни для выбора всех контейнеров на столе">🌱 СТОЛ ПОСЕВА</div>
+                <div class="table-container" id="tableContainer"></div>
+            </div>
+
+            <!-- Колонка 4: Вёдра + управление -->
+            <div class="column buckets-column">
+                <div class="zone-header">
+                    <span>💧 ВЁДРА</span>
+                    <span class="bucket-count-indicator"><span id="totalSeedsInBuckets">0</span>/16 🌱</span>
+                </div>
                 
-                <!-- Правая часть: вертикальный стеллаж (ширина как у блока вёдер) -->
-                <div class="processes-right">
-                    <div class="press-vertical">
-                        <div class="shelf-vertical">
-                            <div class="shelf-header">ПОЛКА 1</div>
-                            <div class="shelf-vertical-containers" id="shelf1Container"></div>
-                        </div>
-                        <div class="shelf-vertical">
-                            <div class="shelf-header">ПОЛКА 2</div>
-                            <div class="shelf-vertical-containers" id="shelf2Container"></div>
-                        </div>
-                        <div class="shelf-vertical">
-                            <div class="shelf-header">ПОЛКА 3</div>
-                            <div class="shelf-vertical-containers" id="shelf3Container"></div>
-                        </div>
+                <!-- Сетка вёдер 2x2 -->
+                <div class="buckets-grid" id="bucketsCompactContainer"></div>
+                
+                <!-- Панель управления вёдрами (вертикальная) -->
+                <div class="buckets-control-vertical">
+                    <!-- Ряд 1: добавление семян -->
+                    <div class="control-row">
+                        <button class="btn-bucket-add" id="compactAdd1Btn">➕1 СЕМЯ</button>
+                        <button class="btn-bucket-add" id="compactAdd4Btn">➕4 СЕМЯН</button>
+                    </div>
+                    <!-- Ряд 2: действия (замочить, проветрить) -->
+                    <div class="control-row">
+                        <button class="btn-bucket-action" id="compactSoakBtn">💧 ЗАМОЧИТЬ</button>
+                        <button class="btn-bucket-action" id="compactAirBtn">🌬 ПРОВЕТРИТЬ</button>
+                    </div>
+                    <!-- Вертикальный список: посев и выбор -->
+                    <div class="control-vertical">
+                        <button class="btn-bucket-special sow" id="compactSowBtn">🌱 ПОСАДИТЬ</button>
+                        <button class="btn-bucket-select" id="compactSelectFreeBtn">СВОБОДНЫЕ</button>
+                        <button class="btn-bucket-select" id="compactSelectSoakBtn">ЗАМАЧИВАНИЕ</button>
+                        <button class="btn-bucket-select" id="compactSelectAirBtn">ПРОВЕТРИВАНИЕ</button>
+                        <button class="btn-bucket-select clear" id="compactClearBucketSelectionBtn">СНЯТЬ</button>
                     </div>
                 </div>
             </div>
         </div>
 
-        <div class="log-panel" id="logPanel">
-            📋 Добро пожаловать в ферму!
+        <!-- Нижняя панель (лог и информация о выбранном) -->
+        <div class="bottom-panel">
+            <div class="log-area" id="logPanel">
+                📋 Добро пожаловать в ферму!
+            </div>
+            <div class="selected-area" id="selectedInfo">
+                👆 Нажми на контейнер или ведро (Ctrl+клик для нескольких)
+            </div>
         </div>
     </div>
 
-    <!-- Правая панель с кнопками (без изменений) -->
+    <!-- Правая панель с кнопками -->
     <div class="sidebar-right">
         <!-- Кнопки добавления ресурсов -->
         <div class="resources-buttons">
@@ -155,14 +161,12 @@
 
         <div class="section-title">УХОД</div>
         
-        <div class="double-action-row">
-            <button class="btn btn-info" id="spraySelectedBtn">
-                <span>💦</span> ОПРЫСКАТЬ
-            </button>
-            <button class="btn btn-water" id="waterSelectedBtn">
-                <span>🚰</span> ПОЛИТЬ
-            </button>
-        </div>
+        <button class="btn btn-info btn-vertical" id="spraySelectedBtn">
+            <span>💦</span> ОПРЫСКАТЬ
+        </button>
+        <button class="btn btn-water btn-vertical" id="waterSelectedBtn" style="margin-top: 5px;">
+            <span>🚰</span> ПОЛИТЬ
+        </button>
 
         <div class="section-title">ВЫДЕЛЕНИЕ</div>
 
@@ -177,10 +181,10 @@
 
         <div class="section-title">УМНОЕ ПЕРЕМЕЩЕНИЕ</div>
 
-        <button class="btn btn-info btn-block" id="smartPressBtn">
+        <button class="btn-small btn-info" id="smartPressBtn">
             <span>📦➡️</span> УМНЫЙ ПРИЖИМ
         </button>
-        <button class="btn btn-warning btn-block" id="smartLightBtn" style="margin-top: 5px;">
+        <button class="btn-small btn-warning" id="smartLightBtn" style="margin-top: 4px;">
             <span>💡➡️</span> УМНЫЙ СВЕТ
         </button>
 
@@ -193,18 +197,6 @@
             <button class="btn btn-danger" id="deleteSelectedBtn">
                 <span>🗑️</span> УДАЛИТЬ
             </button>
-        </div>
-
-        <button class="btn btn-purple btn-block" id="achievementsBtn">
-            <span>🏆</span> ДОСТИЖЕНИЯ
-        </button>
-
-        <button class="btn btn-primary btn-block" id="pauseBtn" onclick="toggleGamePause()">
-            <span>⏸️</span> ПАУЗА
-        </button>
-
-        <div class="selected-info" id="selectedInfo">
-            👆 Нажми на контейнер
         </div>
     </div>
 </div>
