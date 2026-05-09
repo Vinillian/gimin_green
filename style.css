@@ -609,3 +609,119 @@ body {
         max-width: none;
     }
 }
+
+/* Дополнительные стили для новых элементов */
+
+.bucket-actions {
+    display: flex;
+    gap: 5px;
+    margin-top: 10px;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.btn-small {
+    font-size: 0.8rem;
+    padding: 6px 10px;
+    border-radius: 20px;
+    background: #2d5a3a;
+    border: 2px solid #e4c87b;
+    color: white;
+    cursor: pointer;
+    flex: 1 1 auto;
+    min-width: 100px;
+}
+
+.btn-small:active {
+    transform: translateY(2px);
+}
+
+.btn-small.soak {
+    background: #4a6fa5;
+}
+
+.btn-small.air {
+    background: #7b6c5c;
+}
+
+.zone-header, .shelf-header, .pallet-header {
+    cursor: pointer;
+    transition: all 0.2s ease;
+    user-select: none;
+}
+
+.zone-header:hover, .shelf-header:hover, .pallet-header:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+    transform: scale(1.02);
+}
+
+#smartPressBtn, #smartLightBtn {
+    background: linear-gradient(135deg, #4a6fa5, #2f4f7f);
+    font-weight: bold;
+}
+
+#smartPressBtn {
+    background: linear-gradient(135deg, #b68b40, #8b6b2b);
+}
+
+#smartLightBtn {
+    background: linear-gradient(135deg, #f2b84b, #c99c2b);
+}
+
+/* Индикация множественного выбора */
+.bucket.selected {
+    border: 4px solid #ffaa00;
+    box-shadow: 0 0 15px #ffaa00;
+}
+
+.container-card.selected {
+    border: 4px solid #ffaa00;
+    box-shadow: 0 0 15px #ffaa00;
+}
+
+/* Анимация для новых достижений */
+@keyframes achievement-pop {
+    0% { transform: scale(0) rotate(-180deg); opacity: 0; }
+    50% { transform: scale(1.2) rotate(10deg); }
+    100% { transform: scale(1) rotate(0); opacity: 1; }
+}
+
+.achievement-notification {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: linear-gradient(135deg, #ffd700, #ffa500);
+    color: #1e3a1e;
+    padding: 20px;
+    border-radius: 15px;
+    border: 4px solid white;
+    animation: achievement-pop 0.5s ease;
+    z-index: 1000;
+    font-weight: bold;
+    font-size: 1.2rem;
+    box-shadow: 0 10px 0 #b37b2e;
+}
+
+/* Подсказка для множественного выбора */
+.hint {
+    font-size: 0.7rem;
+    color: #9ccc7c;
+    text-align: center;
+    margin-top: 5px;
+    font-style: italic;
+}
+
+/* Улучшенные пустые ячейки */
+.table-cell.empty, .shelf-cell.empty, .container-card.empty {
+    opacity: 0.5;
+    background: #2d5a2d;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    color: #9ccc7c;
+}
+
+.shelf-cell.empty {
+    font-size: 1rem;
+}

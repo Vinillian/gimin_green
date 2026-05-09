@@ -2,41 +2,49 @@
 
 document.addEventListener('DOMContentLoaded', () => {
     loadFromLocalStorage();
-
-    // Добавляем отображение текущего дня
     addDayDisplay();
-    
-    // КНОПКИ ДОБАВЛЕНИЯ СЕМЯН В ВЁДРА
+    initEventHandlers();
+    startGameTimer();
+    render();
+    addLog("🚀 Ферма запущена! Используй Ctrl+клик для множественного выбора");
+});
+
+function initEventHandlers() {
+    // Кнопки добавления семян
     document.getElementById('newBatch1Btn')?.addEventListener('click', () => {
-        addSeedsToBucket(1);
+        addOneSeedToBucket();
     });
     
     document.getElementById('newBatch4Btn')?.addEventListener('click', () => {
-        addSeedsToBucket(4);
+        addFourSeedsToBucket();
     });
     
-    // КНОПКИ СТАДИЙ (работают с выбранным ведром или контейнерами)
+    // Кнопки стадий
     document.getElementById('stageSoakBtn')?.addEventListener('click', () => {
-        if (state.selectedBucketId !== null) {
-            startSoaking();
+        if (state.selectedBucketIds.size > 0 || state.selectedIds.size > 0) {
+            if (state.selectedBucketIds.size > 0) {
+                startSoaking();
+            } else {
+                addLog("⚠️ Для замачивания выбери вёдра");
+            }
         } else {
-            addLog("⚠️ Сначала выбери ведро");
+            addLog("⚠️ Сначала выбери вёдра");
         }
     });
     
     document.getElementById('stageAirBtn')?.addEventListener('click', () => {
-        if (state.selectedBucketId !== null) {
+        if (state.selectedBucketIds.size > 0) {
             startAiring();
         } else {
-            addLog("⚠️ Сначала выбери ведро");
+            addLog("⚠️ Сначала выбери вёдра");
         }
     });
     
     document.getElementById('stageSowBtn')?.addEventListener('click', () => {
-        if (state.selectedBucketId !== null) {
+        if (state.selectedBucketIds.size > 0) {
             startSowing();
         } else {
-            addLog("⚠️ Сначала выбери ведро");
+            addLog("⚠️ Сначала выбери вёдра");
         }
     });
     
@@ -60,7 +68,7 @@ document.addEventListener('DOMContentLoaded', () => {
         clearSelection();
     });
     
-    // КНОПКИ ОПРЫСКИВАНИЯ И ПОЛИВА
+    // Кнопки ухода
     document.getElementById('spraySelectedBtn')?.addEventListener('click', () => {
         if (state.selectedIds.size > 0) {
             spraySelected();
@@ -77,11 +85,11 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
     
-    // КНОПКИ ВЫДЕЛЕНИЯ
+    // Кнопки выделения
     document.getElementById('selectAllBtn')?.addEventListener('click', selectAll);
     document.getElementById('clearSelectionBtn')?.addEventListener('click', clearSelection);
     
-    // КНОПКИ ДЕЙСТВИЙ
+    // Кнопки действий
     document.getElementById('harvestSelectedBtn')?.addEventListener('click', () => {
         if (state.selectedIds.size > 0) {
             harvestSelected();
@@ -98,42 +106,57 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
     
-    // КНОПКИ ДОБАВЛЕНИЯ РЕСУРСОВ
+    // Кнопки ресурсов
     document.getElementById('addWaterBtn')?.addEventListener('click', addWater);
     document.getElementById('addSolutionBtn')?.addEventListener('click', addSolution);
     document.getElementById('addSeedsBtn')?.addEventListener('click', addSeeds);
-
-    // Запускаем таймер
-    startGameTimer();
     
-    // Начальная отрисовка
-    render();
-});
+    // Обработчики клавиш для множественного выбора
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Control' || e.key === 'Shift') {
+            state.multiselectModifier = true;
+        }
+    });
+    
+    document.addEventListener('keyup', (e) => {
+        if (e.key === 'Control' || e.key === 'Shift') {
+            state.multiselectModifier = false;
+        }
+    });
+}
 
 function addDayDisplay() {
-    const topResources = document.querySelector('.top-resources');
-    if (topResources) {
-        const dayCard = document.createElement('div');
-        dayCard.className = 'resource-card large';
-        dayCard.innerHTML = `
-            <span class="resource-icon">⏱️</span>
-            <span class="resource-label">ДЕНЬ</span>
-            <span class="resource-value" id="currentDay">0.0</span>
-        `;
-        topResources.appendChild(dayCard);
+    if (!document.getElementById('currentDay')) {
+        const topResources = document.querySelector('.top-resources');
+        if (topResources) {
+            const dayCard = document.createElement('div');
+            dayCard.className = 'resource-card large';
+            dayCard.innerHTML = `
+                <span class="resource-icon">⏱️</span>
+                <span class="resource-label">ДЕНЬ</span>
+                <span class="resource-value" id="currentDay">0.0</span>
+            `;
+            topResources.appendChild(dayCard);
+        }
     }
 }
 
 function startGameTimer() {
     setInterval(() => {
         if (state.isRunning) {
-            state.gameDay = Math.round((state.gameDay + 0.1) * 10) / 10;
+            state.gameDay = roundResource(state.gameDay + TIME_SETTINGS.DAY_INCREMENT);
             updateProgress();
             saveToLocalStorage();
             
-            if (Number.isInteger(state.gameDay)) {
+            if (Number.isInteger(state.gameDay) && state.gameDay > 0) {
                 addLog(`📆 Наступил день ${state.gameDay}`);
             }
         }
-    }, 6000);
+    }, TIME_SETTINGS.TICK_INTERVAL);
+}
+
+function toggleGamePause() {
+    state.isRunning = !state.isRunning;
+    addLog(state.isRunning ? "▶️ Игра возобновлена" : "⏸️ Игра на паузе");
+    render();
 }

@@ -1,5 +1,7 @@
 // ui.js
 
+// ========== ГЛАВНАЯ ФУНКЦИЯ РЕНДЕРИНГА ==========
+
 function render() {
     renderBuckets();
     renderTable();
@@ -10,144 +12,9 @@ function render() {
     renderLog();
 }
 
-function renderBuckets() {
-    const container = document.getElementById('bucketsContainer');
-    if (!container) return;
-    
-    container.innerHTML = '';
-    
-    state.buckets.forEach(bucket => {
-        const bucketEl = document.createElement('div');
-        bucketEl.className = `bucket ${bucket.stage ? 'active' : ''} ${state.selectedBucketId === bucket.id ? 'selected' : ''}`;
-        bucketEl.dataset.id = bucket.id;
-        
-        let icon = '🪣';
-        if (bucket.stage === 'soak') icon = '💧';
-        else if (bucket.stage === 'air') icon = '🌬';
-        
-        const progress = bucket.stage ? getBucketProgress(bucket) : 0;
-        
-        // Формируем иконки статуса для ведра
-        const statusIcons = [];
-        if (bucket.stage === 'soak') statusIcons.push('💧');
-        else if (bucket.stage === 'air') statusIcons.push('🌬');
-        if (bucket.needsTransition) statusIcons.push('⚠️');
-        
-        bucketEl.innerHTML = `
-            <div class="bucket-icon">${icon}</div>
-            <div class="bucket-count">${bucket.seeds} 🌱</div>
-            ${bucket.stage ? `<div class="bucket-progress">${progress}%</div>` : ''}
-            <div class="bucket-status">${statusIcons.join('')}</div>
-        `;
-        
-        bucketEl.addEventListener('click', (e) => {
-            e.stopPropagation();
-            selectBucket(bucket.id);
-        });
-        
-        container.appendChild(bucketEl);
-    });
-}
+// ========== УНИВЕРСАЛЬНАЯ ФУНКЦИЯ СОЗДАНИЯ КАРТОЧКИ ==========
 
-function renderTable() {
-    const container = document.getElementById('tableContainer');
-    if (!container) return;
-    
-    container.innerHTML = '';
-    
-    // Получаем все контейнеры на столе
-    const tableContainers = state.containers.filter(c => c.location === 'table');
-    
-    // Сортируем по номеру
-    tableContainers.sort((a, b) => a.number - b.number);
-    
-    tableContainers.forEach(containerObj => {
-        const card = createContainerCard(containerObj);
-        container.appendChild(card);
-    });
-    
-    // Заполняем пустые ячейки до 8 (2x4)
-    for (let i = tableContainers.length; i < 8; i++) {
-        const empty = document.createElement('div');
-        empty.className = 'table-cell empty';
-        empty.innerHTML = '🌱';
-        container.appendChild(empty);
-    }
-}
-
-function renderShelves() {
-    // Полка 1
-    const shelf1Container = document.getElementById('shelf1Container');
-    if (shelf1Container) {
-        shelf1Container.innerHTML = '';
-        const shelf = state.shelves.find(s => s.id === 1);
-        if (shelf) {
-            const shelfContainers = state.containers.filter(c => shelf.containers.includes(c.id));
-            shelfContainers.sort((a, b) => a.number - b.number);
-            
-            shelfContainers.forEach(containerObj => {
-                const card = createShelfContainerCard(containerObj);
-                shelf1Container.appendChild(card);
-            });
-            
-            for (let i = shelfContainers.length; i < 4; i++) {
-                const empty = document.createElement('div');
-                empty.className = 'shelf-cell empty';
-                empty.innerHTML = '📦';
-                shelf1Container.appendChild(empty);
-            }
-        }
-    }
-    
-    // Полка 2
-    const shelf2Container = document.getElementById('shelf2Container');
-    if (shelf2Container) {
-        shelf2Container.innerHTML = '';
-        const shelf = state.shelves.find(s => s.id === 2);
-        if (shelf) {
-            const shelfContainers = state.containers.filter(c => shelf.containers.includes(c.id));
-            shelfContainers.sort((a, b) => a.number - b.number);
-            
-            shelfContainers.forEach(containerObj => {
-                const card = createShelfContainerCard(containerObj);
-                shelf2Container.appendChild(card);
-            });
-            
-            for (let i = shelfContainers.length; i < 4; i++) {
-                const empty = document.createElement('div');
-                empty.className = 'shelf-cell empty';
-                empty.innerHTML = '📦';
-                shelf2Container.appendChild(empty);
-            }
-        }
-    }
-    
-    // Полка 3
-    const shelf3Container = document.getElementById('shelf3Container');
-    if (shelf3Container) {
-        shelf3Container.innerHTML = '';
-        const shelf = state.shelves.find(s => s.id === 3);
-        if (shelf) {
-            const shelfContainers = state.containers.filter(c => shelf.containers.includes(c.id));
-            shelfContainers.sort((a, b) => a.number - b.number);
-            
-            shelfContainers.forEach(containerObj => {
-                const card = createShelfContainerCard(containerObj);
-                shelf3Container.appendChild(card);
-            });
-            
-            for (let i = shelfContainers.length; i < 4; i++) {
-                const empty = document.createElement('div');
-                empty.className = 'shelf-cell empty';
-                empty.innerHTML = '📦';
-                shelf3Container.appendChild(empty);
-            }
-        }
-    }
-}
-
-// Специальная функция для создания карточек на полках
-function createShelfContainerCard(container) {
+function createBaseContainerCard(container, isShelfStyle = false) {
     const isSelected = state.selectedIds.has(container.id);
     const card = document.createElement('div');
     card.className = `container-card ${container.stage} ${isSelected ? 'selected' : ''}`;
@@ -164,42 +31,190 @@ function createShelfContainerCard(container) {
         const currentDay = Math.min(Math.floor(daysPassed) + 1, totalDays);
         dayText = `д.${currentDay}`;
     } else {
-        progressPercent = 100;
-        dayText = '✔️';
+        progressPercent = 0;
+        dayText = '⚡';
     }
     
-    // Собираем иконки статуса
     const icons = [];
     icons.push(STAGE_ICONS[container.stage]);
     if (container.needsSpray) icons.push('💦');
     if (container.needsWater) icons.push('🚰');
     if (container.needsTransition) icons.push('⚠️');
     
-    card.innerHTML = `
-        <div class="container-number">#${container.number}</div>
-        <div class="container-icons">${icons.join('')}</div>
-        <div class="progress-container">
-            <div class="progress-fill" style="width: ${progressPercent}%;"></div>
-        </div>
-        <div class="container-day">${dayText}</div>
-    `;
+    if (isShelfStyle) {
+        card.innerHTML = `
+            <div class="container-number">#${container.number}</div>
+            <div class="container-icons">${icons.join('')}</div>
+            <div class="progress-container" style="width: 40px;">
+                <div class="progress-fill" style="width: ${progressPercent}%;"></div>
+            </div>
+            <div class="container-day">${dayText}</div>
+        `;
+    } else {
+        card.innerHTML = `
+            <div class="container-number">#${container.number}</div>
+            <div class="container-icons">${icons.join('')}</div>
+            <div class="progress-container">
+                <div class="progress-fill" style="width: ${progressPercent}%;"></div>
+            </div>
+            <div class="container-day">${dayText}</div>
+        `;
+    }
     
     card.addEventListener('click', (e) => {
         e.stopPropagation();
         const id = Number(card.dataset.id);
         
-        if (state.selectedIds.has(id)) {
-            state.selectedIds.delete(id);
-            addLog(`🔓 Снят выбор с #${getContainerNumber(id)}`);
+        if (e.ctrlKey || e.shiftKey || state.multiselectModifier) {
+            // Множественный выбор
+            if (state.selectedIds.has(id)) {
+                state.selectedIds.delete(id);
+                addLog(`🔓 Снят выбор с #${getContainerNumber(id)}`);
+            } else {
+                state.selectedIds.add(id);
+                state.selectedBucketIds.clear();
+                addLog(`🔒 Выбран #${getContainerNumber(id)}`);
+            }
         } else {
-            state.selectedIds.add(id);
-            addLog(`🔒 Выбран #${getContainerNumber(id)}`);
+            // Одиночный выбор
+            if (state.selectedIds.has(id) && state.selectedIds.size === 1) {
+                state.selectedIds.clear();
+                addLog(`🔓 Снят выбор с #${getContainerNumber(id)}`);
+            } else {
+                state.selectedIds.clear();
+                state.selectedIds.add(id);
+                state.selectedBucketIds.clear();
+                addLog(`🔒 Выбран #${getContainerNumber(id)}`);
+            }
         }
         render();
     });
     
     return card;
 }
+
+function createContainerCard(container) {
+    return createBaseContainerCard(container, false);
+}
+
+function createShelfContainerCard(container) {
+    return createBaseContainerCard(container, true);
+}
+
+// ========== РЕНДЕРИНГ ВЁДЕР ==========
+
+function renderBuckets() {
+    const container = document.getElementById('bucketsContainer');
+    if (!container) return;
+    
+    container.innerHTML = '';
+    
+    state.buckets.forEach(bucket => {
+        const bucketEl = document.createElement('div');
+        bucketEl.className = `bucket ${bucket.stage ? 'active' : ''} ${state.selectedBucketIds.has(bucket.id) ? 'selected' : ''}`;
+        bucketEl.dataset.id = bucket.id;
+        
+        let icon = '🪣';
+        if (bucket.stage === 'soak') icon = '💧';
+        else if (bucket.stage === 'air') icon = '🌬';
+        
+        const progress = bucket.stage ? getBucketProgress(bucket) : 0;
+        
+        const statusIcons = [];
+        if (bucket.stage === 'soak') statusIcons.push('💧');
+        else if (bucket.stage === 'air') statusIcons.push('🌬');
+        if (bucket.needsTransition) statusIcons.push('⚠️');
+        
+        const progressBar = bucket.stage ? `
+            <div class="progress-container" style="width: 80%; margin: 2px auto;">
+                <div class="progress-fill" style="width: ${progress}%;"></div>
+            </div>
+        ` : '';
+        
+        bucketEl.innerHTML = `
+            <div class="bucket-icon">${icon}</div>
+            <div class="bucket-count">${bucket.seeds} 🌱</div>
+            ${progressBar}
+            <div class="bucket-status">${statusIcons.join('')}</div>
+        `;
+        
+        bucketEl.addEventListener('click', (e) => {
+            e.stopPropagation();
+            
+            if (e.ctrlKey || e.shiftKey || state.multiselectModifier) {
+                toggleBucketSelection(bucket.id);
+            } else {
+                if (state.selectedBucketIds.has(bucket.id) && state.selectedBucketIds.size === 1) {
+                    state.selectedBucketIds.clear();
+                    addLog(`🔓 Ведро #${bucket.id} снято с выбора`);
+                } else {
+                    state.selectedBucketIds.clear();
+                    state.selectedBucketIds.add(bucket.id);
+                    state.selectedIds.clear();
+                    addLog(`🔒 Выбрано ведро #${bucket.id}`);
+                }
+            }
+            render();
+        });
+        
+        container.appendChild(bucketEl);
+    });
+}
+
+// ========== РЕНДЕРИНГ СТОЛА ==========
+
+function renderTable() {
+    const container = document.getElementById('tableContainer');
+    if (!container) return;
+    
+    container.innerHTML = '';
+    
+    const tableContainers = state.containers.filter(c => c.location === 'table');
+    tableContainers.sort((a, b) => a.number - b.number);
+    
+    tableContainers.forEach(containerObj => {
+        const card = createContainerCard(containerObj);
+        container.appendChild(card);
+    });
+    
+    for (let i = tableContainers.length; i < CAPACITY.TABLE_CAPACITY; i++) {
+        const empty = document.createElement('div');
+        empty.className = 'table-cell empty';
+        empty.innerHTML = '🌱';
+        container.appendChild(empty);
+    }
+}
+
+// ========== РЕНДЕРИНГ ПОЛОК ==========
+
+function renderShelves() {
+    for (let shelfId = 1; shelfId <= CAPACITY.SHELVES_COUNT; shelfId++) {
+        const shelfContainer = document.getElementById(`shelf${shelfId}Container`);
+        if (!shelfContainer) continue;
+        
+        shelfContainer.innerHTML = '';
+        const shelf = state.shelves.find(s => s.id === shelfId);
+        
+        if (shelf) {
+            const shelfContainers = state.containers.filter(c => shelf.containers.includes(c.id));
+            shelfContainers.sort((a, b) => a.number - b.number);
+            
+            shelfContainers.forEach(containerObj => {
+                const card = createShelfContainerCard(containerObj);
+                shelfContainer.appendChild(card);
+            });
+            
+            for (let i = shelfContainers.length; i < CAPACITY.SHELF_CAPACITY; i++) {
+                const empty = document.createElement('div');
+                empty.className = 'shelf-cell empty';
+                empty.innerHTML = '📦';
+                shelfContainer.appendChild(empty);
+            }
+        }
+    }
+}
+
+// ========== РЕНДЕРИНГ ПОДДОНОВ ==========
 
 function renderPallets() {
     const grid1 = document.getElementById('containerGrid1');
@@ -214,13 +229,10 @@ function renderPallets() {
         .filter(c => c.location === 'light')
         .sort((a, b) => a.number - b.number);
     
-    // Первый поддон (1-8)
-    const containers1 = lightContainers.filter(c => c.number <= 8);
-    // Второй поддон (9-16)
-    const containers2 = lightContainers.filter(c => c.number > 8 && c.number <= 16);
+    const containers1 = lightContainers.filter(c => c.number <= CAPACITY.PALLET_SIZE);
+    const containers2 = lightContainers.filter(c => c.number > CAPACITY.PALLET_SIZE);
     
-    // Первый поддон (1-8)
-    for (let i = 1; i <= 8; i++) {
+    for (let i = 1; i <= CAPACITY.PALLET_SIZE; i++) {
         const container = containers1.find(c => c.number === i);
         if (container) {
             const card = createContainerCard(container);
@@ -230,8 +242,7 @@ function renderPallets() {
         }
     }
     
-    // Второй поддон (9-16)
-    for (let i = 9; i <= 16; i++) {
+    for (let i = CAPACITY.PALLET_SIZE + 1; i <= CAPACITY.LIGHT_CAPACITY; i++) {
         const container = containers2.find(c => c.number === i);
         if (container) {
             const card = createContainerCard(container);
@@ -241,7 +252,6 @@ function renderPallets() {
         }
     }
     
-    // Обновляем счетчики готовых
     const ready1 = containers1.filter(c => c.stage === 'light' && c.needsTransition).length;
     const ready2 = containers2.filter(c => c.stage === 'light' && c.needsTransition).length;
     
@@ -249,59 +259,7 @@ function renderPallets() {
     document.getElementById('readyCount2').innerText = ready2;
 }
 
-function createContainerCard(container) {
-    const isSelected = state.selectedIds.has(container.id);
-    const card = document.createElement('div');
-    card.className = `container-card ${container.stage} ${isSelected ? 'selected' : ''}`;
-    card.dataset.id = container.id;
-    
-    const daysPassed = state.gameDay - container.stageStartDay;
-    const totalDays = STAGE_DURATION[container.stage];
-    
-    let progressPercent = 0;
-    let dayText = '';
-    
-    if (totalDays > 0) {
-        progressPercent = Math.min(100, (daysPassed / totalDays) * 100);
-        const currentDay = Math.min(Math.floor(daysPassed) + 1, totalDays);
-        dayText = `д.${currentDay}`;
-    } else {
-        progressPercent = 100;
-        dayText = '✔️';
-    }
-    
-    // Собираем иконки статуса
-    const icons = [];
-    icons.push(STAGE_ICONS[container.stage]);
-    if (container.needsSpray) icons.push('💦');
-    if (container.needsWater) icons.push('🚰');
-    if (container.needsTransition) icons.push('⚠️');
-    
-    card.innerHTML = `
-        <div class="container-number">#${container.number}</div>
-        <div class="container-icons">${icons.join('')}</div>
-        <div class="progress-container">
-            <div class="progress-fill" style="width: ${progressPercent}%;"></div>
-        </div>
-        <div class="container-day">${dayText}</div>
-    `;
-    
-    card.addEventListener('click', (e) => {
-        e.stopPropagation();
-        const id = Number(card.dataset.id);
-        
-        if (state.selectedIds.has(id)) {
-            state.selectedIds.delete(id);
-            addLog(`🔓 Снят выбор с #${getContainerNumber(id)}`);
-        } else {
-            state.selectedIds.add(id);
-            addLog(`🔒 Выбран #${getContainerNumber(id)}`);
-        }
-        render();
-    });
-    
-    return card;
-}
+// ========== ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ ==========
 
 function getContainerNumber(id) {
     const container = state.containers.find(c => c.id === id);
@@ -314,6 +272,8 @@ function getBucketProgress(bucket) {
     const totalDays = STAGE_DURATION[bucket.stage];
     return Math.min(100, Math.round((daysPassed / totalDays) * 100));
 }
+
+// ========== РЕНДЕРИНГ ИНТЕРФЕЙСА ==========
 
 function renderResources() {
     document.getElementById('waterCount').innerText = state.water.toFixed(1);
@@ -331,16 +291,20 @@ function renderSelectedInfo() {
     const selectedInfo = document.getElementById('selectedInfo');
     if (!selectedInfo) return;
     
-    if (state.selectedBucketId !== null) {
-        const bucket = state.buckets.find(b => b.id === state.selectedBucketId);
-        if (bucket) {
-            let status = '';
-            if (bucket.stage === 'soak') status = ' (замачивание)';
-            else if (bucket.stage === 'air') status = ' (проветривание)';
-            
-            selectedInfo.innerHTML = `✅ Ведро #${bucket.id}${status} — ${bucket.seeds} 🌱`;
-            return;
-        }
+    if (state.selectedBucketIds.size > 0) {
+        const bucketInfo = [];
+        state.selectedBucketIds.forEach(id => {
+            const bucket = state.buckets.find(b => b.id === id);
+            if (bucket) {
+                let status = '';
+                if (bucket.stage === 'soak') status = ' (💧)';
+                else if (bucket.stage === 'air') status = ' (🌬)';
+                bucketInfo.push(`#${bucket.id}${status}:${bucket.seeds}🌱`);
+            }
+        });
+        
+        selectedInfo.innerHTML = `✅ Вёдра: ${bucketInfo.join(', ')}`;
+        return;
     }
     
     if (state.selectedIds.size > 0) {
@@ -357,13 +321,9 @@ function renderSelectedInfo() {
             }
         });
         
-        if (selectedItems.length > 0) {
-            selectedInfo.innerHTML = `✅ ${selectedItems.join(', ')}`;
-        } else {
-            selectedInfo.innerHTML = '👆 Нажми на контейнер или ведро';
-        }
+        selectedInfo.innerHTML = `✅ ${selectedItems.join(', ')}`;
     } else {
-        selectedInfo.innerHTML = '👆 Нажми на контейнер или ведро';
+        selectedInfo.innerHTML = '👆 Нажми на контейнер или ведро (Ctrl+клик для нескольких)';
     }
 }
 
@@ -380,3 +340,131 @@ function renderEmptyCell(grid, number) {
     emptyCard.innerHTML = `<div class="container-number">#${number}</div>`;
     grid.appendChild(emptyCard);
 }
+
+// ========== ДОБАВЛЕНИЕ ЭЛЕМЕНТОВ ИНТЕРФЕЙСА ==========
+
+function addBucketActionButtons() {
+    const zone = document.querySelector('.zone:first-child');
+    if (!zone || document.getElementById('bucketActions')) return;
+    
+    const actionsDiv = document.createElement('div');
+    actionsDiv.id = 'bucketActions';
+    actionsDiv.className = 'bucket-actions';
+    actionsDiv.style.display = 'flex';
+    actionsDiv.style.gap = '5px';
+    actionsDiv.style.marginTop = '10px';
+    actionsDiv.style.flexWrap = 'wrap';
+    
+    actionsDiv.innerHTML = `
+        <button class="btn btn-small" onclick="selectAllFreeBuckets()">🔲 Все свободные</button>
+        <button class="btn btn-small soak" onclick="selectBucketsByStage('soak')">💧 В замачивании</button>
+        <button class="btn btn-small air" onclick="selectBucketsByStage('air')">🌬 В проветривании</button>
+        <button class="btn btn-small" onclick="startSoakingMultiple()">💧 Замочить выбранные</button>
+        <button class="btn btn-small" onclick="startAiringMultiple()">🌬 Проветрить выбранные</button>
+        <button class="btn btn-small" onclick="startSowingMultiple()">🌱 Посеять выбранные</button>
+    `;
+    
+    zone.appendChild(actionsDiv);
+}
+
+function addZoneSelectionHandlers() {
+    const tableZone = document.querySelector('.sowing-zone .zone-header');
+    if (tableZone && !tableZone._hasHandler) {
+        tableZone.style.cursor = 'pointer';
+        tableZone.title = 'Кликни для выбора всех контейнеров на столе';
+        tableZone.addEventListener('click', (e) => {
+            e.stopPropagation();
+            selectAllTable();
+        });
+        tableZone._hasHandler = true;
+    }
+    
+    document.querySelectorAll('.shelf-header').forEach((header, index) => {
+        if (!header._hasHandler) {
+            header.style.cursor = 'pointer';
+            header.title = 'Кликни для выбора всех контейнеров на полке';
+            header.addEventListener('click', (e) => {
+                e.stopPropagation();
+                selectShelf(index + 1);
+            });
+            header._hasHandler = true;
+        }
+    });
+    
+    document.querySelectorAll('.pallet-header').forEach((header, index) => {
+        if (!header._hasHandler) {
+            header.style.cursor = 'pointer';
+            header.title = 'Кликни для выбора всех контейнеров на поддоне';
+            header.addEventListener('click', (e) => {
+                e.stopPropagation();
+                selectPallet(index + 1);
+            });
+            header._hasHandler = true;
+        }
+    });
+}
+
+function addSmartMoveButtons() {
+    const actionsDiv = document.querySelector('.action-grid');
+    if (!actionsDiv || document.getElementById('smartMoveBtn')) return;
+    
+    const smartMoveDiv = document.createElement('div');
+    smartMoveDiv.className = 'double-action-row';
+    smartMoveDiv.style.marginTop = '10px';
+    smartMoveDiv.innerHTML = `
+        <button class="btn btn-info" id="smartPressBtn" onclick="smartMoveToPress()">
+            <span>📦➡️</span> УМНЫЙ ПРИЖИМ
+        </button>
+        <button class="btn btn-warning" id="smartLightBtn" onclick="smartMoveToLight()">
+            <span>💡➡️</span> УМНЫЙ СВЕТ
+        </button>
+    `;
+    
+    actionsDiv.parentNode.insertBefore(smartMoveDiv, actionsDiv.nextSibling);
+}
+
+function addAchievementsButton() {
+    const sidebar = document.querySelector('.sidebar');
+    if (!sidebar || document.getElementById('achievementsBtn')) return;
+    
+    const btn = document.createElement('button');
+    btn.id = 'achievementsBtn';
+    btn.className = 'btn btn-purple btn-block';
+    btn.style.marginTop = '10px';
+    btn.innerHTML = '<span>🏆</span> ДОСТИЖЕНИЯ';
+    btn.onclick = showAchievements;
+    
+    sidebar.appendChild(btn);
+}
+
+function showAchievements() {
+    const earned = state.stats.achievements.map(id => {
+        const ach = Object.values(ACHIEVEMENTS).find(a => a.id === id);
+        return ach ? `✅ ${ach.title}` : null;
+    }).filter(Boolean);
+    
+    const available = Object.values(ACHIEVEMENTS)
+        .filter(ach => !state.stats.achievements.includes(ach.id))
+        .map(ach => `⏳ ${ach.title} — ${ach.description}`);
+    
+    addLog("🏆 ДОСТИЖЕНИЯ:");
+    earned.forEach(ach => addLog(ach));
+    if (available.length > 0) {
+        addLog("📋 Ещё можно получить:");
+        available.slice(0, 3).forEach(ach => addLog(ach));
+    }
+}
+
+// Переопределяем render для добавления новых элементов
+const originalRender = render;
+render = function() {
+    originalRender();
+    
+    if (!window.uiElementsAdded) {
+        addBucketActionButtons();
+        addZoneSelectionHandlers();
+        addSmartMoveButtons();
+        addAchievementsButton();
+        window.uiElementsAdded = true;
+    }
+};
