@@ -484,3 +484,19 @@ body {
         grid-template-columns: repeat(2, 1fr);
     }
 }
+
+/* Стиль для восклицательного знака */
+.container-stage-icon {
+    font-size: 1.5rem;
+    display: flex;
+    gap: 3px;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Красный цвет для восклицательного знака */
+.container-stage-icon span:last-child {
+    color: #ff4444;
+    font-weight: bold;
+    filter: drop-shadow(0 0 2px #ff0000);
+}

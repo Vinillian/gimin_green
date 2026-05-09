@@ -12,7 +12,7 @@ document.addEventListener('DOMContentLoaded', () => {
     
     document.getElementById('stageSoakBtn')?.addEventListener('click', () => setStageForSelected('soak'));
     document.getElementById('stageAirBtn')?.addEventListener('click', () => setStageForSelected('air'));
-    document.getElementById('spraySelectedBtn')?.addEventListener('click', spraySelected); // Новая кнопка
+    document.getElementById('spraySelectedBtn')?.addEventListener('click', spraySelected);
     document.getElementById('stageSowBtn')?.addEventListener('click', () => setStageForSelected('sow'));
     document.getElementById('stagePressBtn')?.addEventListener('click', () => setStageForSelected('press'));
     document.getElementById('stageLightBtn')?.addEventListener('click', () => setStageForSelected('light'));
@@ -50,19 +50,12 @@ function addDayDisplay() {
 }
 
 function startGameTimer() {
-    // Каждые 6 секунд добавляем 0.1 игрового дня (60 секунд = 1 день)
     setInterval(() => {
         if (state.isRunning) {
-            // Увеличиваем игровой день на 0.1
             state.gameDay = Math.round((state.gameDay + 0.1) * 10) / 10;
-            
-            // Обновляем прогресс и проверяем напоминания
             updateProgress();
-            
-            // Сохраняем состояние
             saveToLocalStorage();
             
-            // Логируем каждый целый день
             if (Number.isInteger(state.gameDay)) {
                 addLog(`📆 Наступил день ${state.gameDay}`);
             }

@@ -37,7 +37,8 @@ function createContainer() {
         number: number,
         stageStartDay: state.gameDay,
         lastSprayDay: currentDay,
-        needsSpray: false
+        needsSpray: false,
+        needsTransition: false // Новый флаг для восклицательного знака
     });
 
     addLog(`🌱 Добавлен контейнер #${number} (стадия: замачивание, день ${state.gameDay.toFixed(1)})`);
@@ -95,9 +96,10 @@ function setStageForSelected(stage) {
             const oldStage = c.stage;
             c.stage = stage;
             c.stageStartDay = state.gameDay;
-            // Сбрасываем опрыскивание при смене стадии
+            // Сбрасываем флаги при смене стадии
             c.lastSprayDay = currentDay;
             c.needsSpray = false;
+            c.needsTransition = false; // Сбрасываем восклицательный знак
             changed++;
             
             if (oldStage !== stage) {
@@ -192,18 +194,17 @@ function clearSelection() {
     render();
 }
 
-// Новая функция для опрыскивания
+// Функция для опрыскивания
 function spraySelected() {
     if (state.selectedIds.size === 0) {
         addLog("⚠️ Сначала выбери контейнеры (нажми на них)");
         return;
     }
 
-    const sprayCost = 0.05; // 50 мл = 0.05 литра на контейнер
+    const sprayCost = 0.05;
     let sprayCount = 0;
     let totalCost = 0;
 
-    // Считаем, сколько контейнеров действительно нужно опрыскать
     state.containers.forEach(c => {
         if (state.selectedIds.has(c.id) && c.needsSpray) {
             sprayCount++;
@@ -216,16 +217,13 @@ function spraySelected() {
         return;
     }
 
-    // Проверяем, хватает ли воды
     if (state.water < totalCost) {
         addLog(`❌ Недостаточно воды! Нужно ${totalCost.toFixed(2)} л, есть ${state.water.toFixed(2)} л`);
         return;
     }
 
-    // Списываем воду
     state.water = Math.round((state.water - totalCost) * 100) / 100;
 
-    // Обновляем контейнеры
     const currentDay = Math.floor(state.gameDay);
     let sprayed = [];
 
@@ -246,14 +244,28 @@ function spraySelected() {
 function updateProgress() {
     const currentDay = Math.floor(state.gameDay);
     
-    // Проверяем напоминания об опрыскивании
     state.containers.forEach(c => {
-        // Только для стадий air, press, light
+        // Проверка на опрыскивание
         if (['air', 'press', 'light'].includes(c.stage)) {
-            // Если наступил новый день и ещё не опрыскивали сегодня
             if (currentDay > c.lastSprayDay) {
                 c.needsSpray = true;
             }
+        }
+        
+        // Проверка на завершение стадии (для восклицательного знака)
+        const daysPassed = state.gameDay - c.stageStartDay;
+        const totalDays = STAGE_DURATION[c.stage];
+        
+        if (totalDays > 0) {
+            // Если прошло больше или равно длительности стадии
+            if (daysPassed >= totalDays) {
+                c.needsTransition = true;
+            } else {
+                c.needsTransition = false;
+            }
+        } else {
+            // Для мгновенных стадий (посев)
+            c.needsTransition = false;
         }
     });
     

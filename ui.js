@@ -98,9 +98,10 @@ function renderContainer(container, grid) {
         currentDayText = 'Готово';
     }
     
-    // Иконка стадии + иконка опрыскивания если нужно
+    // Иконки: стадия + опрыскивание + восклицательный знак
     const stageIcon = STAGE_ICONS[container.stage];
     const sprayIcon = container.needsSpray ? ' 💦' : '';
+    const transitionIcon = container.needsTransition ? ' ⚠️' : ''; // Красный восклицательный знак
     
     const progressBar = `
         <div class="progress-container">
@@ -110,7 +111,7 @@ function renderContainer(container, grid) {
     
     card.innerHTML = `
         <div class="container-number">#${container.number}</div>
-        <div class="container-stage-icon">${stageIcon}${sprayIcon}</div>
+        <div class="container-stage-icon">${stageIcon}${sprayIcon}${transitionIcon}</div>
         ${progressBar}
         <div class="container-day">${currentDayText}</div>
     `;
