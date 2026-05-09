@@ -6,12 +6,11 @@ function createContainer() {
         return false;
     }
 
-    if (state.seeds < 0.08) { // 80 грамм семян
-        addLog("❌ Нет семян для посадки (нужно 0.08 кг)");
+    if (state.seeds < RESOURCE_COSTS.soak.seeds) {
+        addLog(`❌ Нет семян для посадки (нужно ${RESOURCE_COSTS.soak.seeds} кг)`);
         return false;
     }
 
-    // Проверяем наличие воды для замачивания
     if (state.water < RESOURCE_COSTS.soak.water) {
         addLog(`❌ Нужно ${RESOURCE_COSTS.soak.water} л воды для замачивания`);
         return false;
@@ -33,10 +32,11 @@ function createContainer() {
     state.containers.push({
         id: id,
         stage: 'soak',
-        number: number
+        number: number,
+        stageStartDay: state.gameDay // Запоминаем день начала стадии
     });
 
-    addLog(`🌱 Добавлен контейнер #${number} (стадия: замачивание, потрачено ${RESOURCE_COSTS.soak.water} л воды и ${RESOURCE_COSTS.soak.seeds} кг семян)`);
+    addLog(`🌱 Добавлен контейнер #${number} (стадия: замачивание, день ${state.gameDay.toFixed(1)})`);
     saveToLocalStorage();
     render();
     return true;
@@ -63,11 +63,9 @@ function setStageForSelected(stage) {
     // Считаем, сколько ресурсов нужно для всех выбранных контейнеров
     state.containers.forEach(c => {
         if (state.selectedIds.has(c.id)) {
-            // При переводе в замачивание тратится вода
             if (stage === 'soak' && c.stage !== 'soak') {
                 requiredWater += RESOURCE_COSTS.soak.water;
             }
-            // При переводе в посев тратится раствор
             if (stage === 'sow' && c.stage !== 'sow') {
                 requiredSolution += RESOURCE_COSTS.sow.solution;
             }
@@ -84,7 +82,7 @@ function setStageForSelected(stage) {
         return;
     }
 
-    // Списываем ресурсы с округлением до 2 знаков
+    // Списываем ресурсы
     state.water = Math.round((state.water - requiredWater) * 100) / 100;
     state.solution = Math.round((state.solution - requiredSolution) * 100) / 100;
 
@@ -94,14 +92,17 @@ function setStageForSelected(stage) {
         if (state.selectedIds.has(c.id)) {
             const oldStage = c.stage;
             c.stage = stage;
+            // Обновляем день начала стадии
+            c.stageStartDay = state.gameDay;
             changed++;
             
-            // Логируем расход для каждого контейнера
             if (oldStage !== stage) {
                 if (stage === 'soak' && requiredWater > 0) {
-                    addLog(`💧 Контейнер #${c.number}: замачивание (-${RESOURCE_COSTS.soak.water} л воды)`);
+                    addLog(`💧 Контейнер #${c.number}: замачивание (день ${state.gameDay.toFixed(1)})`);
                 } else if (stage === 'sow' && requiredSolution > 0) {
-                    addLog(`🌱 Контейнер #${c.number}: посев (-${RESOURCE_COSTS.sow.solution} л раствора)`);
+                    addLog(`🌱 Контейнер #${c.number}: посев (день ${state.gameDay.toFixed(1)})`);
+                } else {
+                    addLog(`🔄 Контейнер #${c.number}: ${STAGE_NAMES[stage]} (день ${state.gameDay.toFixed(1)})`);
                 }
             }
         }
@@ -132,7 +133,7 @@ function harvestSelected() {
     });
 
     state.selectedIds.clear();
-    addLog(`✂️ Собрано ${harvested} контейнеров пшеницы`);
+    addLog(`✂️ Собрано ${harvested} контейнеров пшеницы (день ${state.gameDay.toFixed(1)})`);
     saveToLocalStorage();
     render();
 }
@@ -156,7 +157,6 @@ function addWater() {
 }
 
 function addSolution() {
-    // Проверяем, есть ли вода для создания раствора
     if (state.water < 4) {
         addLog(`❌ Недостаточно воды для создания раствора! Нужно 4 л воды, есть ${state.water.toFixed(2)} л`);
         return;
@@ -185,5 +185,11 @@ function selectAll() {
 function clearSelection() {
     state.selectedIds.clear();
     addLog(`❌ Выбор снят со всех контейнеров`);
+    render();
+}
+
+// Функция для обновления прогресса (будет вызываться таймером)
+function updateProgress() {
+    // Просто перерисовываем - вся логика отображения в ui.js
     render();
 }

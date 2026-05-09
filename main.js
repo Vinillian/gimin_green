@@ -3,16 +3,16 @@
 document.addEventListener('DOMContentLoaded', () => {
     loadFromLocalStorage();
 
-    // Привязка кнопок - убеждаемся что все ID существуют
-    const newBatch1Btn = document.getElementById('newBatch1Btn');
-    const newBatch4Btn = document.getElementById('newBatch4Btn');
+    // Добавляем отображение текущего дня в верхнюю панель
+    addDayDisplay();
     
-    if (newBatch1Btn) newBatch1Btn.addEventListener('click', createContainer);
-    if (newBatch4Btn) newBatch4Btn.addEventListener('click', create4Containers);
+    // Привязка кнопок
+    document.getElementById('newBatch1Btn')?.addEventListener('click', createContainer);
+    document.getElementById('newBatch4Btn')?.addEventListener('click', create4Containers);
     
     document.getElementById('stageSoakBtn')?.addEventListener('click', () => setStageForSelected('soak'));
     document.getElementById('stageAirBtn')?.addEventListener('click', () => setStageForSelected('air'));
-    document.getElementById('stageSowBtn')?.addEventListener('click', () => setStageForSelected('sow')); // Новая кнопка
+    document.getElementById('stageSowBtn')?.addEventListener('click', () => setStageForSelected('sow'));
     document.getElementById('stagePressBtn')?.addEventListener('click', () => setStageForSelected('press'));
     document.getElementById('stageLightBtn')?.addEventListener('click', () => setStageForSelected('light'));
     document.getElementById('resetStageBtn')?.addEventListener('click', resetSelectedStage);
@@ -27,14 +27,40 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('addSolutionBtn')?.addEventListener('click', addSolution);
     document.getElementById('addSeedsBtn')?.addEventListener('click', addSeeds);
 
+    // Запускаем таймер
+    startGameTimer();
+    
     // Начальная отрисовка
     render();
-    
-    // Для теста добавим контейнеры если их нет
-    if (state.containers.length === 0 && state.water >= 200) {
-        // Добавляем 5 контейнеров - они заполнят первый поддон
-        for (let i = 0; i < 5; i++) {
-            createContainer();
-        }
-    }
 });
+
+function addDayDisplay() {
+    // Добавляем отображение дня в верхнюю панель ресурсов
+    const topResources = document.querySelector('.top-resources');
+    if (topResources) {
+        const dayCard = document.createElement('div');
+        dayCard.className = 'resource-card large';
+        dayCard.innerHTML = `
+            <span class="resource-icon">⏱️</span>
+            <span class="resource-label">ДЕНЬ</span>
+            <span class="resource-value" id="currentDay">0.0</span>
+        `;
+        topResources.appendChild(dayCard);
+    }
+}
+
+function startGameTimer() {
+    // Каждые 2 секунды добавляем 0.1 игрового дня (20 секунд = 1 день)
+    setInterval(() => {
+        if (state.isRunning) {
+            // Увеличиваем игровой день на 0.1 (1 день реального времени = 20 сек)
+            state.gameDay = Math.round((state.gameDay + 0.1) * 10) / 10;
+            
+            // Обновляем прогресс всех контейнеров
+            updateProgress();
+            
+            // Сохраняем состояние
+            saveToLocalStorage();
+        }
+    }, 2000); // Каждые 2 секунды
+}

@@ -6,7 +6,13 @@ const state = {
     solution: 15,
     seeds: 30,
     nextId: 1,
-    log: ["📋 Добро пожаловать в тестовую ферму!"]
+    log: ["📋 Добро пожаловать в тестовую ферму!"],
+    
+    // Новые поля для времени
+    gameDay: 0,           // текущий игровой день (может быть дробным)
+    lastUpdateTime: null, // для отслеживания реального времени
+    timeMultiplier: 1,    // множитель скорости (1 день = 20 сек)
+    isRunning: true       // запущен ли таймер
 };
 
 function addLog(msg) {
@@ -21,7 +27,8 @@ function saveToLocalStorage() {
             solution: state.solution,
             seeds: state.seeds,
             containers: state.containers,
-            nextId: state.nextId
+            nextId: state.nextId,
+            gameDay: state.gameDay
         }));
     } catch(e) {}
 }
@@ -36,6 +43,7 @@ function loadFromLocalStorage() {
             state.seeds = data.seeds ?? 30;
             state.containers = data.containers ?? [];
             state.nextId = data.nextId ?? 1;
+            state.gameDay = data.gameDay ?? 0;
         }
     } catch(e) {}
 }

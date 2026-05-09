@@ -336,3 +336,31 @@ body {
 .btn-stage.sow {
     background: #4CAF50; /* Зеленый цвет для посева */
 }
+
+/* Добавить в конец файла style.css */
+
+/* Прогресс-бар */
+.progress-bar-container {
+    width: 100%;
+    margin: 5px 0;
+    font-family: monospace;
+    font-size: 0.8rem;
+    color: #ffeb99;
+    text-align: center;
+}
+
+.progress-bar-text {
+    letter-spacing: 1px;
+}
+
+/* Номер дня на контейнере */
+.container-day {
+    font-size: 0.7rem;
+    color: #9ccc7c;
+    margin-top: 2px;
+}
+
+/* Увеличиваем высоту карточки для нового контента */
+.container-card {
+    min-height: 110px !important;
+}

@@ -18,6 +18,15 @@ const STAGE_ICONS = {
     'light': '💡'
 };
 
+// Длительность стадий в днях
+const STAGE_DURATION = {
+    'soak': 1,
+    'air': 1,
+    'sow': 0,    // Посев мгновенный
+    'press': 2,
+    'light': 5
+};
+
 // Расход ресурсов
 const RESOURCE_COSTS = {
     soak: {
