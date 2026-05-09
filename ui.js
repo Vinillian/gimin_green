@@ -37,7 +37,7 @@ function renderBuckets() {
             <div class="bucket-icon">${icon}</div>
             <div class="bucket-count">${bucket.seeds} 🌱</div>
             ${bucket.stage ? `<div class="bucket-progress">${progress}%</div>` : ''}
-            <div class="bucket-status">${statusIcons.join(' ')}</div>
+            <div class="bucket-status">${statusIcons.join('')}</div>
         `;
         
         bucketEl.addEventListener('click', (e) => {
@@ -58,7 +58,7 @@ function renderTable() {
     // Получаем все контейнеры на столе
     const tableContainers = state.containers.filter(c => c.location === 'table');
     
-    // Сортируем по номеру для красивого отображения
+    // Сортируем по номеру
     tableContainers.sort((a, b) => a.number - b.number);
     
     tableContainers.forEach(containerObj => {
@@ -66,11 +66,11 @@ function renderTable() {
         container.appendChild(card);
     });
     
-    // Заполняем пустые ячейки до 8
+    // Заполняем пустые ячейки до 8 (2x4)
     for (let i = tableContainers.length; i < 8; i++) {
         const empty = document.createElement('div');
         empty.className = 'table-cell empty';
-        empty.innerHTML = '🔲';
+        empty.innerHTML = '🌱';
         container.appendChild(empty);
     }
 }
@@ -86,8 +86,7 @@ function renderShelves() {
             shelfContainers.sort((a, b) => a.number - b.number);
             
             shelfContainers.forEach(containerObj => {
-                const card = createContainerCard(containerObj);
-                card.classList.add('shelf-container-card');
+                const card = createShelfContainerCard(containerObj);
                 shelf1Container.appendChild(card);
             });
             
@@ -110,8 +109,7 @@ function renderShelves() {
             shelfContainers.sort((a, b) => a.number - b.number);
             
             shelfContainers.forEach(containerObj => {
-                const card = createContainerCard(containerObj);
-                card.classList.add('shelf-container-card');
+                const card = createShelfContainerCard(containerObj);
                 shelf2Container.appendChild(card);
             });
             
@@ -134,8 +132,7 @@ function renderShelves() {
             shelfContainers.sort((a, b) => a.number - b.number);
             
             shelfContainers.forEach(containerObj => {
-                const card = createContainerCard(containerObj);
-                card.classList.add('shelf-container-card');
+                const card = createShelfContainerCard(containerObj);
                 shelf3Container.appendChild(card);
             });
             
@@ -147,6 +144,61 @@ function renderShelves() {
             }
         }
     }
+}
+
+// Специальная функция для создания карточек на полках
+function createShelfContainerCard(container) {
+    const isSelected = state.selectedIds.has(container.id);
+    const card = document.createElement('div');
+    card.className = `container-card ${container.stage} ${isSelected ? 'selected' : ''}`;
+    card.dataset.id = container.id;
+    
+    const daysPassed = state.gameDay - container.stageStartDay;
+    const totalDays = STAGE_DURATION[container.stage];
+    
+    let progressPercent = 0;
+    let dayText = '';
+    
+    if (totalDays > 0) {
+        progressPercent = Math.min(100, (daysPassed / totalDays) * 100);
+        const currentDay = Math.min(Math.floor(daysPassed) + 1, totalDays);
+        dayText = `д.${currentDay}`;
+    } else {
+        progressPercent = 100;
+        dayText = '✔️';
+    }
+    
+    // Собираем иконки статуса
+    const icons = [];
+    icons.push(STAGE_ICONS[container.stage]);
+    if (container.needsSpray) icons.push('💦');
+    if (container.needsWater) icons.push('🚰');
+    if (container.needsTransition) icons.push('⚠️');
+    
+    card.innerHTML = `
+        <div class="container-number">#${container.number}</div>
+        <div class="container-icons">${icons.join('')}</div>
+        <div class="progress-container">
+            <div class="progress-fill" style="width: ${progressPercent}%;"></div>
+        </div>
+        <div class="container-day">${dayText}</div>
+    `;
+    
+    card.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const id = Number(card.dataset.id);
+        
+        if (state.selectedIds.has(id)) {
+            state.selectedIds.delete(id);
+            addLog(`🔓 Снят выбор с #${getContainerNumber(id)}`);
+        } else {
+            state.selectedIds.add(id);
+            addLog(`🔒 Выбран #${getContainerNumber(id)}`);
+        }
+        render();
+    });
+    
+    return card;
 }
 
 function renderPallets() {
@@ -162,11 +214,13 @@ function renderPallets() {
         .filter(c => c.location === 'light')
         .sort((a, b) => a.number - b.number);
     
-    const containers1 = lightContainers.filter(c => c.number <= 10);
-    const containers2 = lightContainers.filter(c => c.number > 10);
+    // Первый поддон (1-8)
+    const containers1 = lightContainers.filter(c => c.number <= 8);
+    // Второй поддон (9-16)
+    const containers2 = lightContainers.filter(c => c.number > 8 && c.number <= 16);
     
-    // Первый поддон (1-10)
-    for (let i = 1; i <= 10; i++) {
+    // Первый поддон (1-8)
+    for (let i = 1; i <= 8; i++) {
         const container = containers1.find(c => c.number === i);
         if (container) {
             const card = createContainerCard(container);
@@ -176,8 +230,8 @@ function renderPallets() {
         }
     }
     
-    // Второй поддон (11-20)
-    for (let i = 11; i <= 20; i++) {
+    // Второй поддон (9-16)
+    for (let i = 9; i <= 16; i++) {
         const container = containers2.find(c => c.number === i);
         if (container) {
             const card = createContainerCard(container);
@@ -187,7 +241,7 @@ function renderPallets() {
         }
     }
     
-    // Обновляем счетчики готовых на поддонах
+    // Обновляем счетчики готовых
     const ready1 = containers1.filter(c => c.stage === 'light' && c.needsTransition).length;
     const ready2 = containers2.filter(c => c.stage === 'light' && c.needsTransition).length;
     
@@ -210,10 +264,10 @@ function createContainerCard(container) {
     if (totalDays > 0) {
         progressPercent = Math.min(100, (daysPassed / totalDays) * 100);
         const currentDay = Math.min(Math.floor(daysPassed) + 1, totalDays);
-        dayText = `День ${currentDay} из ${totalDays}`;
+        dayText = `д.${currentDay}`;
     } else {
         progressPercent = 100;
-        dayText = 'Готово';
+        dayText = '✔️';
     }
     
     // Собираем иконки статуса
@@ -225,7 +279,7 @@ function createContainerCard(container) {
     
     card.innerHTML = `
         <div class="container-number">#${container.number}</div>
-        <div class="container-icons">${icons.join(' ')}</div>
+        <div class="container-icons">${icons.join('')}</div>
         <div class="progress-container">
             <div class="progress-fill" style="width: ${progressPercent}%;"></div>
         </div>
@@ -284,7 +338,7 @@ function renderSelectedInfo() {
             if (bucket.stage === 'soak') status = ' (замачивание)';
             else if (bucket.stage === 'air') status = ' (проветривание)';
             
-            selectedInfo.innerHTML = `✅ Выбрано ведро #${bucket.id}${status} — ${bucket.seeds} 🌱`;
+            selectedInfo.innerHTML = `✅ Ведро #${bucket.id}${status} — ${bucket.seeds} 🌱`;
             return;
         }
     }
@@ -304,12 +358,12 @@ function renderSelectedInfo() {
         });
         
         if (selectedItems.length > 0) {
-            selectedInfo.innerHTML = `✅ Выбраны: ${selectedItems.join(', ')}`;
+            selectedInfo.innerHTML = `✅ ${selectedItems.join(', ')}`;
         } else {
-            selectedInfo.innerHTML = '👆 Нажми на контейнер или ведро, чтобы выбрать';
+            selectedInfo.innerHTML = '👆 Нажми на контейнер или ведро';
         }
     } else {
-        selectedInfo.innerHTML = '👆 Нажми на контейнер или ведро, чтобы выбрать';
+        selectedInfo.innerHTML = '👆 Нажми на контейнер или ведро';
     }
 }
 

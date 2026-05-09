@@ -183,7 +183,7 @@ function startSowing() {
             lastWaterDay: currentDay,
             needsSpray: false,
             needsWater: false,
-            needsTransition: false
+            needsTransition: true // Посев мгновенный, сразу готов к прижиму
         };
         
         state.containers.push(container);
@@ -223,6 +223,14 @@ function moveToPress() {
         return;
     }
     
+    // Проверяем, что все выбранные контейнеры готовы к переводу
+    for (let container of selectedContainers) {
+        if (!container.needsTransition) {
+            addLog(`❌ Контейнер #${container.number} ещё не готов к прижиму (нужен ⚠️)`);
+            return;
+        }
+    }
+    
     // Проверяем место на полках
     let totalToMove = selectedContainers.length;
     let availableSpace = 0;
@@ -236,15 +244,22 @@ function moveToPress() {
         return;
     }
     
-    // Распределяем по полкам
+    // Распределяем по полкам (заполняем последовательно)
     const currentDay = Math.floor(state.gameDay);
     let moved = [];
+    let movedIds = [];
+    
+    // Сортируем контейнеры по номеру
+    selectedContainers.sort((a, b) => a.number - b.number);
     
     for (let container of selectedContainers) {
-        // Ищем полку с местом
+        // Ищем первую полку с местом
         const targetShelf = state.shelves.find(s => s.containers.length < 4);
         
         if (targetShelf) {
+            // Сохраняем ID для удаления со стола
+            movedIds.push(container.id);
+            
             container.stage = 'press';
             container.location = 'shelf';
             container.locationId = targetShelf.id;
@@ -257,12 +272,15 @@ function moveToPress() {
     }
     
     // Удаляем со стола
-    state.table.containers = state.table.containers.filter(id => !state.selectedIds.has(id));
+    state.table.containers = state.table.containers.filter(id => !movedIds.includes(id));
     
     // Очищаем выделение
     state.selectedIds.clear();
     
-    addLog(`📦 ${moved.length} контейнеров перемещены на прижим: ${moved.join(', ')}`);
+    if (moved.length > 0) {
+        addLog(`📦 ${moved.length} контейнеров перемещены на прижим: ${moved.join(', ')}`);
+    }
+    
     saveToLocalStorage();
     render();
 }
@@ -292,28 +310,43 @@ function moveToLight() {
         }
     }
     
-    // Проверяем место на поддонах
+    // Проверяем место на поддонах (максимум 16)
     const containersOnLight = state.containers.filter(c => c.location === 'light').length;
-    if (containersOnLight + selectedContainers.length > MAX_CONTAINERS) {
-        addLog(`❌ Недостаточно места на поддонах! Свободно ${MAX_CONTAINERS - containersOnLight}`);
+    if (containersOnLight + selectedContainers.length > 16) {
+        addLog(`❌ Недостаточно места на поддонах! Свободно ${16 - containersOnLight}`);
         return;
     }
     
-    // Перемещаем
-    const currentDay = Math.floor(state.gameDay);
+    // Находим свободные номера для контейнеров на свету
+    const lightNumbers = new Set(state.containers
+        .filter(c => c.location === 'light')
+        .map(c => c.number));
+    
     let moved = [];
+    let movedIds = [];
     
     for (let container of selectedContainers) {
+        // Сохраняем ID для удаления с полки
+        movedIds.push(container.id);
+        
+        // Находим свободный номер на поддонах
+        let lightNumber = 1;
+        while (lightNumbers.has(lightNumber)) {
+            lightNumber++;
+        }
+        lightNumbers.add(lightNumber);
+        
         // Сохраняем номер полки для удаления
         const shelfId = container.locationId;
         
         container.stage = 'light';
         container.location = 'light';
-        container.locationId = container.number; // номер контейнера = место на поддоне
+        container.locationId = lightNumber; // Новый номер на поддоне
+        container.number = lightNumber; // Меняем номер контейнера
         container.stageStartDay = state.gameDay;
         container.needsTransition = false;
         
-        moved.push(`#${container.number}`);
+        moved.push(`#${lightNumber}`);
         
         // Удаляем с полки
         const shelf = state.shelves.find(s => s.id === shelfId);
@@ -324,7 +357,10 @@ function moveToLight() {
     
     state.selectedIds.clear();
     
-    addLog(`💡 ${moved.length} контейнеров перемещены на свет: ${moved.join(', ')}`);
+    if (moved.length > 0) {
+        addLog(`💡 ${moved.length} контейнеров перемещены на свет: ${moved.join(', ')}`);
+    }
+    
     saveToLocalStorage();
     render();
 }
@@ -335,6 +371,20 @@ function harvestSelected() {
 
     let harvested = 0;
     const harvestedNumbers = [];
+    
+    // Проверяем, что все выбранные контейнеры на свету и готовы
+    const selectedContainers = state.containers.filter(c => state.selectedIds.has(c.id));
+    
+    for (let container of selectedContainers) {
+        if (container.location !== 'light') {
+            addLog(`❌ Контейнер #${container.number} не на свету`);
+            return;
+        }
+        if (!container.needsTransition) {
+            addLog(`❌ Контейнер #${container.number} ещё не готов к сбору`);
+            return;
+        }
+    }
     
     state.containers = state.containers.filter(c => {
         if (state.selectedIds.has(c.id)) {
@@ -362,6 +412,7 @@ function deleteSelected() {
     const count = state.selectedIds.size;
     const deletedNumbers = [];
     
+    // Очищаем из всех мест хранения
     state.containers = state.containers.filter(c => {
         if (state.selectedIds.has(c.id)) {
             deletedNumbers.push(`#${c.number}`);
@@ -530,7 +581,7 @@ function selectBucket(bucketId) {
     render();
 }
 
-// Обновление прогресса
+// Функция для обновления прогресса и проверки напоминаний
 function updateProgress() {
     const currentDay = Math.floor(state.gameDay);
     
@@ -566,9 +617,8 @@ function updateProgress() {
         
         if (totalDays > 0) {
             c.needsTransition = daysPassed >= totalDays;
-        } else {
-            c.needsTransition = false;
         }
+        // Для sow стадии needsTransition уже установлен в true при создании
     });
     
     render();
