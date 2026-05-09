@@ -15,16 +15,10 @@ function render() {
 
     // Сортируем контейнеры по номеру
     const sortedContainers = [...state.containers].sort((a, b) => a.number - b.number);
-    
-    // Логируем для отладки
-    console.log('Все контейнеры:', sortedContainers.map(c => c.number));
 
     // Разделяем контейнеры на две группы (1-10 в первый поддон, 11-20 во второй)
     const containers1 = sortedContainers.filter(c => c.number <= 10);
     const containers2 = sortedContainers.filter(c => c.number > 10);
-    
-    console.log('Первый поддон:', containers1.map(c => c.number));
-    console.log('Второй поддон:', containers2.map(c => c.number));
 
     // Создаем карты для быстрого доступа
     const containerMap1 = new Map(containers1.map(c => [c.number, c]));
@@ -50,11 +44,11 @@ function render() {
         }
     }
     
-    // Обновление глобальных счетчиков
+    // Обновление глобальных счетчиков с ОДНИМ знаком после запятой
     if (totalSpan) totalSpan.innerText = state.containers.length;
-    document.getElementById('waterCount').innerText = state.water;
-    document.getElementById('solutionCount').innerText = state.solution;
-    document.getElementById('seedCount').innerText = state.seeds;
+    document.getElementById('waterCount').innerText = state.water.toFixed(1);
+    document.getElementById('solutionCount').innerText = state.solution.toFixed(1);
+    document.getElementById('seedCount').innerText = state.seeds.toFixed(1);
     
     // Считаем готовые для каждого поддона (стадия light)
     const ready1 = containers1.filter(c => c.stage === 'light').length;

@@ -6,8 +6,14 @@ function createContainer() {
         return false;
     }
 
-    if (state.seeds < 1) {
-        addLog("❌ Нет семян для посадки");
+    if (state.seeds < 0.08) { // 80 грамм семян
+        addLog("❌ Нет семян для посадки (нужно 0.08 кг)");
+        return false;
+    }
+
+    // Проверяем наличие воды для замачивания
+    if (state.water < RESOURCE_COSTS.soak.water) {
+        addLog(`❌ Нужно ${RESOURCE_COSTS.soak.water} л воды для замачивания`);
         return false;
     }
 
@@ -19,7 +25,10 @@ function createContainer() {
     }
 
     const id = state.nextId++;
-    state.seeds--;
+    
+    // Списываем ресурсы
+    state.seeds = Math.round((state.seeds - RESOURCE_COSTS.soak.seeds) * 100) / 100;
+    state.water = Math.round((state.water - RESOURCE_COSTS.soak.water) * 100) / 100;
 
     state.containers.push({
         id: id,
@@ -27,7 +36,7 @@ function createContainer() {
         number: number
     });
 
-    addLog(`🌱 Добавлен контейнер #${number} (стадия: замачивание)`);
+    addLog(`🌱 Добавлен контейнер #${number} (стадия: замачивание, потрачено ${RESOURCE_COSTS.soak.water} л воды и ${RESOURCE_COSTS.soak.seeds} кг семян)`);
     saveToLocalStorage();
     render();
     return true;
@@ -47,11 +56,54 @@ function setStageForSelected(stage) {
         return;
     }
 
+    // Проверяем ресурсы перед изменением стадии
+    let requiredWater = 0;
+    let requiredSolution = 0;
+    
+    // Считаем, сколько ресурсов нужно для всех выбранных контейнеров
+    state.containers.forEach(c => {
+        if (state.selectedIds.has(c.id)) {
+            // При переводе в замачивание тратится вода
+            if (stage === 'soak' && c.stage !== 'soak') {
+                requiredWater += RESOURCE_COSTS.soak.water;
+            }
+            // При переводе в посев тратится раствор
+            if (stage === 'sow' && c.stage !== 'sow') {
+                requiredSolution += RESOURCE_COSTS.sow.solution;
+            }
+        }
+    });
+
+    // Проверяем достаточно ли ресурсов
+    if (requiredWater > 0 && state.water < requiredWater) {
+        addLog(`❌ Недостаточно воды! Нужно ${requiredWater.toFixed(2)} л, есть ${state.water.toFixed(2)} л`);
+        return;
+    }
+    if (requiredSolution > 0 && state.solution < requiredSolution) {
+        addLog(`❌ Недостаточно раствора! Нужно ${requiredSolution.toFixed(2)} л, есть ${state.solution.toFixed(2)} л`);
+        return;
+    }
+
+    // Списываем ресурсы с округлением до 2 знаков
+    state.water = Math.round((state.water - requiredWater) * 100) / 100;
+    state.solution = Math.round((state.solution - requiredSolution) * 100) / 100;
+
+    // Меняем стадии
     let changed = 0;
     state.containers.forEach(c => {
         if (state.selectedIds.has(c.id)) {
+            const oldStage = c.stage;
             c.stage = stage;
             changed++;
+            
+            // Логируем расход для каждого контейнера
+            if (oldStage !== stage) {
+                if (stage === 'soak' && requiredWater > 0) {
+                    addLog(`💧 Контейнер #${c.number}: замачивание (-${RESOURCE_COSTS.soak.water} л воды)`);
+                } else if (stage === 'sow' && requiredSolution > 0) {
+                    addLog(`🌱 Контейнер #${c.number}: посев (-${RESOURCE_COSTS.sow.solution} л раствора)`);
+                }
+            }
         }
     });
 
@@ -70,9 +122,9 @@ function harvestSelected() {
     let harvested = 0;
     state.containers = state.containers.filter(c => {
         if (state.selectedIds.has(c.id)) {
-            if (Math.random() > 0.3) state.water += 1;
-            if (Math.random() > 0.5) state.solution += 1;
-            if (Math.random() > 0.7) state.seeds += 1;
+            if (Math.random() > 0.3) state.water = Math.round((state.water + 1) * 100) / 100;
+            if (Math.random() > 0.5) state.solution = Math.round((state.solution + 1) * 100) / 100;
+            if (Math.random() > 0.7) state.seeds = Math.round((state.seeds + 1) * 100) / 100;
             harvested++;
             return false;
         }
@@ -97,22 +149,29 @@ function deleteSelected() {
 }
 
 function addWater() {
-    state.water += 5;
-    addLog("🚰 +5 воды");
+    state.water = Math.round((state.water + 5) * 100) / 100;
+    addLog("🚰 +5 литров воды");
     saveToLocalStorage();
     render();
 }
 
 function addSolution() {
-    state.solution += 4;
-    addLog("🧪 +4 раствора");
+    // Проверяем, есть ли вода для создания раствора
+    if (state.water < 4) {
+        addLog(`❌ Недостаточно воды для создания раствора! Нужно 4 л воды, есть ${state.water.toFixed(2)} л`);
+        return;
+    }
+    
+    state.water = Math.round((state.water - 4) * 100) / 100;
+    state.solution = Math.round((state.solution + 4) * 100) / 100;
+    addLog("🧪 +4 литра раствора (потрачено 4 л воды)");
     saveToLocalStorage();
     render();
 }
 
 function addSeeds() {
-    state.seeds += 10;
-    addLog("🌱 +10 семян");
+    state.seeds = Math.round((state.seeds + 10) * 100) / 100;
+    addLog("🌱 +10 кг семян");
     saveToLocalStorage();
     render();
 }

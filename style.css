@@ -332,3 +332,7 @@ body {
         flex-direction: column;
     }
 }
+
+.btn-stage.sow {
+    background: #4CAF50; /* Зеленый цвет для посева */
+}
