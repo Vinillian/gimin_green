@@ -1,7 +1,7 @@
 import { store } from '../store/index.js';
 
 export function renderSelectedInfo() {
-    const selectedInfo = document.getElementById('selectedInfo');
+    const selectedInfo = document.getElementById('selectedInfoBottom');
     if (!selectedInfo) return;
 
     if (store.selectedBucketIds.size > 0) {

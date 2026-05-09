@@ -5,7 +5,7 @@ export function renderLog() {
     if (!logPanel) return;
     
     if (store.log && store.log.length > 0) {
-        logPanel.innerHTML = '📋 ' + store.log.slice(0, 5).join('<br>📋 ');
+        logPanel.innerHTML = store.log.slice(0, 10).map(msg => `📋 ${msg}`).join('<br>');
     } else {
         logPanel.innerHTML = '📋 Добро пожаловать в ферму!';
     }
