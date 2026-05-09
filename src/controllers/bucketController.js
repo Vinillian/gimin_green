@@ -32,7 +32,7 @@ export const bucketController = {
 
     store.resources.useWater(waterNeeded);
     store.stats.totalWaterUsed += waterNeeded;
-    bucket.startStage('soak', store.gameDay);
+    bucket.startStage('soak', Date.now());
     store.notify();
     eventBus.emit('bucket:stageStarted', { bucketId, stage: 'soak' });
     return true;
@@ -40,10 +40,9 @@ export const bucketController = {
 
   startAiring(bucketId) {
     const bucket = store.getBucket(bucketId);
-    // Добавлена проверка на наличие семян (хотя стадия 'soak' подразумевает их наличие)
     if (!bucket || bucket.stage !== 'soak' || !bucket.needsTransition || bucket.seeds === 0) return false;
 
-    bucket.startStage('air', store.gameDay);
+    bucket.startStage('air', Date.now());
     store.notify();
     eventBus.emit('bucket:stageStarted', { bucketId, stage: 'air' });
     return true;
@@ -63,14 +62,14 @@ export const bucketController = {
     store.resources.useSolution(solutionNeeded);
     store.stats.totalSolutionUsed += solutionNeeded;
 
-    const currentDay = store.gameDay;
+    const now = Date.now();
     const newIds = [];
     for (let i = 0; i < seedsCount; i++) {
       let number = 1;
       const existingNumbers = new Set(store.containers.map(c => c.number));
       while (existingNumbers.has(number)) number++;
 
-      const container = new Container(store.nextId++, number, 'sow', currentDay);
+      const container = new Container(store.nextId++, number, 'sow', now);
       store.addContainer(container);
       store.table.containers.push(container.id);
       newIds.push(container.id);

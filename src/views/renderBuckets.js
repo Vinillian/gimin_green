@@ -1,5 +1,5 @@
 import { store } from '../store/index.js';
-import { STAGE_DURATION } from '../../constants.js';
+import { STAGE_DURATION_REAL } from '../../constants.js';
 
 export function renderBuckets() {
     console.log('🪣 renderBuckets called', store.buckets.length);
@@ -11,6 +11,7 @@ export function renderBuckets() {
     }
 
     container.innerHTML = '';
+    const now = Date.now();
     
     store.buckets.forEach(bucket => {
         const el = document.createElement('div');
@@ -21,12 +22,7 @@ export function renderBuckets() {
         if (bucket.stage === 'soak') icon = '💧';
         else if (bucket.stage === 'air') icon = '🌬';
 
-        let progress = 0;
-        if (bucket.stage && bucket.stageStartDay !== null) {
-            progress = ((store.gameDay - bucket.stageStartDay) / STAGE_DURATION[bucket.stage]) * 100;
-            progress = Math.min(100, Math.max(0, progress));
-        }
-        
+        const progress = bucket.getProgressPercent(now);
         const status = bucket.needsTransition ? '⚠️' : '';
 
         el.innerHTML = `

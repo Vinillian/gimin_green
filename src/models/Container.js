@@ -1,66 +1,76 @@
-import { STAGE_DURATION, STAGE_ICONS } from '../../constants.js';
+import { STAGE_DURATION_REAL, CARE_INTERVALS, STAGE_ICONS } from '../../constants.js';
 
 export class Container {
-  constructor(id, number, stage, currentDay) {
-    this.id = id;
-    this.number = number;
-    this.stage = stage;
-    this.location = 'table';
-    this.locationId = null;
-    this.stageStartDay = currentDay;
-    this.lastSprayDay = currentDay;
-    this.lastWaterDay = currentDay;
-    this.needsSpray = false;
-    this.needsWater = false;
-    this.needsTransition = (STAGE_DURATION[stage] === 0);
-  }
-
-  updateProgress(currentDay) {
-    const daysPassed = currentDay - this.stageStartDay;
-    const totalDays = STAGE_DURATION[this.stage];
-    if (totalDays > 0) {
-      this.needsTransition = daysPassed >= totalDays;
+    constructor(id, number, stage, startTime = Date.now()) {
+        this.id = id;
+        this.number = number;
+        this.stage = stage;
+        this.location = 'table';
+        this.locationId = null;
+        this.stageStartTime = startTime;
+        this.lastSprayTime = startTime;
+        this.lastWaterTime = startTime;
+        this.needsSpray = false;
+        this.needsWater = false;
+        this.needsTransition = (STAGE_DURATION_REAL[stage] === 0);
     }
 
-    // Опрыскивание нужно, если прошёл хотя бы 1 полный день с последнего опрыскивания
-    // и контейнер не в стадии 'sow'
-    if (this.stage !== 'sow' && currentDay - this.lastSprayDay >= 1) {
-      this.needsSpray = true;
+    updateProgress(now = Date.now()) {
+        // Переход на следующую стадию
+        const duration = STAGE_DURATION_REAL[this.stage];
+        if (duration > 0) {
+            const elapsed = now - this.stageStartTime;
+            this.needsTransition = elapsed >= duration;
+        } else {
+            this.needsTransition = true;
+        }
+
+        // Опрыскивание (если не стадия посева)
+        if (this.stage !== 'sow') {
+            const sprayElapsed = now - this.lastSprayTime;
+            this.needsSpray = sprayElapsed >= CARE_INTERVALS.SPRAY_EVERY;
+        }
+
+        // Полив (только на стадии света)
+        if (this.stage === 'light') {
+            const waterElapsed = now - this.lastWaterTime;
+            this.needsWater = waterElapsed >= CARE_INTERVALS.WATER_EVERY;
+        }
     }
 
-    // Полив нужен, если прошёл хотя бы 1 полный день с последнего полива
-    // и контейнер на стадии 'light'
-    if (this.stage === 'light' && currentDay - this.lastWaterDay >= 1) {
-      this.needsWater = true;
+    getProgressPercent(now = Date.now()) {
+        const duration = STAGE_DURATION_REAL[this.stage];
+        if (duration === 0) return 100;
+        const elapsed = now - this.stageStartTime;
+        return Math.min(100, Math.max(0, (elapsed / duration) * 100));
     }
-  }
 
-  spray(currentDay) {
-    this.lastSprayDay = currentDay;
-    this.needsSpray = false;
-  }
-
-  water(currentDay) {
-    this.lastWaterDay = currentDay;
-    this.needsWater = false;
-  }
-
-  moveTo(newLocation, newStage, currentDay, locationId = null, newNumber = null) {
-    this.location = newLocation;
-    this.stage = newStage;
-    this.stageStartDay = currentDay;
-    this.needsTransition = false;
-    this.locationId = locationId;
-    if (newLocation === 'light' && newNumber !== null) {
-      this.number = newNumber;
+    spray(now = Date.now()) {
+        this.lastSprayTime = now;
+        this.needsSpray = false;
     }
-    this.lastSprayDay = currentDay;
-    this.lastWaterDay = currentDay;
-    this.needsSpray = false;
-    this.needsWater = false;
-  }
 
-  get stageIcon() {
-    return STAGE_ICONS[this.stage];
-  }
+    water(now = Date.now()) {
+        this.lastWaterTime = now;
+        this.needsWater = false;
+    }
+
+    moveTo(newLocation, newStage, now = Date.now(), locationId = null, newNumber = null) {
+        this.location = newLocation;
+        this.stage = newStage;
+        this.stageStartTime = now;
+        this.needsTransition = false;
+        this.locationId = locationId;
+        if (newLocation === 'light' && newNumber !== null) {
+            this.number = newNumber;
+        }
+        this.lastSprayTime = now;
+        this.lastWaterTime = now;
+        this.needsSpray = false;
+        this.needsWater = false;
+    }
+
+    get stageIcon() {
+        return STAGE_ICONS[this.stage];
+    }
 }

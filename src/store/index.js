@@ -2,7 +2,7 @@ import { Bucket } from '../models/Bucket.js';
 import { Container } from '../models/Container.js';
 import { Shelf } from '../models/Shelf.js';
 import { ResourceStock } from '../models/ResourceStock.js';
-import { INITIAL_STATS } from '../../constants.js'; // импортируем из констант
+import { INITIAL_STATS, CAPACITY } from '../../constants.js';
 
 class Store {
     constructor() {
@@ -13,7 +13,6 @@ class Store {
         this.table = { containers: [] };
         this.shelves = [1, 2, 3].map(id => new Shelf(id));
         this.resources = new ResourceStock(20, 15, 30);
-        this.gameDay = 0;
         this.nextId = 1;
         this.stats = { ...INITIAL_STATS };
         this.settings = {
@@ -24,7 +23,7 @@ class Store {
         this.selectedContainerIds = new Set();
         this.selectedBucketIds = new Set();
         this.multiselectModifier = false;
-        this.log = ['📋 Добро пожаловать в ферму!'];
+        this.log = ['📋 Добро пожаловать в реальную ферму!'];
 
         this._subscribers = [];
         
@@ -42,7 +41,6 @@ class Store {
         this._subscribers.forEach(cb => cb(this));
     }
 
-    // ИСПРАВЛЕНО: обратные кавычки для шаблонной строки
     addLog(msg) {
         const timeStr = new Date().toLocaleTimeString().slice(0,5);
         this.log.unshift(`⏱️ ${timeStr} • ${msg}`);
@@ -64,6 +62,12 @@ class Store {
 
     addContainer(container) {
         this.containers.push(container);
+        // Обновляем статистику максимального заполнения стола
+        if (container.location === 'table') {
+            if (this.table.containers.length >= CAPACITY.TABLE_CAPACITY) {
+                this.stats.maxFullTable = true;
+            }
+        }
     }
 
     removeContainer(id) {
@@ -119,47 +123,90 @@ class Store {
         this.notify();
     }
 
-    updateAllProgress() {
-        const currentDay = this.gameDay;
-        this.buckets.forEach(b => b.updateProgress(currentDay));
-        this.containers.forEach(c => c.updateProgress(currentDay));
+    updateAllProgress(now = Date.now()) {
+        this.buckets.forEach(b => b.updateProgress(now));
+        this.containers.forEach(c => c.updateProgress(now));
         this.notify();
     }
 
     toJSON() {
         return {
-            water: this.resources.water,
-            solution: this.resources.solution,
-            seeds: this.resources.seeds,
-            containers: this.containers,
-            buckets: this.buckets,
+            resources: {
+                water: this.resources.water,
+                solution: this.resources.solution,
+                seeds: this.resources.seeds
+            },
+            containers: this.containers.map(c => ({
+                id: c.id,
+                number: c.number,
+                stage: c.stage,
+                location: c.location,
+                locationId: c.locationId,
+                stageStartTime: c.stageStartTime,
+                lastSprayTime: c.lastSprayTime,
+                lastWaterTime: c.lastWaterTime
+            })),
+            buckets: this.buckets.map(b => ({
+                id: b.id,
+                seeds: b.seeds,
+                stage: b.stage,
+                stageStartTime: b.stageStartTime
+            })),
             table: this.table,
             shelves: this.shelves.map(s => ({ id: s.id, containers: s.containers })),
             nextId: this.nextId,
-            gameDay: this.gameDay,
             stats: this.stats,
             settings: this.settings,
-            log: this.log,
+            log: this.log
         };
     }
 
     fromJSON(data) {
-        this.resources.water = data.water ?? 20;
-        this.resources.solution = data.solution ?? 15;
-        this.resources.seeds = data.seeds ?? 30;
-        this.containers = data.containers?.map(c => Object.assign(new Container(), c)) ?? [];
-        this.buckets = data.buckets?.map(b => Object.assign(new Bucket(), b)) ?? [1,2,3,4].map(id => new Bucket(id));
-        this.table = data.table ?? { containers: [] };
-        this.shelves = data.shelves?.map(s => {
+        // Восстанавливаем ресурсы
+        this.resources.water = data.resources?.water ?? 20;
+        this.resources.solution = data.resources?.solution ?? 15;
+        this.resources.seeds = data.resources?.seeds ?? 30;
+
+        // Восстанавливаем контейнеры
+        this.containers = (data.containers || []).map(cData => {
+            const c = new Container(cData.id, cData.number, cData.stage, cData.stageStartTime);
+            c.location = cData.location;
+            c.locationId = cData.locationId;
+            c.lastSprayTime = cData.lastSprayTime;
+            c.lastWaterTime = cData.lastWaterTime;
+            c.updateProgress();
+            return c;
+        });
+
+        // Восстанавливаем вёдра
+        this.buckets = (data.buckets || []).map(bData => {
+            const b = new Bucket(bData.id);
+            b.seeds = bData.seeds;
+            b.stage = bData.stage;
+            b.stageStartTime = bData.stageStartTime;
+            b.updateProgress();
+            return b;
+        });
+        // Если нет сохранённых вёдер, создаём новые
+        if (!data.buckets) {
+            this.buckets = [1,2,3,4].map(id => new Bucket(id));
+        }
+
+        this.table = data.table || { containers: [] };
+        this.shelves = (data.shelves || []).map(s => {
             const shelf = new Shelf(s.id);
             shelf.containers = s.containers;
             return shelf;
-        }) ?? [1,2,3].map(id => new Shelf(id));
+        });
+        if (!data.shelves) {
+            this.shelves = [1,2,3].map(id => new Shelf(id));
+        }
+
         this.nextId = data.nextId ?? 1;
-        this.gameDay = data.gameDay ?? 0;
         this.stats = { ...INITIAL_STATS, ...(data.stats ?? {}) };
         this.settings = { ...this.settings, ...(data.settings ?? {}) };
-        this.log = data.log ?? ['📋 Добро пожаловать в ферму!'];
+        this.log = data.log ?? ['📋 Добро пожаловать в реальную ферму!'];
+
         this.notify();
     }
 }

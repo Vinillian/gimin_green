@@ -23,13 +23,14 @@ export const containerController = {
 
     const toMoveCount = Math.min(candidates.length, totalFree);
     const moved = [];
+    const now = Date.now();
 
     for (let i = 0; i < toMoveCount; i++) {
       const container = candidates[i];
       const target = shelfSpace.find(s => s.free > 0);
       if (!target) break;
 
-      container.moveTo('shelf', 'press', store.gameDay, target.shelf.id);
+      container.moveTo('shelf', 'press', now, target.shelf.id);
       target.shelf.addContainer(container.id);
       target.free--;
       moved.push(container.id);
@@ -38,8 +39,6 @@ export const containerController = {
     store.table.containers = store.table.containers.filter(id => !moved.includes(id));
     
     store.notify();
-
-    // После перемещения сбрасываем выделение (как в старой версии)
     store.clearSelection();
 
     if (moved.length > 0) {
@@ -72,6 +71,7 @@ export const containerController = {
     const toMoveCount = Math.min(candidates.length, availableSpace);
     const lightNumbers = new Set(store.containers.filter(c => c.location === 'light').map(c => c.number));
     const moved = [];
+    const now = Date.now();
 
     for (let i = 0; i < toMoveCount; i++) {
       const container = candidates[i];
@@ -80,7 +80,7 @@ export const containerController = {
       lightNumbers.add(number);
       
       const shelfId = container.locationId;
-      container.moveTo('light', 'light', store.gameDay, null, number);
+      container.moveTo('light', 'light', now, null, number);
       
       const shelf = store.getShelf(shelfId);
       if (shelf) shelf.removeContainer(container.id);
@@ -89,8 +89,6 @@ export const containerController = {
     }
 
     store.notify();
-
-    // После перемещения сбрасываем выделение (как в старой версии)
     store.clearSelection();
 
     if (moved.length > 0) {
@@ -103,7 +101,6 @@ export const containerController = {
   },
 
   spray(containerIds) {
-    // Сохраняем текущее выделение для последующего восстановления
     const originalSelection = Array.from(store.selectedContainerIds);
     
     const containers = containerIds.map(id => store.getContainer(id)).filter(c => c?.needsSpray);
@@ -121,10 +118,10 @@ export const containerController = {
 
     store.resources.useWater(totalCost);
     store.stats.totalWaterUsed += totalCost;
-    containers.forEach(c => c.spray(Math.floor(store.gameDay)));
+    const now = Date.now();
+    containers.forEach(c => c.spray(now));
     store.notify();
     
-    // Восстанавливаем выделение (оно должно сохраниться после опрыскивания)
     store.selectContainers(originalSelection);
     
     store.addLog(`💦 Опрыскано контейнеров: ${containers.length}`);
@@ -132,7 +129,6 @@ export const containerController = {
   },
 
   water(containerIds) {
-    // Сохраняем текущее выделение для последующего восстановления
     const originalSelection = Array.from(store.selectedContainerIds);
     
     const containers = containerIds.map(id => store.getContainer(id)).filter(c => c?.stage === 'light' && c.needsWater);
@@ -150,10 +146,10 @@ export const containerController = {
 
     store.resources.useWater(totalCost);
     store.stats.totalWaterUsed += totalCost;
-    containers.forEach(c => c.water(Math.floor(store.gameDay)));
+    const now = Date.now();
+    containers.forEach(c => c.water(now));
     store.notify();
     
-    // Восстанавливаем выделение (оно должно сохраниться после полива)
     store.selectContainers(originalSelection);
     
     store.addLog(`💧 Полито контейнеров: ${containers.length}`);

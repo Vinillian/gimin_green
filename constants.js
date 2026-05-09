@@ -1,12 +1,8 @@
-// constants.js - теперь это модуль с экспортами
-
-// Максимальное количество контейнеров
+// constants.js - реальные длительности стадий (в миллисекундах)
 export const MAX_CONTAINERS = 20;
 
-// Стадии роста
 export const STAGES = ['soak', 'air', 'sow', 'press', 'light'];
 
-// Названия стадий для отображения
 export const STAGE_NAMES = {
     'soak': '💧 Замачивание',
     'air': '🌬 Проветривание',
@@ -15,7 +11,6 @@ export const STAGE_NAMES = {
     'light': '💡 На свету'
 };
 
-// Иконки стадий
 export const STAGE_ICONS = {
     'soak': '💧',
     'air': '🌬',
@@ -24,29 +19,30 @@ export const STAGE_ICONS = {
     'light': '💡'
 };
 
-// Длительность стадий в днях
-export const STAGE_DURATION = {
-    'soak': 1,
-    'air': 1,
-    'sow': 0,
-    'press': 2,
-    'light': 5
+// РЕАЛЬНЫЕ длительности в миллисекундах (настройте под свои процессы)
+export const STAGE_DURATION_REAL = {
+    'soak': 24 * 60 * 60 * 1000,      // 24 часа
+    'air': 24 * 60 * 60 * 1000,        // 24 часа
+    'sow': 0,                          // посев моментальный
+    'press': 2 * 24 * 60 * 60 * 1000,  // 2 дня
+    'light': 7 * 24 * 60 * 60 * 1000   // 7 дней
 };
 
-// Расход ресурсов
+// Реальные интервалы для полива и опрыскивания (в миллисекундах)
+export const CARE_INTERVALS = {
+    SPRAY_EVERY: 24 * 60 * 60 * 1000,   // опрыскивать раз в сутки
+    WATER_EVERY: 24 * 60 * 60 * 1000    // поливать раз в сутки
+};
+
+// Расход ресурсов (оставляем как есть)
 export const RESOURCE_COSTS = {
-    soak: {
-        water: 0.2,
-        seeds: 0.08
-    },
-    sow: {
-        solution: 0.2
-    },
+    soak: { water: 0.2, seeds: 0.08 },
+    sow: { solution: 0.2 },
     water: 0.2,
     spray: 0.05
 };
 
-// Вместимость различных зон
+// Вместимость (без изменений)
 export const CAPACITY = {
     MAX_SEEDS_PER_BUCKET: 4,
     TABLE_CAPACITY: 8,
@@ -58,14 +54,7 @@ export const CAPACITY = {
     PALLETS_COUNT: 2
 };
 
-// Настройки времени
-export const TIME_SETTINGS = {
-    DAY_INCREMENT: 0.1,
-    TICK_INTERVAL: 6000,
-    REAL_SECONDS_PER_DAY: 60
-};
-
-// Достижения
+// Достижения (можно оставить как есть)
 export const ACHIEVEMENTS = {
     FIRST_CROP: {
         id: 'first_crop',
@@ -133,7 +122,6 @@ export const ACHIEVEMENTS = {
     }
 };
 
-// Начальная статистика
 export const INITIAL_STATS = {
     totalHarvested: 0,
     totalWaterUsed: 0,

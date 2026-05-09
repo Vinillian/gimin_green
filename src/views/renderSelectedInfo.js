@@ -12,7 +12,12 @@ export function renderSelectedInfo() {
                 let status = '';
                 if (bucket.stage === 'soak') status = ' (💧)';
                 else if (bucket.stage === 'air') status = ' (🌬)';
-                bucketInfo.push(`#${bucket.id}${status}:${bucket.seeds || 0}🌱`);
+                let timeInfo = '';
+                if (bucket.stageStartTime) {
+                    const startDate = new Date(bucket.stageStartTime);
+                    timeInfo = ` с ${startDate.toLocaleDateString()} ${startDate.toLocaleTimeString()}`;
+                }
+                bucketInfo.push(`#${bucket.id}${status}:${bucket.seeds || 0}🌱${timeInfo}`);
             }
         });
         selectedInfo.innerHTML = `✅ Вёдра: ${bucketInfo.join(', ')}`;
@@ -28,7 +33,12 @@ export function renderSelectedInfo() {
                 if (c.location === 'table') location = ' (стол)';
                 else if (c.location === 'shelf') location = ` (полка ${c.locationId})`;
                 else if (c.location === 'light') location = ' (свет)';
-                selectedItems.push(`#${c.number}${location}`);
+                let timeInfo = '';
+                if (c.stageStartTime) {
+                    const startDate = new Date(c.stageStartTime);
+                    timeInfo = ` с ${startDate.toLocaleDateString()} ${startDate.toLocaleTimeString()}`;
+                }
+                selectedItems.push(`#${c.number}${location}${timeInfo}`);
             }
         });
         selectedInfo.innerHTML = `✅ ${selectedItems.join(', ')}`;

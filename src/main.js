@@ -34,10 +34,10 @@ persistenceService.load();
 
 document.addEventListener('DOMContentLoaded', () => {
     fullRender();
-    store.addLog("🚀 Ферма запущена");
+    store.addLog("🚀 Реальный трекер фермы запущен");
 
     persistenceService.autoSave();
-    timeService.start();
+    timeService.start();  // запускаем периодическое обновление прогресса
 
     initButtonHandlers();
     initKeyboardHandlers();
@@ -45,15 +45,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
     document.getElementById('pauseBtn')?.addEventListener('click', () => {
         timeService.toggle();
-        store.addLog(timeService.isRunning ? '▶️ Игра запущена' : '⏸️ Игра на паузе');
+        store.addLog(timeService.isRunning ? '▶️ Обновление включено' : '⏸️ Обновление на паузе');
     });
 
     document.getElementById('resetGameBtn')?.addEventListener('click', () => {
-        if (confirm('Сбросить всю игру? Это действие нельзя отменить!')) {
+        if (confirm('Сбросить всю ферму? Это действие нельзя отменить!')) {
             localStorage.removeItem('farmState');
             location.reload();
         }
     });
 });
 
-console.log('✅ Main.js loaded');
+console.log('✅ Main.js loaded (реальный трекер)');

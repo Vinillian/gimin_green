@@ -1,5 +1,5 @@
 import { store } from '../store/index.js';
-import { STAGE_DURATION, STAGE_ICONS } from '../../constants.js';
+import { STAGE_DURATION_REAL, STAGE_ICONS } from '../../constants.js';
 
 export function createContainerCard(container) {
     if (!container) return document.createElement('div');
@@ -8,10 +8,18 @@ export function createContainerCard(container) {
     card.className = `container-card ${container.stage || ''} ${store.selectedContainerIds.has(container.id) ? 'selected' : ''}`;
     card.dataset.id = container.id;
 
-    const daysPassed = store.gameDay - (container.stageStartDay || store.gameDay);
-    const totalDays = STAGE_DURATION[container.stage] || 1;
-    const progress = totalDays > 0 ? Math.min(100, (daysPassed / totalDays) * 100) : 0;
-    const dayText = totalDays > 0 ? `${Math.floor(daysPassed) + 1}/${totalDays}` : '⚡';
+    const now = Date.now();
+    const progress = container.getProgressPercent(now);
+    const durationMs = STAGE_DURATION_REAL[container.stage] || 0;
+    let dayText = '';
+    if (durationMs === 0) {
+        dayText = '⚡';
+    } else {
+        const elapsedMs = now - container.stageStartTime;
+        const daysPassed = Math.floor(elapsedMs / (1000 * 3600 * 24));
+        const totalDays = Math.floor(durationMs / (1000 * 3600 * 24));
+        dayText = `${daysPassed + 1}/${totalDays}`;
+    }
 
     const icons = [];
     icons.push(STAGE_ICONS[container.stage] || '📦');

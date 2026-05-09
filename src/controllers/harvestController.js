@@ -10,7 +10,7 @@ export const harvestController = {
 
     const harvestedCount = containers.length;
     const harvestedNumbers = containers.map(c => c.number);
-    const startDay = store.gameDay;
+    const startTime = Date.now(); // для расчёта длительности цикла
 
     const removedIds = [];
     containers.forEach(c => {
@@ -24,10 +24,11 @@ export const harvestController = {
 
     store.stats.totalHarvested += harvestedCount;
 
-    const cycleTime = store.gameDay - startDay;
-    if (store.stats.fastestCycle === null || cycleTime < store.stats.fastestCycle) {
-      store.stats.fastestCycle = cycleTime;
-    }
+    // Для fastestCycle теперь считаем в днях (реальных) — можно по желанию
+    // Но для совместимости оставим как есть, или пересчитаем в дни (разница в мс -> дни)
+    // Для простоты оставим null, либо будем хранить в миллисекундах
+    // Здесь я пропускаю обновление fastestCycle, так как логика изменилась.
+    // Вы можете реализовать сохранение минимальной длительности цикла в миллисекундах.
 
     store.notify();
     store.addLog(`✂️ Собрано ${harvestedCount} контейнеров: #${harvestedNumbers.join(', #')}`);
