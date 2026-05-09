@@ -1,170 +1,135 @@
 // ui.js
 
-function renderForecast(days = 7) {
-    const forecastContainer = document.getElementById('forecastContainer');
-    if (!forecastContainer) return;
-    
-    const forecast = getForecast(days);
-    
-    let html = '';
-    const now = new Date();
-    
-    for (let i = 0; i < days; i++) {
-        const date = new Date(now);
-        date.setDate(date.getDate() + i);
-        
-        html += `
-            <div class="forecast-day ${i === 0 ? 'today' : ''}">
-                <div>${date.toLocaleDateString('ru', { weekday: 'short' })}</div>
-                <div>${date.getDate()}.${date.getMonth()+1}</div>
-                <div class="forecast-number">${forecast[i]}</div>
-            </div>
-        `;
-    }
-    
-    forecastContainer.innerHTML = html;
-
-    const total = forecast.reduce((a, b) => a + b, 0);
-    const avg = total / days;
-    
-    let recommendation = '';
-    if (avg < 0.8) recommendation = "⚠️ Критично мало! Срочно сажай новые боксы";
-    else if (avg < 1.2) recommendation = "💡 Добавь 1-2 бокса для стабильности";
-    else recommendation = "🟢 Отличная ротация! Так держать";
-    
-    const recommendationEl = document.getElementById('recommendation');
-    if (recommendationEl) {
-        recommendationEl.innerHTML = `💡 ${recommendation}`;
-    }
-}
-
 function render() {
-    const grid = document.getElementById('containerGrid');
-    const totalSpan = document.getElementById('totalBoxes');
+    const grid1 = document.getElementById('containerGrid1');
+    const grid2 = document.getElementById('containerGrid2');
+    const totalSpan = document.getElementById('totalContainers');
     const logPanel = document.getElementById('logPanel');
-    const remindersPanel = document.getElementById('remindersPanel');
+    const selectedInfo = document.getElementById('selectedInfo');
     
-    if (!grid) return;
+    if (!grid1 || !grid2) return;
     
-    grid.innerHTML = '';
+    // Очищаем оба поддона
+    grid1.innerHTML = '';
+    grid2.innerHTML = '';
 
-    // Подсчёт по стадиям
-    let soakCount = 0, pressCount = 0, lightCount = 0, readyCount = 0;
+    // Сортируем контейнеры по номеру
+    const sortedContainers = [...state.containers].sort((a, b) => a.number - b.number);
     
-    state.containers.forEach(c => {
-        const ready = isReady(c);
-        if (c.stage === 'soak') soakCount++;
-        else if (c.stage === 'press') pressCount++;
-        else if (c.stage === 'light') lightCount++;
-        if (ready) readyCount++;
-        
-        const isSelected = state.selectedIds.has(c.id);
-        const progress = getStageProgress(c);
-        const timeLeft = getTimeLeft(c);
-        const readyDate = getReadyDate(c);
-        const needSpray = needsSpray(c);
-        const needWater = needsWater(c);
-        
-        const card = document.createElement('div');
-        card.className = `container-card ${isSelected ? 'selected' : ''} ${ready ? 'ready' : ''}`;
-        card.style.border = isSelected ? '5px solid #ffaa00' : (ready ? '5px solid #ff5500' : '3px solid #dbb158');
-        card.style.background = isSelected ? '#3d874a' : '#31663d';
+    // Логируем для отладки
+    console.log('Все контейнеры:', sortedContainers.map(c => c.number));
 
-        let reminderIcon = '';
-        if (needSpray) reminderIcon = '💦';
-        if (needWater) reminderIcon = '💧';
+    // Разделяем контейнеры на две группы (1-10 в первый поддон, 11-20 во второй)
+    const containers1 = sortedContainers.filter(c => c.number <= 10);
+    const containers2 = sortedContainers.filter(c => c.number > 10);
+    
+    console.log('Первый поддон:', containers1.map(c => c.number));
+    console.log('Второй поддон:', containers2.map(c => c.number));
 
-        card.innerHTML = `
-            <div class="container-header">
-                <span>🌾 бокс <small style="opacity:0.7;">#${c.number}</small></span>
-                <span class="container-id">${STAGE_ICONS[c.stage]}</span>
-            </div>
-            <div class="stage-badge">${STAGE_NAMES[c.stage]}</div>
-            <div class="progress-bar">
-                <div class="progress-fill" style="width: ${progress}%;"></div>
-            </div>
-            <div class="timer-row">
-                <span>⏳ ${timeLeft} дн</span>
-                <span>${readyDate}</span>
-            </div>
-            <div class="btn-group">
-                <button class="btn" data-action="spray" data-id="${c.id}" title="Опрыскать">💦</button>
-                <button class="btn" data-action="water" data-id="${c.id}" title="Полить (200мл)">💧</button>
-                <button class="btn btn-orange" data-action="light" data-id="${c.id}" title="На свет">💡</button>
-                <button class="btn" data-action="harvest" data-id="${c.id}" title="Собрать">✂️</button>
-            </div>
-        `;
+    // Создаем карты для быстрого доступа
+    const containerMap1 = new Map(containers1.map(c => [c.number, c]));
+    const containerMap2 = new Map(containers2.map(c => [c.number, c]));
 
-        card.addEventListener('click', (e) => {
-            if (e.target.tagName === 'BUTTON') return;
-            
-            if (state.selectedIds.has(c.id)) {
-                state.selectedIds.delete(c.id);
-                addLog(`🔓 Снят выбор с бокса #${c.number}`);
-            } else {
-                state.selectedIds.add(c.id);
-                addLog(`🔒 Выбран бокс #${c.number}`);
-            }
-            render();
-        });
-
-        grid.appendChild(card);
-    });
-
-    // Пустые ячейки
-    for (let i = state.containers.length; i < MAX_CONTAINERS; i++) {
-        const emptyCard = document.createElement('div');
-        emptyCard.className = 'container-card';
-        emptyCard.style.background = '#264d31';
-        emptyCard.style.border = '3px dashed #8b9a6b';
-        emptyCard.style.opacity = '0.5';
-        emptyCard.style.display = 'flex';
-        emptyCard.style.alignItems = 'center';
-        emptyCard.style.justifyContent = 'center';
-        emptyCard.innerHTML = '⬜ пусто';
-        grid.appendChild(emptyCard);
+    // Рендерим первый поддон (ячейки 1-10)
+    for (let i = 1; i <= 10; i++) {
+        const container = containerMap1.get(i);
+        if (container) {
+            renderContainer(container, grid1);
+        } else {
+            renderEmptyCell(grid1, i);
+        }
     }
 
-    if (totalSpan) totalSpan.innerText = state.containers.length;
+    // Рендерим второй поддон (ячейки 11-20)
+    for (let i = 11; i <= 20; i++) {
+        const container = containerMap2.get(i);
+        if (container) {
+            renderContainer(container, grid2);
+        } else {
+            renderEmptyCell(grid2, i);
+        }
+    }
     
-    // Ресурсы в литрах
-    document.getElementById('waterCount').innerText = (state.water / 1000).toFixed(1) + 'л';
-    document.getElementById('solutionCount').innerText = (state.solution / 1000).toFixed(1) + 'л';
-
-    document.getElementById('readyCount').innerText = readyCount;
-    document.getElementById('inProgressCount').innerText = state.containers.length - readyCount;
-
-    // Статистика по стадиям
-    document.getElementById('statSoak').innerText = soakCount;
-    document.getElementById('statPress').innerText = pressCount;
-    document.getElementById('statLight').innerText = lightCount;
-    document.getElementById('statReady').innerText = readyCount;
-
-    const selectedInfo = document.getElementById('selectedInfo');
+    // Обновление глобальных счетчиков
+    if (totalSpan) totalSpan.innerText = state.containers.length;
+    document.getElementById('waterCount').innerText = state.water;
+    document.getElementById('solutionCount').innerText = state.solution;
+    document.getElementById('seedCount').innerText = state.seeds;
+    
+    // Считаем готовые для каждого поддона (стадия light)
+    const ready1 = containers1.filter(c => c.stage === 'light').length;
+    const ready2 = containers2.filter(c => c.stage === 'light').length;
+    
+    document.getElementById('readyCount1').innerText = ready1;
+    document.getElementById('inProgressCount1').innerText = containers1.length - ready1;
+    
+    document.getElementById('readyCount2').innerText = ready2;
+    document.getElementById('inProgressCount2').innerText = containers2.length - ready2;
+    
+    // Информация о выбранных
     if (selectedInfo) {
         if (state.selectedIds.size > 0) {
-            const ids = Array.from(state.selectedIds).map(id => {
+            const selectedNumbers = [];
+            state.selectedIds.forEach(id => {
                 const c = state.containers.find(c => c.id === id);
-                return c ? `#${c.number}` : '';
-            }).join(', ');
-            selectedInfo.innerHTML = `✅ Выбраны: ${ids}`;
+                if (c) selectedNumbers.push(`#${c.number}`);
+            });
+            selectedInfo.innerHTML = `✅ Выбраны: ${selectedNumbers.join(', ')}`;
         } else {
             selectedInfo.innerHTML = '👆 Нажми на контейнер, чтобы выбрать';
         }
     }
-
-    // Напоминания
-    const reminders = checkReminders();
-    if (remindersPanel) {
-        if (reminders.length > 0) {
-            remindersPanel.innerHTML = '🔔 ' + reminders.join('<br>🔔 ');
-            remindersPanel.style.display = 'block';
-        } else {
-            remindersPanel.style.display = 'none';
-        }
+    
+    // Лог
+    if (logPanel) {
+        logPanel.innerHTML = '📋 ' + state.log.slice(0, 5).join('<br>📋 ');
     }
+}
 
-    renderForecast(state.forecastDays);
+function renderContainer(container, grid) {
+    const isSelected = state.selectedIds.has(container.id);
+    const card = document.createElement('div');
+    card.className = `container-card ${container.stage} ${isSelected ? 'selected' : ''}`;
+    card.setAttribute('data-id', container.id);
+    card.setAttribute('data-number', container.number);
+    
+    card.innerHTML = `
+        <div class="container-number">#${container.number}</div>
+        <div class="container-stage-icon">${STAGE_ICONS[container.stage]}</div>
+    `;
+    
+    card.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const id = Number(card.getAttribute('data-id'));
+        const container = state.containers.find(c => c.id === id);
+        
+        if (!container) return;
+        
+        if (state.selectedIds.has(id)) {
+            state.selectedIds.delete(id);
+            addLog(`🔓 Снят выбор с #${container.number}`);
+        } else {
+            state.selectedIds.add(id);
+            addLog(`🔒 Выбран #${container.number}`);
+        }
+        render();
+    });
+    
+    grid.appendChild(card);
+}
 
-    if (logPanel) logPanel.innerHTML = '📋 ' + state.log.join('<br>📋 ');
+function renderEmptyCell(grid, number) {
+    const emptyCard = document.createElement('div');
+    emptyCard.className = 'container-card';
+    emptyCard.style.background = '#264d31';
+    emptyCard.style.border = '2px dashed #8b9a6b';
+    emptyCard.style.opacity = '0.5';
+    emptyCard.style.cursor = 'default';
+    emptyCard.style.display = 'flex';
+    emptyCard.style.alignItems = 'center';
+    emptyCard.style.justifyContent = 'center';
+    emptyCard.style.minHeight = '85px';
+    emptyCard.innerHTML = `<div class="container-number">#${number}</div>`;
+    
+    grid.appendChild(emptyCard);
 }

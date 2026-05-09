@@ -2,12 +2,11 @@
 const state = {
     containers: [],
     selectedIds: new Set(),
-    water: 10000,        // 10 литров = 10000 мл
-    solution: 5000,      // 5 литров = 5000 мл
+    water: 20,
+    solution: 15,
+    seeds: 30,
     nextId: 1,
-    speed: 1,
-    forecastDays: 7,
-    log: ["📋 Добро пожаловать в симулятор фермы!"]
+    log: ["📋 Добро пожаловать в тестовую ферму!"]
 };
 
 function addLog(msg) {
@@ -20,10 +19,9 @@ function saveToLocalStorage() {
         localStorage.setItem('farmState', JSON.stringify({
             water: state.water,
             solution: state.solution,
+            seeds: state.seeds,
             containers: state.containers,
-            nextId: state.nextId,
-            speed: state.speed,
-            forecastDays: state.forecastDays
+            nextId: state.nextId
         }));
     } catch(e) {}
 }
@@ -33,12 +31,11 @@ function loadFromLocalStorage() {
         const saved = localStorage.getItem('farmState');
         if (saved) {
             const data = JSON.parse(saved);
-            state.water = data.water ?? 10000;
-            state.solution = data.solution ?? 5000;
+            state.water = data.water ?? 20;
+            state.solution = data.solution ?? 15;
+            state.seeds = data.seeds ?? 30;
             state.containers = data.containers ?? [];
             state.nextId = data.nextId ?? 1;
-            state.speed = data.speed ?? 1;
-            state.forecastDays = data.forecastDays ?? 7;
         }
     } catch(e) {}
 }
