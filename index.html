@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <title>🌾 СИТИФЕРМА — полный интерфейс</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="game-wrapper">
+    <!-- Левая панель -->
+    <div class="left-panel">
+        <!-- Ресурсы и кнопки добавления -->
+        <div class="resources-bar">
+            <div class="resource-pill">💧 <span id="waterCount">10.0л</span></div>
+            <div class="resource-pill">🧪 <span id="solutionCount">5.0л</span></div>
+            <div class="resource-pill">📦 <span id="totalBoxes">0</span>/10</div>
+            <button class="resource-btn" id="addWaterBtn">🚰 +1л</button>
+            <button class="resource-btn purple" id="addSolutionBtn">🧪 +4л</button>
+        </div>
+
+        <button class="new-batch-btn" id="newBatch1Btn">🌱 +1 контейнер</button>
+        <button class="new-batch-btn orange" id="newBatch4Btn" style="margin-top:10px;">⚡ +4 контейнера</button>
+
+        <!-- Управление скоростью -->
+        <div style="display: flex; gap: 10px; align-items: center; background: #2b4f2b; padding: 8px 20px; border-radius: 40px; margin: 20px 0;">
+            <span>⏱️ Скорость:</span>
+            <button class="speed-btn" id="speed1Btn" style="background:#4caf50; padding:8px 16px; border-radius:30px; border:none; color:white; font-weight:bold; cursor:pointer;">x1</button>
+            <button class="speed-btn" id="speed2Btn" style="background:#ff9800; padding:8px 16px; border-radius:30px; border:none; color:white; font-weight:bold; cursor:pointer;">x2</button>
+            <button class="speed-btn" id="speed5Btn" style="background:#f44336; padding:8px 16px; border-radius:30px; border:none; color:white; font-weight:bold; cursor:pointer;">x5</button>
+            <span id="currentSpeed">x1</span>
+        </div>
+
+        <!-- Статистика по стадиям -->
+        <div class="stats-panel" style="background: #1f4727; border-radius: 30px; padding: 15px; margin: 15px 0;">
+            <div style="display: flex; justify-content: space-around; font-size: 1.2rem;">
+                <div>💧 <span id="statSoak">0</span></div>
+                <div>📦 <span id="statPress">0</span></div>
+                <div>💡 <span id="statLight">0</span></div>
+                <div>✅ <span id="statReady">0</span></div>
+            </div>
+        </div>
+
+        <div class="section-title">🎮 ОПЕРАЦИИ</div>
+        <div class="operations-grid">
+            <button class="op-btn" id="opSowBtn">🌱 Посев (-250мл)</button>
+            <button class="op-btn" id="opSprayBtn">💦 Опрыскать</button>
+            <button class="op-btn water" id="opWaterBtn">💧 Полив (-200мл)</button>
+            <button class="op-btn" id="opLightBtn">💡 На свет</button>
+            <button class="op-btn highlight" id="opHarvestBtn">✂️ Сбор</button>
+            <button class="op-btn" id="opSelectAllBtn">🔲 Выбрать все</button>
+            <button class="op-btn" id="opClearSelectBtn">❌ Снять все</button>
+        </div>
+
+        <!-- Информация о выбранных -->
+        <div class="recommendation" id="selectedInfo">
+            👆 Нажми на контейнер, чтобы выбрать
+        </div>
+
+        <!-- Панель напоминаний -->
+        <div id="remindersPanel" class="recommendation" style="display: none; background: #b34f4f;"></div>
+
+        <!-- Прогноз -->
+        <div class="section-title">📅 ПРОГНОЗ</div>
+        <div class="forecast-control">
+            <button class="forecast-btn active" id="forecastWeekBtn">Неделя</button>
+            <button class="forecast-btn" id="forecast2WeeksBtn">2 недели</button>
+            <button class="forecast-btn" id="forecastMonthBtn">Месяц</button>
+        </div>
+        <div id="forecastContainer" class="forecast-grid"></div>
+        <div class="recommendation" id="recommendation">💡 Рекомендация</div>
+    </div>
+
+    <!-- Правая панель -->
+    <div class="right-panel">
+        <div style="background: rgba(0,0,0,0.3); border-radius:40px; padding:15px 25px; margin-bottom:20px; border:2px solid #f7d44a; display:flex; justify-content:space-between;">
+            <span>🌾 ПШЕНИЦА • ПОДДОН 5×2</span>
+            <span>✅ Готово: <span id="readyCount">0</span> | ⏳ В работе: <span id="inProgressCount">0</span></span>
+        </div>
+        <div class="pallet">
+            <div class="pallet-grid" id="containerGrid"></div>
+        </div>
+        <!-- Лог под сеткой -->
+        <div class="log-panel" id="logPanel">📋 Добро пожаловать</div>
+    </div>
+</div>
+
+<script src="constants.js"></script>
+<script src="state.js"></script>
+<script src="utils.js"></script>
+<script src="ui.js"></script>
+<script src="containerManager.js"></script>
+<script src="main.js"></script>
+</body>
+</html>

@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <title>🌾 ТЕСТОВАЯ ФЕРМА — ручное управление</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+            user-select: none;
+        }
+        
+        body {
+            background: linear-gradient(145deg, #1a4f2a 0%, #2d6b3a 100%);
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            color: #f0ffe6;
+        }
+        
+        .game-wrapper {
+            max-width: 1300px;
+            width: 100%;
+        }
+        
+        /* Статус бар */
+        .status-bar {
+            background: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(10px);
+            border-radius: 50px;
+            padding: 15px 25px;
+            margin-bottom: 25px;
+            border: 3px solid #f7d44a;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            gap: 20px;
+            box-shadow: 0 10px 0 #856f2e;
+        }
+        
+        .title-block {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .title-block h1 {
+            font-size: 2rem;
+            color: #ffeb99;
+            text-shadow: 3px 3px 0 #5f4a1a;
+        }
+        
+        .new-batch-btn {
+            background: #4caf50;
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            font-weight: bold;
+            padding: 15px 30px;
+            border-radius: 60px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            box-shadow: 0 8px 0 #2d6b31, 0 10px 20px black;
+            cursor: pointer;
+            transition: 0.06s;
+        }
+        
+        .new-batch-btn:active {
+            transform: translateY(6px);
+            box-shadow: 0 2px 0 #2d6b31, 0 10px 20px black;
+        }
+        
+        .batch-x4 {
+            background: #ff9800;
+            box-shadow: 0 8px 0 #b45f06;
+        }
+        
+        .resources {
+            display: flex;
+            gap: 25px;
+            flex-wrap: wrap;
+        }
+        
+        .resource-pill {
+            background: #263f2e;
+            border: 3px solid #9ccc7c;
+            border-radius: 60px;
+            padding: 12px 30px;
+            font-size: 1.6rem;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            box-shadow: 0 6px 0 #1a311f;
+        }
+        
+        .counter-badge {
+            background: #ccb27c;
+            color: #1f3f1f;
+            border-radius: 40px;
+            padding: 5px 18px;
+            font-size: 1.3rem;
+            margin-left: 15px;
+        }
+        
+        /* Секция с пшеницей */
+        .wheat-section {
+            background: rgba(40, 70, 40, 0.7);
+            backdrop-filter: blur(5px);
+            border-radius: 60px;
+            padding: 30px;
+            border: 4px solid #e4c87b;
+            box-shadow: 0 15px 0 #6d8f4a, 0 20px 30px black;
+            margin-bottom: 30px;
+        }
+        
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+        
+        .section-header h2 {
+            font-size: 2.8rem;
+            color: #ffdb8e;
+            text-shadow: 4px 4px 0 #4f6b2f;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+        
+        .container-count {
+            background: #8f6f2e;
+            padding: 15px 30px;
+            border-radius: 60px;
+            font-size: 1.8rem;
+            font-weight: bold;
+            border: 3px solid #ffd966;
+        }
+        
+        /* Сетка 5x2 */
+        .wheat-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        @media (max-width: 900px) {
+            .wheat-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+        
+        @media (max-width: 600px) {
+            .wheat-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+        
+        /* Карточка контейнера */
+        .container-card {
+            background: #31663d;
+            border-radius: 35px;
+            padding: 20px 15px;
+            border: 3px solid #dbb158;
+            box-shadow: 0 10px 0 #1f4727, 0 8px 15px rgba(0,0,0,0.5);
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            transition: 0.1s;
+            cursor: pointer;
+        }
+        
+        .container-card:hover {
+            transform: scale(1.02);
+            border-color: #ffd966;
+        }
+        
+        .container-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: bold;
+            background: #234f2b;
+            padding: 8px 15px;
+            border-radius: 40px;
+            margin-bottom: 5px;
+        }
+        
+        .container-id {
+            background: #a88633;
+            padding: 4px 12px;
+            border-radius: 40px;
+            font-size: 0.9rem;
+        }
+        
+        .stage-badge {
+            padding: 6px 15px;
+            border-radius: 40px;
+            font-weight: bold;
+            text-align: center;
+            font-size: 1rem;
+        }
+        
+        .stage-soak { background: #4a6fa5; }
+        .stage-air { background: #7b6c5c; }
+        .stage-press { background: #b68b40; }
+        .stage-light { background: #f2b84b; color: #1e3a1e; }
+        
+        .btn-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 5px;
+        }
+        
+        .btn {
+            background: #4f7a5f;
+            border: none;
+            color: white;
+            padding: 8px 12px;
+            border-radius: 40px;
+            font-size: 0.9rem;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            box-shadow: 0 4px 0 #2b462b;
+            cursor: pointer;
+            flex: 1 1 auto;
+            min-width: 60px;
+            justify-content: center;
+        }
+        
+        .btn:active {
+            transform: translateY(3px);
+            box-shadow: 0 1px 0 #2b462b;
+        }
+        
+        .btn-green { background: #3f9e4a; }
+        .btn-orange { background: #d68d3a; }
+        .btn-red { background: #b34f4f; }
+        
+        /* Панель управления */
+        .control-panel {
+            background: #264d31;
+            border-radius: 50px;
+            padding: 25px;
+            border: 3px solid #e2c476;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            justify-content: center;
+            margin-top: 20px;
+        }
+        
+        .control-btn {
+            background: #507a5c;
+            border: none;
+            color: white;
+            font-size: 1.3rem;
+            padding: 18px 30px;
+            border-radius: 60px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            box-shadow: 0 8px 0 #2d4f2d;
+            cursor: pointer;
+            min-width: 200px;
+            justify-content: center;
+        }
+        
+        .reset-btn {
+            background: #a55e5e;
+            box-shadow: 0 8px 0 #6b3d3d;
+        }
+        
+        /* Лог */
+        .log-panel {
+            background: #1b3d23;
+            border-radius: 40px;
+            padding: 20px;
+            margin-top: 25px;
+            border: 3px solid #b8a45a;
+            max-height: 150px;
+            overflow-y: auto;
+        }
+    </style>
+</head>
+<body>
+<div class="game-wrapper">
+    <!-- Статус бар с кнопками новых партий -->
+    <div class="status-bar">
+        <div class="title-block">
+            <h1>🌾 ПШЕНИЧНАЯ ФЕРМА</h1>
+            <button class="new-batch-btn" id="newBatch1Btn">
+                🌱 +1 контейнер
+            </button>
+            <button class="new-batch-btn batch-x4" id="newBatch4Btn">
+                ⚡ +4 контейнера
+            </button>
+        </div>
+        <div class="resources">
+            <div class="resource-pill">🌾 <span id="totalContainers">0</span></div>
+            <div class="resource-pill">💧 <span id="waterCount">20</span></div>
+            <div class="resource-pill">🧪 <span id="solutionCount">15</span></div>
+        </div>
+    </div>
+    
+    <!-- Секция пшеницы -->
+    <div class="wheat-section">
+        <div class="section-header">
+            <h2>
+                🌾 ПШЕНИЦА 
+                <span class="counter-badge" id="wheatCounter">0/10</span>
+            </h2>
+            <div class="container-count" id="containerCounter">0 контейнеров</div>
+        </div>
+        
+        <!-- Сетка 5x2 -->
+        <div class="wheat-grid" id="wheatGrid">
+            <!-- Сюда будут добавляться контейнеры -->
+        </div>
+        
+        <!-- Панель управления стадиями -->
+        <div class="control-panel">
+            <button class="control-btn" id="stageSoakBtn">💧 В замачивание</button>
+            <button class="control-btn" id="stageAirBtn">🌬 В проветривание</button>
+            <button class="control-btn" id="stagePressBtn">📦 Под прижим</button>
+            <button class="control-btn" id="stageLightBtn">💡 На свет</button>
+            <button class="control-btn reset-btn" id="resetStageBtn">🔄 Сброс стадии</button>
+        </div>
+    </div>
+    
+    <!-- Ресурсы и кнопки управления -->
+    <div style="display: flex; gap: 20px; margin: 20px 0; flex-wrap: wrap;">
+        <button class="control-btn" id="addWaterBtn">🚰 +5 воды</button>
+        <button class="control-btn" id="addSolutionBtn">🧪 +4 удобрения</button>
+        <button class="control-btn" id="harvestSelectedBtn">✂️ Собрать выбранные</button>
+        <button class="control-btn reset-btn" id="deleteSelectedBtn">🗑️ Удалить выбранные</button>
+    </div>
+    
+    <!-- Лог событий -->
+    <div class="log-panel" id="logPanel">
+        📋 Добро пожаловать в тестовую ферму! Нажимай на контейнеры, чтобы выбрать.
+    </div>
+</div>
+
+<script>
+    (function() {
+        // Состояние приложения
+        let state = {
+            containers: [],
+            selectedIds: new Set(),
+            water: 20,
+            solution: 15,
+            nextId: 1,
+            log: ["📋 Добро пожаловать в тестовую ферму!"]
+        };
+        
+        // Максимум контейнеров (5x2 = 10)
+        const MAX_CONTAINERS = 10;
+        
+        // Стадии по порядку
+        const STAGES = ['soak', 'air', 'press', 'light'];
+        const STAGE_NAMES = {
+            'soak': '💧 Замачивание',
+            'air': '🌬 Проветривание',
+            'press': '📦 Прижим',
+            'light': '💡 На свету'
+        };
+        
+        // Добавить запись в лог
+        function addLog(msg) {
+            state.log.unshift(`⏱️ ${new Date().toLocaleTimeString().slice(0,5)} • ${msg}`);
+            if (state.log.length > 15) state.log.pop();
+            document.getElementById('logPanel').innerHTML = '📋 ' + state.log.join('<br>📋 ');
+        }
+        
+        // Создать новый контейнер
+        function createContainer() {
+            if (state.containers.length >= MAX_CONTAINERS) {
+                addLog("❌ Достигнут максимум контейнеров (10)");
+                return false;
+            }
+            
+            const id = state.nextId++;
+            state.containers.push({
+                id: id,
+                stage: 'soak',  // начинаем с замачивания
+                number: id
+            });
+            
+            addLog(`🌱 Добавлен контейнер #${id} (стадия: замачивание)`);
+            render();
+            return true;
+        }
+        
+        // Создать 4 контейнера
+        function create4Containers() {
+            let created = 0;
+            for (let i = 0; i < 4; i++) {
+                if (createContainer()) created++;
+            }
+            if (created > 0) addLog(`⚡ Добавлено ${created} контейнеров`);
+        }
+        
+        // Изменить стадию выбранных контейнеров
+        function setStageForSelected(stage) {
+            if (state.selectedIds.size === 0) {
+                addLog("⚠️ Сначала выбери контейнеры (нажми на них)");
+                return;
+            }
+            
+            let changed = 0;
+            state.containers.forEach(c => {
+                if (state.selectedIds.has(c.id)) {
+                    c.stage = stage;
+                    changed++;
+                }
+            });
+            
+            addLog(`🔄 ${changed} контейнеров переведены в ${STAGE_NAMES[stage]}`);
+            render();
+        }
+        
+        // Сбросить стадию выбранных (на замачивание)
+        function resetSelectedStage() {
+            setStageForSelected('soak');
+        }
+        
+        // Собрать выбранные (удалить с начислением ресурсов)
+        function harvestSelected() {
+            if (state.selectedIds.size === 0) return;
+            
+            let harvested = 0;
+            state.containers = state.containers.filter(c => {
+                if (state.selectedIds.has(c.id)) {
+                    // Шанс на ресурсы при сборе
+                    if (Math.random() > 0.3) state.water += 1;
+                    if (Math.random() > 0.5) state.solution += 1;
+                    harvested++;
+                    return false;
+                }
+                return true;
+            });
+            
+            state.selectedIds.clear();
+            addLog(`✂️ Собрано ${harvested} контейнеров пшеницы`);
+            render();
+        }
+        
+        // Удалить выбранные
+        function deleteSelected() {
+            if (state.selectedIds.size === 0) return;
+            
+            const count = state.selectedIds.size;
+            state.containers = state.containers.filter(c => !state.selectedIds.has(c.id));
+            state.selectedIds.clear();
+            addLog(`🗑️ Удалено ${count} контейнеров`);
+            render();
+        }
+        
+        // Добавить ресурсы
+        function addWater() {
+            state.water += 5;
+            addLog("🚰 +5 воды");
+            render();
+        }
+        
+        function addSolution() {
+            state.solution += 4;
+            addLog("🧪 +4 удобрения");
+            render();
+        }
+        
+        // Отрисовка сетки
+        function render() {
+            const grid = document.getElementById('wheatGrid');
+            const containerCounter = document.getElementById('containerCounter');
+            const wheatCounter = document.getElementById('wheatCounter');
+            const totalSpan = document.getElementById('totalContainers');
+            
+            // Очищаем сетку
+            grid.innerHTML = '';
+            
+            // Рисуем все контейнеры
+            state.containers.forEach(c => {
+                const isSelected = state.selectedIds.has(c.id);
+                const card = document.createElement('div');
+                card.className = `container-card ${isSelected ? 'selected' : ''}`;
+                card.style.border = isSelected ? '5px solid #ffaa00' : '3px solid #dbb158';
+                card.style.background = isSelected ? '#3d874a' : '#31663d';
+                
+                card.innerHTML = `
+                    <div class="container-header">
+                        <span>#${c.id}</span>
+                        <span class="container-id">🌾 пшеница</span>
+                    </div>
+                    <div class="stage-badge stage-${c.stage}">
+                        ${STAGE_NAMES[c.stage]}
+                    </div>
+                    <div class="btn-group">
+                        <button class="btn btn-green" onclick="event.stopPropagation(); window.selectAndSet(${c.id}, 'soak')">💧</button>
+                        <button class="btn" onclick="event.stopPropagation(); window.selectAndSet(${c.id}, 'air')">🌬</button>
+                        <button class="btn btn-orange" onclick="event.stopPropagation(); window.selectAndSet(${c.id}, 'press')">📦</button>
+                        <button class="btn" onclick="event.stopPropagation(); window.selectAndSet(${c.id}, 'light')">💡</button>
+                    </div>
+                `;
+                
+                // Клик по карточке для выбора
+                card.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    if (state.selectedIds.has(c.id)) {
+                        state.selectedIds.delete(c.id);
+                    } else {
+                        state.selectedIds.add(c.id);
+                    }
+                    render();
+                });
+                
+                grid.appendChild(card);
+            });
+            
+            // Заполняем пустые ячейки для сетки 5x2
+            const emptySlots = MAX_CONTAINERS - state.containers.length;
+            for (let i = 0; i < emptySlots; i++) {
+                const emptyCard = document.createElement('div');
+                emptyCard.className = 'container-card';
+                emptyCard.style.background = '#264d31';
+                emptyCard.style.border = '3px dashed #8b9a6b';
+                emptyCard.style.opacity = '0.5';
+                emptyCard.style.display = 'flex';
+                emptyCard.style.alignItems = 'center';
+                emptyCard.style.justifyContent = 'center';
+                emptyCard.innerHTML = '⬜ пусто';
+                grid.appendChild(emptyCard);
+            }
+            
+            // Обновляем счетчики
+            containerCounter.innerText = `${state.containers.length}/${MAX_CONTAINERS} контейнеров`;
+            wheatCounter.innerText = `${state.containers.length}/${MAX_CONTAINERS}`;
+            totalSpan.innerText = state.containers.length;
+            
+            // Ресурсы
+            document.getElementById('waterCount').innerText = state.water;
+            document.getElementById('solutionCount').innerText = state.solution;
+        }
+        
+        // Вспомогательная функция для быстрой смены стадии
+        window.selectAndSet = function(id, stage) {
+            // Очищаем выделение и выделяем только этот
+            state.selectedIds.clear();
+            state.selectedIds.add(id);
+            setStageForSelected(stage);
+        };
+        
+        // Привязка кнопок
+        document.getElementById('newBatch1Btn').addEventListener('click', createContainer);
+        document.getElementById('newBatch4Btn').addEventListener('click', create4Containers);
+        document.getElementById('stageSoakBtn').addEventListener('click', () => setStageForSelected('soak'));
+        document.getElementById('stageAirBtn').addEventListener('click', () => setStageForSelected('air'));
+        document.getElementById('stagePressBtn').addEventListener('click', () => setStageForSelected('press'));
+        document.getElementById('stageLightBtn').addEventListener('click', () => setStageForSelected('light'));
+        document.getElementById('resetStageBtn').addEventListener('click', resetSelectedStage);
+        document.getElementById('addWaterBtn').addEventListener('click', addWater);
+        document.getElementById('addSolutionBtn').addEventListener('click', addSolution);
+        document.getElementById('harvestSelectedBtn').addEventListener('click', harvestSelected);
+        document.getElementById('deleteSelectedBtn').addEventListener('click', deleteSelected);
+        
+        // Начальная отрисовка
+        render();
+        
+        // Для теста добавим пару контейнеров
+        createContainer();
+        createContainer();
+    })();
+</script>
+</body>
+</html>
