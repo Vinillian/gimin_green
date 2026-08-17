@@ -5,14 +5,12 @@ class TimeService {
     constructor() {
         this.interval = null;
         this.isRunning = true;
-        this.updateIntervalMs = 60000; // обновлять UI каждую минуту (можно уменьшить до 10000 для более частого обновления)
+        this.updateIntervalMs = 15000; // было 60000, теперь 15 секунд
     }
 
     start() {
         if (this.interval) return;
-        // Немедленно обновляем прогресс при старте
         this.tick();
-        // Запускаем периодическое обновление
         this.interval = setInterval(() => {
             if (!this.isRunning) return;
             this.tick();
@@ -23,7 +21,6 @@ class TimeService {
         const now = Date.now();
         store.updateAllProgress(now);
         eventBus.emit('game:tick', now);
-        // При необходимости можно проверять готовность к сбору и отправлять уведомления
     }
 
     pause() {
@@ -32,7 +29,7 @@ class TimeService {
 
     resume() {
         this.isRunning = true;
-        this.tick(); // сразу обновить
+        this.tick();
     }
 
     toggle() {

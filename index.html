@@ -18,7 +18,6 @@
 
         <div class="section-title">ДЕЙСТВИЯ С КОНТЕЙНЕРАМИ</div>
         <button class="btn-action" id="selectAllBtn">🔲 ВЫБРАТЬ ВСЕ</button>
-        <!-- Кнопки СОБРАТЬ, ОПРЫСКАТЬ, ПОЛИТЬ УБРАНЫ ОТСЮДА -->
         <button class="btn-action delete" id="deleteSelectedBtn">🗑️ УДАЛИТЬ</button>
 
         <div class="section-title">УПРАВЛЕНИЕ СТАДИЯМИ</div>
@@ -28,11 +27,41 @@
         <button class="btn-smart" id="smartPressBtn"><span>📦➡️</span> УМНЫЙ ПРИЖИМ</button>
         <button class="btn-smart" id="smartLightBtn"><span>💡➡️</span> УМНЫЙ СВЕТ</button>
 
-        <div class="section-title" style="margin-top:15px;">📋 ЛОГ СОБЫТИЙ</div>
+        <div class="section-title">📋 ЛОГ СОБЫТИЙ</div>
         <div class="log-panel" id="logPanel">Добро пожаловать в ферму!</div>
 
-        <div class="section-title" style="margin-top:15px;">СИСТЕМА</div>
+        <div class="section-title">СИСТЕМА</div>
         <button class="btn-system" id="resetGameBtn"><span>🔄</span> СБРОСИТЬ ИГРУ</button>
+        <button class="btn-system dev-toggle-btn" id="toggleDevBtn"><span>🛠</span> DEV</button>
+    </div>
+
+    <!-- Панель разработчика (скрыта по умолчанию) -->
+    <div class="dev-panel" id="devPanel">
+        <div class="dev-panel-header">🛠️ DEV MODE</div>
+        <div class="dev-section">
+            <div class="dev-title">🎯 Контейнеры (выбранные)</div>
+            <button class="dev-btn" id="devCStageSow">🌱 Посев (стол)</button>
+            <button class="dev-btn" id="devCStagePress">📦 Прижим (полка 1)</button>
+            <button class="dev-btn" id="devCStageLight">💡 Свет (готов к сбору)</button>
+            <button class="dev-btn dev-danger" id="devDeleteSelected">🗑️ Удалить выбранные</button>
+        </div>
+        <div class="dev-section">
+            <div class="dev-title">🪣 Вёдра (выбранные)</div>
+            <button class="dev-btn" id="devBStageSoak">💧 Замачивание</button>
+            <button class="dev-btn" id="devBStageAir">🌬 Проветривание</button>
+            <button class="dev-btn" id="devBSow">🌱 Посадить</button>
+            <button class="dev-btn" id="devBClear">🧹 Очистить</button>
+        </div>
+        <div class="dev-section">
+            <div class="dev-title">💰 Ресурсы</div>
+            <button class="dev-btn" id="devAddWater">+100 воды</button>
+            <button class="dev-btn" id="devAddSolution">+100 раствора</button>
+            <button class="dev-btn" id="devAddSeeds">+100 семян</button>
+        </div>
+        <div class="dev-section">
+            <button class="dev-btn" id="devForceUpdate">🔄 Обновить прогресс</button>
+            <button class="dev-btn dev-danger" id="devResetAll">🧹 Сбросить ферму</button>
+        </div>
     </div>
 
     <!-- Основная рабочая область -->
