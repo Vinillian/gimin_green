@@ -44,6 +44,7 @@ document.addEventListener('DOMContentLoaded', () => {
     initKeyboardHandlers();
     initZoneClickHandlers();
     initDevHandlers();
+    initDevPanelDrag(); // инициализация перетаскивания
 
     document.getElementById('pauseBtn')?.addEventListener('click', () => {
         timeService.toggle();
@@ -90,6 +91,41 @@ function initDevHandlers() {
 
     // Полный сброс
     document.getElementById('devResetAll')?.addEventListener('click', () => devController.resetAll());
+}
+
+// Функция перетаскивания панели за заголовок
+function initDevPanelDrag() {
+    const panel = document.getElementById('devPanel');
+    const header = document.getElementById('devPanelHeader');
+    if (!panel || !header) return;
+
+    let isDragging = false;
+    let offsetX, offsetY;
+
+    header.addEventListener('mousedown', (e) => {
+        isDragging = true;
+        const rect = panel.getBoundingClientRect();
+        offsetX = e.clientX - rect.left;
+        offsetY = e.clientY - rect.top;
+        e.preventDefault();
+    });
+
+    document.addEventListener('mousemove', (e) => {
+        if (!isDragging) return;
+        let newLeft = e.clientX - offsetX;
+        let newTop = e.clientY - offsetY;
+
+        // Ограничение в пределах окна (по желанию)
+        newLeft = Math.max(0, Math.min(window.innerWidth - panel.offsetWidth, newLeft));
+        newTop = Math.max(0, Math.min(window.innerHeight - 50, newTop));
+
+        panel.style.left = newLeft + 'px';
+        panel.style.top = newTop + 'px';
+    });
+
+    document.addEventListener('mouseup', () => {
+        isDragging = false;
+    });
 }
 
 console.log('✅ Main.js loaded');

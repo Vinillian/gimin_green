@@ -710,9 +710,8 @@ body {
 .dev-panel {
     display: none;
     position: fixed;
+    left: calc(50% - 200px);
     top: 20px;
-    left: 50%;
-    transform: translateX(-50%);
     width: 400px;
     max-height: 80vh;
     overflow-y: auto;
@@ -729,11 +728,8 @@ body {
 }
 
 .dev-panel-header {
-    font-size: 1.2rem;
-    font-weight: bold;
-    color: #ffaa00;
-    margin-bottom: 10px;
-    text-align: center;
+    cursor: move;
+    user-select: none;
 }
 
 .dev-section {
