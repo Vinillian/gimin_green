@@ -218,6 +218,38 @@ export const devController = {
         store.notify();
     },
 
+    // Прогнать время вперёд для выбранных контейнеров/вёдер
+    // Сдвигает временные метки в прошлое, чтобы прогресс пересчитался как будто прошло N часов
+    advanceSelectedTime(hours) {
+        const ms = hours * 60 * 60 * 1000;
+        let changed = 0;
+
+        store.selectedContainerIds.forEach(id => {
+            const c = store.getContainer(id);
+            if (!c) return;
+            c.stageStartTime -= ms;
+            c.lastSprayTime -= ms;
+            c.lastWaterTime -= ms;
+            changed++;
+        });
+
+        store.selectedBucketIds.forEach(id => {
+            const b = store.getBucket(id);
+            if (!b || !b.stage) return;
+            b.stageStartTime -= ms;
+            changed++;
+        });
+
+        if (changed === 0) {
+            store.addLog('⚠️ Сначала выбери контейнеры или вёдра');
+            return;
+        }
+
+        store.updateAllProgress(Date.now());
+        store.addLog(`⏩ Время +${hours}ч применено к ${changed} объект(ам)`);
+        store.notify();
+    },
+
     // Полный сброс фермы
     resetAll() {
         if (!confirm('Сбросить всю ферму? Это действие нельзя отменить!')) return;

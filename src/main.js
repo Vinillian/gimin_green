@@ -82,6 +82,11 @@ function initDevHandlers() {
     document.getElementById('devAddSolution')?.addEventListener('click', () => devController.addResources(0, 100, 0));
     document.getElementById('devAddSeeds')?.addEventListener('click', () => devController.addResources(0, 0, 100));
 
+    // Подогнать время (выбранные контейнеры/вёдра)
+    document.getElementById('devAdvance1h')?.addEventListener('click', () => devController.advanceSelectedTime(1));
+    document.getElementById('devAdvance6h')?.addEventListener('click', () => devController.advanceSelectedTime(6));
+    document.getElementById('devAdvance12h')?.addEventListener('click', () => devController.advanceSelectedTime(12));
+
     // Обновить прогресс вручную
     document.getElementById('devForceUpdate')?.addEventListener('click', () => {
         store.updateAllProgress(Date.now());
